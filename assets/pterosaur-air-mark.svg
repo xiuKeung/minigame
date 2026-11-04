@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title desc">
+  <title id="title">空中冒险图标</title>
+  <desc id="desc">迎着太阳飞行的翼龙</desc>
+  <defs><linearGradient id="bg" x1="18" y1="16" x2="145" y2="149" gradientUnits="userSpaceOnUse"><stop stop-color="#38527F"/><stop offset="1" stop-color="#202B48"/></linearGradient></defs>
+  <rect x="10" y="10" width="140" height="140" rx="43" fill="url(#bg)"/>
+  <path d="M25 61c0-8 6-14 14-14 3-10 16-13 23-4 8-2 15 4 15 12 0 8-6 14-14 14H39c-8 0-14-3-14-8z" fill="#F9FBFF" opacity=".95"/>
+  <path d="M95 107c0-7 5-12 12-12 3-8 14-10 20-3 7-1 12 4 12 11 0 7-5 12-12 12h-20c-7 0-12-3-12-8z" fill="#A8F1E5"/>
+  <path d="M82 81h15L72 58H59l14 23h9z" fill="#FFC84E"/>
+  <path d="M31 81h72l25 7-25 7H31l10-7-10-7z" fill="#FFC84E"/>
+  <path d="m44 81 2-10h7l8 10H44z" fill="#FFC84E"/>
+  <path d="M83 95h18l-29 28H56l16-28h11z" fill="#FFC84E"/>
+  <path d="m105 77 11 11h-24l4-11h9z" fill="#F9FBFF"/>
+</svg>

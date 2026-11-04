@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title desc">
+  <title id="title">翼龙小蜜蜂图标</title>
+  <desc id="desc">翼龙编队与玩家飞行器</desc>
+  <defs><linearGradient id="bg" x1="18" y1="16" x2="145" y2="149" gradientUnits="userSpaceOnUse"><stop stop-color="#38527F"/><stop offset="1" stop-color="#202B48"/></linearGradient></defs>
+  <rect x="10" y="10" width="140" height="140" rx="43" fill="url(#bg)"/>
+  <g fill="#FF866F"><path d="m42 38 11 7-11 7-11-7 11-7z"/><path d="m80 28 11 7-11 7-11-7 11-7z"/><path d="m118 38 11 7-11 7-11-7 11-7z"/></g>
+  <g fill="#FFB29E"><path d="m42 38 11 7-11 2-11-2 11-7z"/><path d="m80 28 11 7-11 2-11-2 11-7z"/><path d="m118 38 11 7-11 2-11-2 11-7z"/></g>
+  <path d="M80 132 57 111l15-8 8 8 8-8 15 8-23 21z" fill="#56D7C0"/>
+  <path d="M80 80v24" stroke="#FFC84E" stroke-width="7" stroke-linecap="round"/>
+  <path d="M80 60v10" stroke="#FFC84E" stroke-width="5" stroke-linecap="round"/>
+</svg>

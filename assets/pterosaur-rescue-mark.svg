@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title desc">
+  <title id="title">遗迹救援图标</title>
+  <desc id="desc">小战车救援能量方块</desc>
+  <defs><linearGradient id="bg" x1="18" y1="16" x2="145" y2="149" gradientUnits="userSpaceOnUse"><stop stop-color="#38527F"/><stop offset="1" stop-color="#202B48"/></linearGradient></defs>
+  <rect x="10" y="10" width="140" height="140" rx="43" fill="url(#bg)"/>
+  <path d="M45 78V57c0-12 9-21 21-21h28c12 0 21 9 21 21v21" fill="none" stroke="#F9FBFF" stroke-width="10" stroke-linecap="round"/>
+  <path d="m62 65 18-12 18 12v20l-18 12-18-12V65z" fill="#56D7C0"/>
+  <path d="m62 65 18 12 18-12" fill="none" stroke="#A8F1E5" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M37 105h76l10 11-9 18H46l-9-18v-11z" fill="#FFC84E"/>
+  <path d="M52 105V91h28l9 14" fill="none" stroke="#F9FBFF" stroke-width="7" stroke-linejoin="round"/>
+  <circle cx="57" cy="127" r="8" fill="#243654"/><circle cx="103" cy="127" r="8" fill="#243654"/>
+</svg>
