@@ -6,7 +6,7 @@ function chantFor(a, b) { const answer = a * b; const product = answer === 10 ? 
 const facts = Array.from({ length: 9 }, (_, i) => i + 1).flatMap(a =>
   Array.from({ length: 9 }, (_, i) => i + 1).filter(b => b >= a).map(b => ({ a, b, answer: a * b, chant: chantFor(a, b) }))
 );
-const state = { screen: 'home', difficulty: 'easy', selectedFactors: [2,3,4,5,6,7,8,9], lessonGroup: 2, lessonIndex: 0, seconds: DURATION, score: 0, total: 0, misses: [], timer: null, nextQuestionTimer: null, question: null, inputValue: '', locked: false };
+const state = { screen: 'home', difficulty: 'easy', playMode: 'practice', selectedFactors: [2,3,4,5,6,7,8,9], lessonGroup: 2, lessonIndex: 0, seconds: DURATION, score: 0, total: 0, roundSize: 0, misses: [], coverageQueue: [], reviewQueue: [], timer: null, nextQuestionTimer: null, question: null, inputValue: '', skipGameAnimation: false, locked: false };
 const saved = JSON.parse(localStorage.getItem('times-progress') || '{"learned":[]}');
 function save() { localStorage.setItem('times-progress', JSON.stringify(saved)); }
 function shuffle(items) { return [...items].sort(() => Math.random() - .5); }
@@ -23,38 +23,57 @@ function render() {
   return results();
 }
 function home() {
-  app.innerHTML = shell(`<div class="brand"><div class="brand-mark">✦</div><h1>九九星球</h1><p class="subtitle">边玩边记住九九乘法表</p></div><div class="home-actions"><button class="mode-card play" data-go="difficulty"><span class="mode-icon">🚀</span><span><strong>开始闯关</strong><span>三分钟，完成数学小挑战</span></span></button><button class="mode-card learn" data-go="learn"><span class="mode-icon">📖</span><span><strong>口诀课堂</strong><span>直接看答案，轻松学口诀</span></span></button></div><p class="home-note">每次答错都会告诉你正确口诀</p>`);
+  app.innerHTML = shell(`<div class="brand"><img class="brand-mark" src="../assets/minigame-mark.svg" alt="小游戏乐园" /><h1>九九星球</h1><p class="subtitle">边玩边记住九九乘法表</p></div><div class="home-actions"><button class="mode-card play" data-go="difficulty"><span class="mode-icon">🚀</span><span><strong>开始闯关</strong><span>练习一轮或限时挑战</span></span></button><button class="mode-card learn" data-go="learn"><span class="mode-icon">📖</span><span><strong>口诀课堂</strong><span>直接看答案，轻松学口诀</span></span></button></div><p class="home-note">每次答错都会告诉你正确口诀</p>`);
 }
 function headerBar(title, back) { return `<header class="topbar"><button class="back" data-go="${back}">‹ 返回</button><span class="title">${title}</span><span aria-hidden="true">　</span></header>`; }
 function difficulty() {
   const data = [{id:'easy', name:'容易', note:'小范围口诀，选项更少'}, {id:'middle', name:'中等', note:'混合练习，逐步挑战全表'}, {id:'hard', name:'困难', note:'全表随机，相近答案来挑战'}];
-  app.innerHTML = shell(`${headerBar('选择难度','home')}<div class="panel center"><p class="eyebrow">3 分钟闯关</p><h2>今天挑战哪一关？</h2><div class="difficulty">${data.map(d => `<button class="${state.difficulty === d.id ? 'active' : ''}" data-difficulty="${d.id}"><span><b>${d.name}</b><small>${d.note}</small></span><span>${state.difficulty === d.id ? '✓' : ''}</span></button>`).join('')}</div><div class="factor-picker"><div class="factor-heading"><span>练习范围</span><small>可只选一个数</small></div><div class="factor-options">${Array.from({length:8},(_,i)=>i+2).map(n => `<button class="${state.selectedFactors.includes(n) ? 'active' : ''}" data-factor="${n}" aria-pressed="${state.selectedFactors.includes(n)}"><span>${n}</span><span class="factor-check">${state.selectedFactors.includes(n) ? '✓' : ''}</span></button>`).join('')}</div></div><button class="primary" data-action="start-game">出发！</button></div>`);
+  const modes = [{id:'practice', name:'练习一轮', note:'完整覆盖，再复习错题'}, {id:'challenge', name:'3 分钟挑战', note:'限时练习，挑战更多题目'}];
+  app.innerHTML = shell(`${headerBar('选择难度','home')}<div class="panel center"><p class="eyebrow">开始闯关</p><h2>今天挑战哪一关？</h2><div class="difficulty">${data.map(d => `<button class="${state.difficulty === d.id ? 'active' : ''}" data-difficulty="${d.id}"><span><b>${d.name}</b><small>${d.note}</small></span><span>${state.difficulty === d.id ? '✓' : ''}</span></button>`).join('')}</div><div class="play-mode-picker"><div class="factor-heading"><span>挑战方式</span><small>默认练习一轮</small></div>${modes.map(mode => `<button class="${state.playMode === mode.id ? 'active' : ''}" data-play-mode="${mode.id}"><span><b>${mode.name}</b><small>${mode.note}</small></span><span>${state.playMode === mode.id ? '✓' : ''}</span></button>`).join('')}</div><div class="factor-picker"><div class="factor-heading"><span>练习范围</span><small>可只选一个数</small></div><div class="factor-options">${Array.from({length:8},(_,i)=>i+2).map(n => `<button class="${state.selectedFactors.includes(n) ? 'active' : ''}" data-factor="${n}" aria-pressed="${state.selectedFactors.includes(n)}"><span>${n}</span><span class="factor-check">${state.selectedFactors.includes(n) ? '✓' : ''}</span></button>`).join('')}</div></div><button class="primary" data-action="start-game">出发！</button></div>`);
 }
 function learnMenu() {
-  app.innerHTML = shell(`${headerBar('口诀课堂','home')}<div class="panel center"><p class="eyebrow">直接看答案</p><h2>想先学哪一组？</h2><p class="subtitle">选一组口诀，慢慢看一遍</p><div class="learn-grid">${Array.from({length:8},(_,i)=>i+2).map(n=>`<button class="${saved.learned.includes(n)?'done':''}" data-group="${n}">${cn(n)}的口诀</button>`).join('')}</div></div><p class="home-note">学习完成后，随时可以回到闯关模式</p>`);
+  const allChants = Array.from({length:8}, (_, i) => i + 2).map(group => {
+    const items = facts.filter(f => f.a === group);
+    return `<section class="chant-group"><h3>${cn(group)}的口诀</h3>${items.map(item => `<p><b>${factText(item)}</b><span>${item.chant}</span></p>`).join('')}</section>`;
+  }).join('');
+  app.innerHTML = shell(`${headerBar('口诀课堂','home')}<div class="panel center"><p class="eyebrow">直接看答案</p><h2>想先学哪一组？</h2><p class="subtitle">选一组口诀，慢慢看一遍</p><div class="learn-grid">${Array.from({length:8},(_,i)=>i+2).map(n=>`<button class="${saved.learned.includes(n)?'done':''}" data-group="${n}">${cn(n)}的口诀</button>`).join('')}</div></div><section class="all-chants"><h2>全部口诀</h2><p class="subtitle">算式和口诀一起看</p>${allChants}</section><p class="home-note">学习完成后，随时可以回到闯关模式</p>`, 'learn-screen');
 }
 function lessonFacts() { return facts.filter(f => f.a === state.lessonGroup); }
 function lesson() {
   const items = lessonFacts(), f = items[state.lessonIndex];
-  app.innerHTML = shell(`${headerBar('口诀课堂','learn')}<div class="lesson-progress"><span style="width:${((state.lessonIndex+1)/items.length)*100}%"></span></div><p class="center subtitle">第 ${state.lessonIndex+1} 条 / 共 ${items.length} 条</p><article class="panel lesson-card center"><p class="lesson-label">${cn(state.lessonGroup)}的口诀</p><p class="equation">${factText(f)}</p><p class="chant">${f.chant}</p><p class="subtitle">看一看，念一念</p></article><div class="lesson-actions"><button class="secondary" data-action="lesson-prev">上一条</button><button class="primary" data-action="lesson-next">${state.lessonIndex === items.length-1 ? '学完啦！' : '下一条'}</button><button class="secondary" data-action="lesson-repeat">再看一次</button></div>`);
+  app.innerHTML = shell(`${headerBar('口诀课堂','learn')}<div class="lesson-progress"><span style="width:${((state.lessonIndex+1)/items.length)*100}%"></span></div><p class="center subtitle">第 ${state.lessonIndex+1} 条 / 共 ${items.length} 条</p><article class="panel lesson-card center"><p class="lesson-label">${cn(state.lessonGroup)}的口诀</p><p class="equation">${factText(f)}</p><p class="chant">${f.chant}</p><p class="subtitle">看一看，念一念</p></article><section class="lesson-overview" aria-label="本组口诀总览"><p>本组口诀</p><div>${items.map((item, index) => `<span class="${index === state.lessonIndex ? 'current' : ''}">${item.chant}</span>`).join('')}</div></section><div class="lesson-actions"><button class="secondary" data-action="lesson-prev">上一条</button><button class="primary" data-action="lesson-next">${state.lessonIndex === items.length-1 ? '学完啦！' : '下一条'}</button><button class="secondary" data-action="lesson-repeat">再看一次</button></div>`);
 }
 function availableFacts() {
   const inRange = facts.filter(f => state.selectedFactors.includes(f.a) || state.selectedFactors.includes(f.b));
   const easyFacts = inRange.filter(f => f.a <= 5 && f.b <= 5);
   return state.difficulty === 'easy' && easyFacts.length ? easyFacts : inRange;
 }
-function chooseFact() { const pool = availableFacts(); return pool[Math.floor(Math.random()*pool.length)]; }
+function factKey(f) { return `${f.a}-${f.b}`; }
+function refillCoverageQueue() { state.coverageQueue = shuffle(availableFacts()); state.roundSize = state.coverageQueue.length; }
+function chooseFact() {
+  if (!state.coverageQueue.length && !state.reviewQueue.length) {
+    if (state.playMode === 'practice' && state.total > 0) return null;
+    refillCoverageQueue();
+  }
+  if (state.coverageQueue.length) return { fact: state.coverageQueue.shift(), phase: 'coverage' };
+  return { fact: state.reviewQueue.shift(), phase: 'review' };
+}
 function answerChoices(f, count=4) { const candidates = availableFacts().map(x => x.answer).filter(n => n !== f.answer); const close = candidates.sort((x,y)=>Math.abs(x-f.answer)-Math.abs(y-f.answer)); return shuffle(unique([f.answer, ...close.slice(0, count-1)])).slice(0,count); }
 function newQuestion() {
-  const f = chooseFact(); const types = state.difficulty === 'easy' ? ['choice','fill'] : state.difficulty === 'hard' ? ['choice','fill','wrong','input'] : ['choice','fill','wrong'];
+  const next = chooseFact();
+  if (!next) { finishGame(); return false; }
+  const f = next.fact; const types = state.difficulty === 'easy' ? ['choice','fill'] : state.difficulty === 'hard' ? ['choice','fill','wrong','input'] : ['choice','fill','wrong'];
   const shouldSwap = state.difficulty === 'hard' && Math.random() < .5;
   const display = shouldSwap ? { a: f.b, b: f.a } : { a: f.a, b: f.b };
-  const type = types[Math.floor(Math.random()*types.length)]; state.question = { f, display, type, choices: answerChoices(f, state.difficulty === 'easy' ? 3 : 4) }; state.inputValue = ''; state.locked = false;
+  const type = types[Math.floor(Math.random()*types.length)]; state.question = { f, phase: next.phase, display, type, choices: answerChoices(f, 4) }; state.inputValue = ''; state.locked = false; return true;
 }
 function game() {
-  if (!state.question) newQuestion(); const q = state.question;
-  app.innerHTML = shell(`<div class="game-top"><button class="pause-btn" data-action="pause" aria-label="暂停游戏">Ⅱ <span>暂停</span></button><div class="timer-wrap"><div class="timer-bar" style="width:${(state.seconds/DURATION)*100}%"></div></div><span class="timer">${formatTime(state.seconds)}</span><span></span><span></span><span class="score">✦ ${state.score}</span></div>${gameQuestion(q)}<div id="feedback" class="feedback">认真看题，再选出答案吧。</div><div id="pause" class="pause hidden"><div class="panel center"><p class="eyebrow">已暂停</p><h2>休息一下吧</h2><p class="subtitle">准备好后继续挑战</p><button class="primary" data-action="resume">继续游戏</button><button class="muted-btn" data-go="home">结束本局</button></div></div>`, 'game-screen');
-  startTimer();
+  if (!state.question && !newQuestion()) return; const q = state.question;
+  const gameClass = state.skipGameAnimation ? 'game-screen no-animate' : 'game-screen';
+  state.skipGameAnimation = false;
+  const gameStatus = state.playMode === 'challenge' ? `<div class="challenge-status"><div class="timer-wrap"><div class="timer-bar" style="width:${(state.seconds/DURATION)*100}%"></div></div><span class="timer">${formatTime(state.seconds)}</span></div>` : `<div class="practice-progress"><span>${q.phase === 'review' ? '错题复习' : '完整覆盖'}</span><strong>${q.phase === 'review' ? `剩余 ${state.reviewQueue.length + 1} 题` : `${state.roundSize - state.coverageQueue.length} / ${state.roundSize}`}</strong></div>`;
+  app.innerHTML = shell(`<div id="confetti" class="confetti" aria-hidden="true"></div><div class="game-top"><button class="pause-btn" data-action="pause" aria-label="暂停游戏">Ⅱ <span>暂停</span></button>${gameStatus}<span class="score">✦ ${state.score}</span></div>${gameQuestion(q)}<div id="feedback" class="feedback">认真看题，再选出答案吧。</div><div id="pause" class="pause hidden"><div class="panel center"><p class="eyebrow">已暂停</p><h2>休息一下吧</h2><p class="subtitle">准备好后继续挑战</p><button class="primary" data-action="resume">继续游戏</button><button class="muted-btn" data-go="home">结束本局</button></div></div>`, gameClass);
+  if (state.playMode === 'challenge') startTimer();
 }
 function gameQuestion(q) {
   const f = q.f, shown = q.display;
@@ -75,9 +94,10 @@ function finishGame() {
 function startTimer() { state.timer = setInterval(()=>{ state.seconds--; const bar=document.querySelector('.timer-bar'), time=document.querySelector('.timer'); if(bar) bar.style.width=`${Math.max(0,state.seconds/DURATION*100)}%`; if(time) time.textContent=formatTime(state.seconds); if(state.seconds<=0) finishGame(); },1000); }
 function formatTime(sec) { return `${String(Math.floor(sec/60)).padStart(1,'0')}:${String(sec%60).padStart(2,'0')}`; }
 function feedback(html, kind) { const el=document.querySelector('#feedback'); if(el) { el.className=`feedback ${kind}`; el.innerHTML=html; } }
-function resolve(correct, message) { if(state.locked) return; state.locked=true; document.querySelectorAll('.answer, .keypad button').forEach(b=>b.classList.add('disabled')); state.total++; if(correct) { state.score++; feedback('答对啦！继续加油 ✦','good'); } else { state.misses.push(state.question.f); feedback(message || `答案是 <b>${factText(state.question.f)}</b>，${state.question.f.chant}。`,'bad'); } state.nextQuestionTimer = setTimeout(()=>{ if(state.screen !== 'game' || state.seconds <= 0) return; newQuestion(); render(); }, correct ? 700 : 1700); }
+function celebrate() { const box = document.querySelector('#confetti'); if (!box) return; const colors = ['#ffc94a','#ff8068','#3978e8','#27b99a']; box.innerHTML = Array.from({length: 18}, (_, i) => `<i style="--x:${8 + Math.random() * 84}%;--r:${-150 + Math.random() * 300}deg;--d:${Math.random() * 140}ms;--c:${colors[i % colors.length]}"></i>`).join(''); setTimeout(() => { if (box) box.innerHTML = ''; }, 900); }
+function resolve(correct, message) { if(state.locked) return; state.locked=true; document.querySelectorAll('.answer, .keypad button').forEach(b=>b.classList.add('disabled')); state.total++; if(correct) { state.score++; feedback('答对啦！继续加油 ✦','good'); celebrate(); } else { state.misses.push(state.question.f); if (!state.reviewQueue.some(f => factKey(f) === factKey(state.question.f))) state.reviewQueue.push(state.question.f); feedback(message || `答案是 <b>${factText(state.question.f)}</b>，${state.question.f.chant}。`,'bad'); } state.nextQuestionTimer = setTimeout(()=>{ if(state.screen !== 'game' || (state.playMode === 'challenge' && state.seconds <= 0)) return; state.question = null; state.skipGameAnimation = true; render(); }, correct ? 700 : 1700); }
 function updateInputAnswer() { const display = document.querySelector('#input-answer'); if (display) display.textContent = state.inputValue || '?'; }
-function startGame() { clearTimeout(state.nextQuestionTimer); state.nextQuestionTimer=null; state.screen='game'; state.seconds=DURATION; state.score=0; state.total=0; state.misses=[]; state.question=null; render(); }
+function startGame() { clearTimeout(state.nextQuestionTimer); state.nextQuestionTimer=null; state.screen='game'; state.seconds=DURATION; state.score=0; state.total=0; state.roundSize=0; state.misses=[]; state.coverageQueue=[]; state.reviewQueue=[]; state.question=null; render(); }
 document.addEventListener('click', e => {
   const el=e.target.closest('button'); if(!el) return;
   if(el.dataset.go) { state.screen=el.dataset.go; render(); return; }
@@ -85,6 +105,15 @@ document.addEventListener('click', e => {
     state.difficulty = el.dataset.difficulty;
     document.querySelectorAll('[data-difficulty]').forEach(button => {
       const selected = button.dataset.difficulty === state.difficulty;
+      button.classList.toggle('active', selected);
+      button.lastElementChild.textContent = selected ? '✓' : '';
+    });
+    return;
+  }
+  if(el.dataset.playMode) {
+    state.playMode = el.dataset.playMode;
+    document.querySelectorAll('[data-play-mode]').forEach(button => {
+      const selected = button.dataset.playMode === state.playMode;
       button.classList.toggle('active', selected);
       button.lastElementChild.textContent = selected ? '✓' : '';
     });
@@ -121,10 +150,10 @@ document.addEventListener('click', e => {
   if(el.dataset.action==='lesson-repeat') return render();
   if(el.dataset.action==='lesson-next') { const items=lessonFacts(); if(state.lessonIndex < items.length-1) state.lessonIndex++; else { if(!saved.learned.includes(state.lessonGroup)) saved.learned.push(state.lessonGroup); save(); state.screen='learn'; } render(); return; }
   if(el.dataset.action==='pause') { clearInterval(state.timer); document.querySelector('#pause').classList.remove('hidden'); return; }
-  if(el.dataset.action==='resume') { document.querySelector('#pause').classList.add('hidden'); startTimer(); return; }
+  if(el.dataset.action==='resume') { document.querySelector('#pause').classList.add('hidden'); if (state.playMode === 'challenge') startTimer(); return; }
   if(state.screen!=='game'||state.locked) return;
   if(el.dataset.answer) { const q=state.question; const correct=q.type==='fill'?Number(el.dataset.correct):q.f.answer; const isCorrect=Number(el.dataset.answer)===correct; el.classList.add(isCorrect?'correct':'wrong'); if(!isCorrect) [...document.querySelectorAll('.answer')].find(b=>Number(b.dataset.answer)===correct)?.classList.add('correct'); resolve(isCorrect, `答案是 <b>${correct}</b>。${q.f.chant}。`); return; }
   if(el.dataset.wrong) { const ok=el.dataset.wrong==='yes'; el.classList.add(ok?'correct':'wrong'); resolve(ok, `这一题应该是 <b>${factText(state.question.f)}</b>，${state.question.f.chant}。`); return; }
 });
-function results() { const review=unique(state.misses.map(f=>`${factText(f)}，${f.chant}`)).slice(0,4); const stars=state.score>=12?'★★★':state.score>=6?'★★☆':'★☆☆'; app.innerHTML=shell(`${headerBar('本局完成','home')}<div class="panel center"><p class="eyebrow">做得不错！</p><h2>三分钟挑战结束</h2><div class="result-stars">${stars}</div><div class="stat-row"><div class="stat"><strong>${state.score}</strong><span>答对题数</span></div><div class="stat"><strong>${state.total}</strong><span>练习题数</span></div></div>${review.length?`<div class="review"><h3>这些口诀再看一眼</h3>${review.map(x=>`<div class="review-item"><span>${x}</span></div>`).join('')}</div>`:`<p class="subtitle">这一局全都答对啦！</p>`}<div class="result-actions"><button class="primary" data-action="start-game">再玩一局</button><button class="secondary" data-go="difficulty">换个难度</button><button class="muted-btn" data-go="home">返回首页</button></div></div>`); }
+function results() { const review=unique(state.misses.map(f=>`${factText(f)}，${f.chant}`)).slice(0,4); const stars=state.score>=12?'★★★':state.score>=6?'★★☆':'★☆☆'; const title = state.playMode === 'challenge' ? '三分钟挑战结束' : '练习一轮完成'; app.innerHTML=shell(`${headerBar('本局完成','home')}<div class="panel center"><p class="eyebrow">做得不错！</p><h2>${title}</h2><div class="result-stars">${stars}</div><div class="stat-row"><div class="stat"><strong>${state.score}</strong><span>答对题数</span></div><div class="stat"><strong>${state.total}</strong><span>练习题数</span></div></div>${review.length?`<div class="review"><h3>这些口诀再看一眼</h3>${review.map(x=>`<div class="review-item"><span>${x}</span></div>`).join('')}</div>`:`<p class="subtitle">这一局全都答对啦！</p>`}<div class="result-actions"><button class="primary" data-action="start-game">再玩一局</button><button class="secondary" data-go="difficulty">换个难度</button><button class="muted-btn" data-go="home">返回首页</button></div></div>`); }
 render();
