@@ -1,0 +1,700 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>针对灰产的产品对比</title>
+    <style>
+      :root{
+        --bg:#ffffff; --bg-soft:#f5f5f7; --ink:#1d1d1f; --ink-2:#6e6e73; --ink-3:#86868b;
+        --line:#d2d2d7; --line-soft:#e8e8ed;
+        --blue:#0066cc; --blue-soft:rgba(0,102,204,.08);
+        --red:#b42318; --red-soft:rgba(180,35,24,.07);
+        --amber:#8a5a00; --amber-soft:rgba(176,120,0,.10);
+        --green:#1a6b3c; --green-soft:rgba(26,107,60,.08);
+        --card:#ffffff;
+        --shadow:0 1px 2px rgba(0,0,0,.04),0 8px 24px rgba(0,0,0,.05);
+      }
+      @media (prefers-color-scheme: dark){
+        :root{
+          --bg:#000000; --bg-soft:#161617; --ink:#f5f5f7; --ink-2:#a1a1a6; --ink-3:#86868b;
+          --line:#3a3a3c; --line-soft:#262628;
+          --blue:#2997ff; --blue-soft:rgba(41,151,255,.12);
+          --red:#ff8a80; --red-soft:rgba(255,138,128,.10);
+          --amber:#e8b04b; --amber-soft:rgba(232,176,75,.12);
+          --green:#63d68a; --green-soft:rgba(99,214,138,.10);
+          --card:#1c1c1e;
+          --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35);
+        }
+      }
+      *{box-sizing:border-box}
+      html{scroll-behavior:smooth}
+      body{
+        margin:0; background:var(--bg); color:var(--ink);
+        font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Hiragino Sans GB","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;
+        font-size:16px; line-height:1.65; -webkit-font-smoothing:antialiased;
+      }
+      a{color:var(--blue); text-decoration:none}
+      a:hover{text-decoration:underline}
+      .wrap{max-width:1080px; margin:0 auto; padding:0 24px}
+
+      /* ---------- nav ---------- */
+      nav{
+        position:sticky; top:0; z-index:50;
+        background:color-mix(in srgb, var(--bg) 82%, transparent);
+        -webkit-backdrop-filter:blur(14px); backdrop-filter:blur(14px);
+        border-bottom:1px solid var(--line-soft);
+      }
+      nav .wrap{display:flex; align-items:center; gap:22px; height:52px; overflow-x:auto; scrollbar-width:none}
+      nav .wrap::-webkit-scrollbar{display:none}
+      nav .brand{font-weight:600; font-size:15px; white-space:nowrap}
+      nav a.nl{color:var(--ink-2); font-size:14px; white-space:nowrap}
+      nav a.nl:hover{color:var(--blue); text-decoration:none}
+
+      /* ---------- hero ---------- */
+      header{padding:72px 0 8px}
+      .kicker{font-size:14px; color:var(--blue); font-weight:600; margin:0 0 14px}
+      h1{font-size:clamp(34px,5.4vw,54px); line-height:1.12; font-weight:700; letter-spacing:-.01em; margin:0 0 18px}
+      .lede{font-size:clamp(17px,2.2vw,20px); color:var(--ink-2); max-width:820px; margin:0 0 34px}
+      .verdicts{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:0 0 10px}
+      .verdict{border:1px solid var(--line-soft); border-radius:14px; padding:22px 24px; background:var(--card); box-shadow:var(--shadow)}
+      .verdict .tag{font-size:13px; font-weight:600; letter-spacing:.02em; margin:0 0 8px}
+      .verdict.global .tag{color:var(--blue)} .verdict.china .tag{color:var(--red)}
+      .verdict p{margin:0; font-size:16px; line-height:1.7}
+      .caveat{font-size:13px; color:var(--ink-3); margin:14px 2px 0}
+      .meta-line{font-size:13px; color:var(--ink-3); margin-top:6px}
+
+      /* ---------- sections ---------- */
+      section{padding:56px 0 8px; scroll-margin-top:64px}
+      h2{font-size:clamp(26px,3.6vw,36px); font-weight:700; letter-spacing:-.01em; margin:0 0 10px}
+      h3{font-size:21px; font-weight:600; margin:34px 0 12px}
+      .sec-lede{color:var(--ink-2); font-size:16px; max-width:860px; margin:0 0 22px}
+      p{margin:0 0 12px}
+
+      /* ---------- definition / tiers ---------- */
+      .def-grid{display:grid; grid-template-columns:1.2fr .8fr; gap:16px}
+      .panel{border:1px solid var(--line-soft); border-radius:14px; padding:22px 24px; background:var(--card)}
+      .panel h4{margin:0 0 10px; font-size:15px; font-weight:600}
+      .panel p, .panel li{font-size:14.5px; color:var(--ink); line-height:1.7}
+      .panel ul{margin:0; padding-left:18px}
+      .panel li{margin-bottom:6px}
+      .tier{display:flex; gap:12px; padding:10px 0; border-top:1px solid var(--line-soft)}
+      .tier:first-of-type{border-top:none; padding-top:2px}
+      .tier .dot{flex:none; margin-top:7px; width:9px; height:9px; border-radius:50%}
+      .dot.core{background:var(--blue)} .dot.part{background:var(--amber)} .dot.out{background:var(--ink-3)}
+      .tier b{font-size:14.5px}
+      .tier span{display:block; font-size:13.5px; color:var(--ink-2); line-height:1.6}
+
+      /* spectrum */
+      .spectrum{display:flex; gap:8px; margin:26px 0 4px; flex-wrap:wrap}
+      .spec{flex:1 1 200px; border-radius:12px; padding:14px 16px; background:var(--bg-soft); border:1px solid var(--line-soft)}
+      .spec b{display:block; font-size:14px; margin-bottom:4px}
+      .spec span{font-size:13px; color:var(--ink-2); line-height:1.55; display:block}
+      .spec.hot{background:var(--blue-soft); border-color:transparent}
+      .spec-arrow{align-self:center; color:var(--ink-3); font-size:15px}
+
+      /* ---------- product cards ---------- */
+      .cards{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+      .pcard{border:1px solid var(--line-soft); border-radius:16px; padding:24px 26px; background:var(--card); box-shadow:var(--shadow); display:flex; flex-direction:column}
+      .pcard.wide{grid-column:1 / -1}
+      .pcard .head{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; margin-bottom:4px}
+      .pcard h3{font-size:20px; margin:0; font-weight:700}
+      .pcard .sub{color:var(--ink-2); font-size:13.5px}
+      .badge{flex:none; font-size:12px; font-weight:600; padding:2.5px 9px; border-radius:999px; line-height:1.5}
+      .badge.core{background:var(--blue-soft); color:var(--blue)}
+      .badge.part{background:var(--amber-soft); color:var(--amber)}
+      .badge.pub{background:var(--red-soft); color:var(--red)}
+      .pcard .targets{font-size:13.5px; color:var(--ink-2); margin:2px 0 12px}
+      .pcard .targets b{color:var(--ink); font-weight:600}
+      .pcard p.body{font-size:14.5px; line-height:1.72; margin:0 0 12px}
+      dl.facts{margin:0; font-size:13.5px; line-height:1.62}
+      dl.facts div{display:flex; gap:10px; padding:7px 0; border-top:1px solid var(--line-soft)}
+      dl.facts dt{flex:0 0 74px; color:var(--ink-3); font-weight:500}
+      dl.facts dd{margin:0; flex:1}
+      .flag{display:inline-block; font-size:11.5px; font-weight:600; padding:0 6px; border-radius:5px; vertical-align:1px}
+      .flag.self{background:var(--amber-soft); color:var(--amber)}
+      .flag.tbd{background:var(--red-soft); color:var(--red)}
+      .flag.second{background:var(--bg-soft); color:var(--ink-2)}
+      .pcard .src{margin-top:auto; padding-top:12px; font-size:12.5px; color:var(--ink-3)}
+      .pcard .src a{font-size:12.5px}
+
+      /* ---------- tables ---------- */
+      .tablewrap{border:1px solid var(--line-soft); border-radius:14px; background:var(--card); overflow:hidden}
+      table{border-collapse:collapse; width:100%; font-size:13.5px; line-height:1.6}
+      thead th{background:var(--bg-soft); text-align:left; font-weight:600; font-size:13px; padding:11px 14px; border-bottom:1px solid var(--line-soft); white-space:nowrap}
+      tbody td{padding:12px 14px; border-bottom:1px solid var(--line-soft); vertical-align:top}
+      tbody tr:last-child td{border-bottom:none}
+      td.name{font-weight:600; white-space:nowrap}
+      td.name .geo{display:block; font-weight:400; color:var(--ink-3); font-size:12px; white-space:normal}
+      .filters{display:flex; gap:8px; flex-wrap:wrap; margin:0 0 14px}
+      .chip{border:1px solid var(--line); background:var(--card); color:var(--ink-2); font-size:13.5px; padding:6px 14px; border-radius:999px; cursor:pointer; font-family:inherit}
+      .chip[aria-pressed="true"]{background:var(--blue); border-color:var(--blue); color:#fff}
+      .note-under{font-size:13px; color:var(--ink-3); margin-top:10px}
+
+      /* ---------- two-col insight ---------- */
+      .duo{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+      .duo .panel ul{padding-left:18px}
+      .reasons{counter-reset:r; list-style:none; margin:0; padding:0}
+      .reasons li{position:relative; padding:16px 0 16px 52px; border-top:1px solid var(--line-soft); font-size:15px; line-height:1.7}
+      .reasons li:first-child{border-top:none; padding-top:4px}
+      .reasons li::before{counter-increment:r; content:counter(r); position:absolute; left:0; top:14px; width:34px; height:34px; border-radius:50%; background:var(--bg-soft); color:var(--ink); font-weight:600; font-size:15px; display:flex; align-items:center; justify-content:center}
+      .reasons li:first-child::before{top:2px}
+      .reasons b{display:block; margin-bottom:2px}
+
+      /* ---------- summary / lists ---------- */
+      ol.takeaways{margin:0; padding-left:22px; font-size:15.5px; line-height:1.75}
+      ol.takeaways li{margin-bottom:12px}
+      ul.plain{margin:0; padding-left:20px; font-size:14.5px; line-height:1.75}
+      ul.plain li{margin-bottom:8px}
+      .sources{columns:2; column-gap:40px; font-size:13.5px; line-height:1.6}
+      .sources li{margin-bottom:7px; break-inside:avoid}
+      .sources ul{margin:0; padding-left:18px}
+      .history{border:1px solid var(--line-soft); border-radius:14px; overflow:hidden; background:var(--card)}
+      .history .row{display:flex; gap:16px; padding:14px 22px; border-top:1px solid var(--line-soft); font-size:14px; align-items:baseline}
+      .history .row:first-child{border-top:none}
+      .history .d{flex:0 0 92px; color:var(--ink-3); font-size:13px; white-space:nowrap}
+      .history .t{flex:1}
+      .history .s{flex:none; font-size:12.5px; font-weight:600}
+      .s.done{color:var(--green)} .s.doing{color:var(--amber)}
+      footer{padding:48px 0 64px; color:var(--ink-3); font-size:13px}
+
+      @media (max-width:820px){
+        nav .wrap{flex-wrap:wrap; height:auto; padding-top:10px; padding-bottom:10px; gap:6px 16px; overflow-x:visible}
+        section{scroll-margin-top:118px}
+        nav .brand{flex-basis:100%}
+        .verdicts,.def-grid,.cards,.duo{grid-template-columns:1fr}
+        .sources{columns:1}
+        header{padding:48px 0 4px}
+        section{padding:44px 0 4px}
+        /* comparison table -> stacked cards */
+        .tablewrap{border:none; background:transparent; overflow:visible}
+        table.cmp, table.cmp tbody, table.cmp tr, table.cmp td{display:block; width:100%}
+        table.cmp thead{display:none}
+        table.cmp tr{border:1px solid var(--line-soft); border-radius:14px; background:var(--card); margin-bottom:12px; padding:8px 4px}
+        table.cmp td{border-bottom:none; padding:5px 16px}
+        table.cmp td::before{content:attr(data-label); display:block; font-size:11.5px; color:var(--ink-3); font-weight:600; margin-bottom:1px}
+        table.cmp td.name{font-size:16px; padding-top:10px}
+        table.cmp td.name::before{display:none}
+        /* exclusion table -> stacked */
+        table.exc, table.exc tbody, table.exc tr, table.exc td{display:block; width:100%}
+        table.exc thead{display:none}
+        table.exc tr{border-bottom:1px solid var(--line-soft); padding:6px 0}
+        table.exc td{border-bottom:none; padding:4px 14px}
+        .history .row{flex-wrap:wrap; gap:4px 12px}
+      }
+      @media (prefers-reduced-motion: reduce){
+        html{scroll-behavior:auto}
+      }
+    </style>
+  </head>
+  <body>
+    <nav aria-label="页内导航">
+      <div class="wrap">
+        <span class="brand">针对灰产的产品对比</span>
+        <a class="nl" href="#scope">收窄标准</a>
+        <a class="nl" href="#global">全球产品</a>
+        <a class="nl" href="#china">中国产品</a>
+        <a class="nl" href="#compare">对照表</a>
+        <a class="nl" href="#excluded">排除说明</a>
+        <a class="nl" href="#china-market">中国市场特殊性</a>
+        <a class="nl" href="#summary">总结</a>
+        <a class="nl" href="#sources">来源</a>
+      </div>
+    </nav>
+
+    <header>
+      <div class="wrap">
+        <p class="kicker">Apate.ai / BeeSafe AI 后续调研 · 范围收窄</p>
+        <h1>针对灰产的产品，<br>全球与中国各有哪些</h1>
+        <p class="lede">范围只限直接打击灰产运营者或其基础设施的产品——AI 诱饵、钱骡情报、钓鱼下架、暗网/Telegram 灰市监测、链上追踪。一般反欺诈评分、骚扰拦截、受害者预警不算在内。</p>
+        <div class="verdicts">
+          <div class="verdict global">
+            <p class="tag">全球 · 一句话结论</p>
+            <p>真正符合的产品是一个很小的品类：核心是 2024–2026 年出现的 AI 诱饵智能体（Apate.ai、BeeSafe AI、CYBERA、Lurely），外加钓鱼基础设施下架（Netcraft、Group-IB）、暗网/Telegram 灰市监测与加密资金追踪（部分符合）。没有任何一家是通用反欺诈大厂的主力产品线。</p>
+          </div>
+          <div class="verdict china">
+            <p class="tag">中国 · 一句话结论</p>
+            <p>没有公开的 AI 诱饵/钱骡提取类商业产品。最接近的是面向公安、运营商、金融机构的黑灰产情报平台——威胁猎人、无糖信息「重明」、奇安信「星源」（微步 ATI 部分符合）；真正的打击主体是公安专项行动与运营商封堵体系，商业公司只能做供应商。</p>
+          </div>
+        </div>
+        <p class="caveat">证据说明：凡标注 <span class="flag self">公司自称</span> 的数字（对话量、客户数、损失下降等）均未见独立第三方审计；标注 <span class="flag tbd">待核实</span> 的为口径冲突或未公开；标注 <span class="flag second">二手数据</span> 的定价来自第三方采购数据平台引述。引用时请保留这些限定。</p>
+        <p class="meta-line">调研时间：2026-11-04，以当日可检索到的公开资料为准。中英文双语检索，中文关键词含黑灰产、钱骡、养号、钓鱼基础设施、暗网监测、Telegram 灰产监测、反诈情报、黑产情报。</p>
+      </div>
+    </header>
+
+    <section id="scope">
+      <div class="wrap">
+        <h2>收窄后的定义与标准</h2>
+        <p class="sec-lede">「灰产 / 黑灰产」指非法、半非法的线上经济及其运营者与基础设施：诈骗呼叫中心与杀猪盘、钱骡网络与钱骡账户、养号、假流量与点击农场、钓鱼网站/域名/套件、被盗数据交易、SIM 卡农场（猫池/GoIP）、加密钱包盗取器（crypto drainer），以及交易这些东西的 Telegram / 暗网市场。「针对灰产」= 产品主动去找运营者或其基础设施，而不是只保护受害者、只给交易打分、只拦截电话。</p>
+        <div class="def-grid">
+          <div class="panel">
+            <h4>纳入标准（满足任一即入选）</h4>
+            <ul>
+              <li>主动与骗子互动并提取其收款/基础设施情报（诱饵智能体、蜜罐、钓鱼互动）；</li>
+              <li>持续监测灰产社群、暗网市场、Telegram 频道，输出可用于打击的团伙、工具、资源、流量情报；</li>
+              <li>针对钓鱼域名/网站/App 做发现—取证—下架/封堵闭环；</li>
+              <li>针对钱骡账户/加密诈骗钱包做「事前发现」（骗子亲口给出）或链上团伙级追踪，而非仅事后交易评分。</li>
+            </ul>
+          </div>
+          <div class="panel">
+            <h4>分级（避免把「沾边」写成「就是」）</h4>
+            <div class="tier"><span class="dot core"></span><div><b>核心符合</b><span>产品主线就是打灰产运营者/基础设施。</span></div></div>
+            <div class="tier"><span class="dot part"></span><div><b>部分符合</b><span>有一块直接相关，但主线是通用威胁情报、品牌保护或事后追踪。</span></div></div>
+            <div class="tier"><span class="dot out"></span><div><b>考察后不入选</b><span>检索过、有名气，但无证据表明其有针对灰产的独立产品线，只在排除说明中交代。</span></div></div>
+          </div>
+        </div>
+        <div class="spectrum" aria-label="机制光谱">
+          <div class="spec hot"><b>诱饵互动 · 付款前</b><span>AI 假扮受害者与骗子对话，套出钱骡账户与钱包。Apate、BeeSafe、CYBERA、Lurely、ScamBuster。</span></div>
+          <div class="spec"><b>监测与测绘</b><span>盯暗网、Telegram 灰市与涉诈资产，输出团伙与基础设施情报。威胁猎人、重明、星源、CloudSEK 等。</span></div>
+          <div class="spec"><b>下架与封堵</b><span>钓鱼域名/网站/App 的发现—取证—下架闭环，或运营商网络层封堵。Netcraft、Group-IB、中国移动等。</span></div>
+          <div class="spec"><b>事后追踪 · 付款后</b><span>从受害者已付款的链上资金流反向追踪、交执法冻结。Chainalysis、TRM Labs。</span></div>
+        </div>
+        <p class="note-under">读法提醒：只有第一档与 Apate / BeeSafe 是同一机制；其余是同一目标、不同机制。把机制混为一谈会高估可比性。</p>
+      </div>
+    </section>
+
+    <section id="global">
+      <div class="wrap">
+        <h2>全球针对灰产的产品</h2>
+        <p class="sec-lede">先是与 Apate / BeeSafe 同机制的诱饵智能体（5 个），再是钓鱼下架、暗网监测与链上追踪等不同机制的产品。明确未找到的类别：以 SIM 农场/猫池、养号/假流量农场为独立卖点的商业产品，全球均未找到；除下述 5 个外，未找到其他已商业化的诱饵智能体公司（419eater 等属个人/非商业实践，不算产品）。</p>
+
+        <h3>一、AI 诱饵智能体 —— 与 Apate / BeeSafe 同一机制</h3>
+        <div class="cards">
+          <article class="pcard">
+            <div class="head"><h3>Apate.ai</h3><span class="badge core">核心符合</span></div>
+            <p class="sub">澳大利亚悉尼 · 2024 年创立，源自麦考瑞大学；2026 年 8 月起在美国特拉华州重新注册</p>
+            <p class="targets"><b>针对环节：</b>诈骗呼叫中心、杀猪盘/投资诈骗运营、钱骡银行账户、加密钱包、钓鱼网站/域名、冒充品牌、诈骗话术与团伙作息</p>
+            <p class="body">部署数千个 AI 智能体，伪装成不同年龄、性别、口音、语言的易受骗受害者：接听诈骗电话、回复可疑短信与邮件、点击钓鱼链接、加入社交群组，用犹豫、听不懂、找眼镜、信号不好等拟真行为拖住骗子——单次通话可超过两小时——且永不付款。骗子为收钱最终必须报出收款账户、加密钱包、电话与钓鱼网站，这些情报在数秒内被结构化并推送给客户；客户可在 Apate Insights 门户查看情报，并给智能体下达「拿到某个银行账号/钱包地址」等定向任务。文本智能体还会主动搜索论坛、投资群组与社交平台，以虚构身份潜入诈骗对话。</p>
+            <dl class="facts">
+              <div><dt>谁付费</dt><dd>银行、电信运营商、政府机构、公用事业；情报订阅 + Insights 门户（B2B SaaS/情报服务）。电信侧由运营商转接疑似诈骗来电，另有与美国 Mobileum 的渠道合作</dd></div>
+              <div><dt>公开定价</dt><dd>未公开</dd></div>
+              <div><dt>客户/案例</dt><dd>澳大利亚联邦银行（CBA）、TPG Telecom；TPG 已转接近 590,000 通电话给其智能体 <span class="flag self">公司自称</span></dd></div>
+              <div><dt>规模证据</dt><dd>自称 250 万次对话、浪费骗子时间约 17 年、提取情报 25 万余条；自称 CBA 公开报告的诈骗损失下降 76%、一家未具名澳大利亚银行用其外呼智能体打掉 22 个诈骗活动 <span class="flag self">公司自称，未经独立核实</span>；智能体/人设数量在约 35 万个与约 19.7 万个之间口径不一 <span class="flag tbd">待核实</span>；约 2% 骗子识破 AI <span class="flag self">公司自称</span></dd></div>
+              <div><dt>融资</dt><dd>2026 年 8 月种子轮 815 万美元（Lobby Capital 领投），公司称累计略低于 1,000 万美元，团队约 20 人；另有报道称种子轮为 A$1,140 万澳元，汇率换算后大致接近但口径不一致 <span class="flag tbd">待核实</span></dd></div>
+            </dl>
+            <p class="src">来源：<a href="https://techcrunch.com/2026/10/14/apate-sends-ai-agents-undercover-to-get-scammed-so-they-can-gather-fraud-intelligence/" target="_blank" rel="noopener">TechCrunch</a> · <a href="https://www.webpronews.com/apate-turns-ai-agents-into-perfect-scam-victims-to-harvest-fraudster-secrets/" target="_blank" rel="noopener">WebProNews</a> · <a href="https://www.yourlifechoices.com.au/life/the-picnic-phone-call-that-sparked-a-very-sneaky-revenge/" target="_blank" rel="noopener">YourLifeChoices</a> · <a href="https://www.ainvest.com/news/ai-fraud-abundant-scarce-asset-scammer-time-2610/" target="_blank" rel="noopener">AInvest</a></p>
+          </article>
+
+          <article class="pcard">
+            <div class="head"><h3>BeeSafe AI</h3><span class="badge core">核心符合</span></div>
+            <p class="sub">美国旧金山 · Y Combinator W26 批次；成立年份未在 YC 页面公开 <span class="flag tbd">待核实</span></p>
+            <p class="targets"><b>针对环节：</b>杀猪盘、恋爱/交友诈骗、求职诈骗、冒充与投资诈骗、授权 push payment 诈骗；核心是钱骡账户、欺诈资产、恶意域名、加密盗取器（crypto drainer）</p>
+            <p class="body">与 Apate 的「接电话拖时间」不同，BeeSafe 专攻长周期、多平台的信任型诈骗：用带社交媒体资料的虚假人设进入 SMS、语音、邮件与社交平台对话，以友好甚至调情的口吻维持数日到数周——其追踪的 1,000 余次对话平均持续 7–8 天，约 60 次往来后骗子才提出要钱；约 10 次往来后可分辨真骗子与误发者并终止后者；约三分之二的案例在约 25 次往来后骗子要求换到 WhatsApp、Telegram、微信或 Signal。最终套出钱骡账户、资金链与整个诈骗活动的全貌，并绘制作案模式图谱；情报强调是「地面实况」（ground truth）而非概率评分，以降低误报。三位博士创始人来自卡内基梅隆大学与加州大学圣迭戈分校，学术根源是 2025 年 BSides Las Vegas / DEF CON 34 的研究分享「Victim as a Service」。</p>
+            <dl class="facts">
+              <div><dt>谁付费</dt><dd>金融服务与加密机构（AML 钱骡账户检测）、电信运营商（拦截可疑入站信息）、政府机构（打击网络犯罪）；B2B 高保真欺诈信号 feed/API</dd></div>
+              <div><dt>公开定价</dt><dd>未公开</dd></div>
+              <div><dt>客户/案例</dt><dd>YC 页面称已帮助金融服务与政府机构在交易前识别与拦截骗子，但未具名客户 <span class="flag self">公司自称，未经独立核实</span></dd></div>
+              <div><dt>规模证据</dt><dd>自称数万次真实骗子对话、数千个钱骡账户 + 关联基础设施 <span class="flag self">公司自称</span></dd></div>
+              <div><dt>融资</dt><dd>pre-seed 阶段（据第三方通讯报道），融资额未公开 <span class="flag tbd">待核实</span></dd></div>
+            </dl>
+            <p class="src">来源：<a href="https://www.ycombinator.com/companies/beesafe-ai" target="_blank" rel="noopener">Y Combinator</a> · <a href="https://www.scworld.com/news/talk-to-the-llm-how-ai-exposes-pig-butchering-scams" target="_blank" rel="noopener">SCWorld</a> · <a href="https://www.paymentvillage.org/def-con-34/speakers" target="_blank" rel="noopener">Payment Village / DEF CON 34</a></p>
+          </article>
+
+          <article class="pcard">
+            <div class="head"><h3>CYBERA — Money Mule Intelligence</h3><span class="badge core">核心符合</span></div>
+            <p class="sub">美国纽约 · 成立年份冲突：PitchBook/CB Insights 称 2020 年，LinkedIn/LeadIQ 称 2022 年 <span class="flag tbd">待核实</span>；创始人含前网络犯罪检察官</p>
+            <p class="targets"><b>针对环节：</b>钱骡账户（核心）、诈骗资金的收集与快速洗钱链路；覆盖投资/杀猪盘、冒充、授权支付诈骗</p>
+            <p class="body">不判断受害者是否被操纵，而是直接找「钱要去哪」：用 AI 生成的人设与骗子互动并套取收款详情，输出经确认、有证据支撑的钱骡账户数据（非概率评分）。银行与保险公司在付款与新增受益人环节用该 feed 做筛查，在资金转出前拦截；无需客户 PII；SOC 2 Type II 认证。</p>
+            <dl class="facts">
+              <div><dt>谁付费</dt><dd>银行、保险公司、金融科技公司；直接销售，或通过与 Recorded Future（Mastercard 旗下）的合作打包销售；FS-ISAC 成员可获得每日钱骡账户样本 feed</dd></div>
+              <div><dt>公开定价</dt><dd>未公开</dd></div>
+              <div><dt>客户/案例</dt><dd>Mastercard 2026-10-27 报道：其钱骡情报已通过 Recorded Future 提供给金融机构，一家欧洲银行据此拦截了一笔客户已合法授权的 6 万欧元诈骗付款；2026 年 2 月 26 日宣布与 Recorded Future 正式合作</dd></div>
+              <div><dt>融资/规模</dt><dd>2022 年 9 月种子轮 500 万美元（Converge VC、New North Ventures 领投）有据可查；总融资额在不同数据库为 580 万 / 970 万 / 1,371 万美元不等 <span class="flag tbd">待核实</span>；员工 11–50 人；2024 年获世界经济论坛 Technology Pioneer</dd></div>
+            </dl>
+            <p class="src">来源：<a href="https://www.mastercard.com/us/en/news-and-trends/stories/2026/cybera-ai-scam-money-mule-accounts.html" target="_blank" rel="noopener">Mastercard</a> · <a href="https://pitchbook.com/profiles/company/481266-01" target="_blank" rel="noopener">PitchBook</a> · <a href="https://www.linkedin.com/company/cyberaglobal" target="_blank" rel="noopener">LinkedIn</a> · <a href="https://leadiq.com/c/cybera/5e29ab4a62be9f43ca5b532c" target="_blank" rel="noopener">LeadIQ</a></p>
+          </article>
+
+          <article class="pcard">
+            <div class="head"><h3>Lurely</h3><span class="badge core">核心符合 · 早期</span></div>
+            <p class="sub">总部未公开（官网仅留 hello@lurely.ai）<span class="flag tbd">待核实</span> · 官网明确处于「发布前、招募设计合作伙伴」阶段</p>
+            <p class="targets"><b>针对环节：</b>钱骡账户（核心）、加密钱包、支付应用号码、钓鱼网站、诈骗呼叫中心的话术与号码</p>
+            <p class="body">与 Apate / CYBERA 同构但更窄：AI 诱饵人设各有电话号码、人生故事与写作风格，出现在骗子寻找受害者的地方；以骗子自己的语言、用怀疑、家庭故事与慢回复维持可信对话，直到骗子说出「钱打到这里」；随后悄悄退出、永不付款。捕获并校验银行账户、IBAN、加密钱包、支付应用号码与网站后，按开户行分发——每家银行只收到开在自家的钱骡账户，并附完整对话作为证据。</p>
+            <dl class="facts">
+              <div><dt>谁付费</dt><dd>目标付费方为银行、支付公司与发卡机构、电信运营商、执法与监管机构；正在招募一小批设计合作伙伴</dd></div>
+              <div><dt>公开定价</dt><dd>未公开</dd></div>
+              <div><dt>客户/规模</dt><dd>无（发布前产品）。其官网引用的市场背景数字（42 国一年诈骗损失 4,420 亿美元、美国 2025 年 159 亿美元、英国 push-payment 诈骗 5.76 亿英镑）为行业统计，非自身业绩</dd></div>
+              <div><dt>成立/融资</dt><dd>均未公开 <span class="flag tbd">待核实</span></dd></div>
+            </dl>
+            <p class="src">来源：<a href="https://lurely.ai/" target="_blank" rel="noopener">Lurely 官网</a></p>
+          </article>
+
+          <article class="pcard wide">
+            <div class="head"><h3>ScamBuster</h3><span class="badge core">核心符合（机制）· 非商业</span></div>
+            <p class="sub">法国 · 开源项目（MIT），作者 Laurent Giovannoni（Filigran 首席软件工程师），源自巴黎综合理工学院工程研究；2025 年 11 月起生产运行，2026 年 8 月 Black Hat USA 2026 正式发布</p>
+            <p class="targets"><b>针对环节：</b>邮件钓鱼/诈骗团伙的收款层（cash-out layer）：IBAN、支付域名、电话号码前缀、加密钱包与关联基础设施</p>
+            <p class="body">仅入站、不主动发起：收到钓鱼邮件后才回复。六个 AI 智能体分工——分类诈骗、选择/管理人设、撰写回复、提取与校验指标、防范 AI 被劫持等——用人设（如老年寡妇、小企业主）扮演骗子要找的受害者，把对话引向「钱打到哪里」；用 GPT-4o-mini 等低成本模型，运行成本「接近于零」。收集到的情报聚类成团伙画像，导出为 STIX 2.1 与 MISP 标准格式供安全团队使用。无商业模式：免费开源，使用者自付 LLM token 成本；无付费客户与公开规模数字。它的价值在于证明诱饵智能体可以低成本、标准化输出，而不是一家公司的业绩。</p>
+            <p class="src">来源：<a href="https://scambuster.ai/" target="_blank" rel="noopener">ScamBuster 官网</a> · <a href="https://www.darkreading.com/cyberattacks-data-breaches/turning-tables-email-scammers-scambuster" target="_blank" rel="noopener">Dark Reading</a> · <a href="https://kingy.ai/news/scambuster-ai-bot-tricks-email-scammers/" target="_blank" rel="noopener">Kingy AI</a></p>
+          </article>
+        </div>
+
+        <h3>二、钓鱼下架、暗网监测、链上追踪 —— 同一目标，不同机制</h3>
+        <div class="cards">
+          <article class="pcard">
+            <div class="head"><h3>Netcraft</h3><span class="badge part">部分符合</span></div>
+            <p class="sub">英国巴斯 · 成立年份未在本次检索来源中核实 <span class="flag tbd">待核实</span></p>
+            <p class="targets"><b>针对环节：</b>钓鱼网站/域名、仿冒品牌、虚假商店、虚假 App、加密诈骗、社交媒体冒充</p>
+            <p class="body">数字风险与品牌保护平台，工作流为发现 → 验证 → 取证 → 封堵 → 下架 → 持续监测再出现；自称可在不到 5 分钟内封堵恶意域名，下架中位时间为 33 分钟。是「钓鱼下架速度与规模」的基准厂商，但不与骗子对话、不提取钱骡账户，与 Apate / BeeSafe 机制不同。未在本次检索中获得具名客户名单。</p>
+            <dl class="facts">
+              <div><dt>谁付费</dt><dd>品牌方、金融机构、Web 服务商等企业客户，报价制</dd></div>
+              <div><dt>公开定价</dt><dd>未公开标价；第三方 Vendr 数据称中位合同约 35,000 美元/年 <span class="flag second">二手数据</span><span class="flag tbd">待核实</span></dd></div>
+            </dl>
+            <p class="src">来源：<a href="https://www.netcraft.com/blog/best-phishing-detection-tools-web-services" target="_blank" rel="noopener">Netcraft</a> · <a href="https://lawyerd.net/blog/top-igaming-brand-protection-companies-2026/" target="_blank" rel="noopener">Lawyered</a></p>
+          </article>
+
+          <article class="pcard">
+            <div class="head"><h3>Group-IB — Digital Risk Protection</h3><span class="badge part">部分符合</span></div>
+            <p class="sub">总部新加坡，全球化运营 · 成立年份未在本次检索来源中核实 <span class="flag tbd">待核实</span></p>
+            <p class="targets"><b>针对环节：</b>钓鱼与诈骗网络（域名、账户、支付资源、钓鱼页面构成的关联基础设施）、仿冒、假 App、数据泄露、VIP 冒充</p>
+            <p class="body">监测域名、钓鱼/诈骗数据库、广告、搜索结果、社交平台、市场、应用商店与消息服务；用图分析、诈骗情报与自动归因把分散的域名、账户、别名、支付资源连成团伙结构；下架分通知、执法、停止侵权函三阶段，托管计划下下架次数不限（按模块、品牌与语言报价）。2026 年 5 月与 Google SecOps 集成。属「基础设施测绘 + 下架」路线，不与骗子对话、不提取钱骡账户。</p>
+            <dl class="facts">
+              <div><dt>谁付费</dt><dd>品牌方、金融机构、博彩/游戏等企业客户，报价制</dd></div>
+              <div><dt>公开定价</dt><dd>未公开标价</dd></div>
+            </dl>
+            <p class="src">来源：<a href="https://www.netcraft.com/blog/best-phishing-detection-tools-web-services" target="_blank" rel="noopener">Netcraft</a> · <a href="https://www.techdogs.com/blogs/blog-detail/9-best-digital-risk-protection-platforms-for-2026" target="_blank" rel="noopener">TechDogs</a></p>
+          </article>
+
+          <article class="pcard">
+            <div class="head"><h3>ZeroFox</h3><span class="badge part">部分符合</span></div>
+            <p class="sub">美国马里兰州巴尔的摩 · 已被 Haveli Investments 私有化；2024 财年收入 2.333 亿美元（据行业报告引述）</p>
+            <p class="targets"><b>针对环节：</b>社交/域名/暗网上的钓鱼与冒充、高管冒充、深伪、泄露凭证——通用外部风险，非专门针对诈骗团伙</p>
+            <p class="body">监测社交、域名、暗网与高管风险，发现冒充域名、虚假社媒账号、钓鱼页面后走下架流程；套餐按年计下架额度：Foundation 250 次、Core 500 次、Premium 1,000 次，仅成功下架才计入额度。入选理由是「钓鱼基础设施下架」这一环节；不入选核心的理由是它不针对杀猪盘/钱骡/灰产团伙本身，主线是品牌与高管保护。</p>
+            <dl class="facts">
+              <div><dt>谁付费</dt><dd>企业客户打包订阅</dd></div>
+              <div><dt>公开定价</dt><dd>未公开；Vendr 中位合同约 45,600 美元/年 <span class="flag second">二手数据</span><span class="flag tbd">待核实</span></dd></div>
+              <div><dt>规模证据</dt><dd>自称年下架超 100 万次、70+ 财富 500 强客户 <span class="flag self">公司自称</span></dd></div>
+            </dl>
+            <p class="src">来源：<a href="https://www.netcraft.com/blog/best-phishing-detection-tools-web-services" target="_blank" rel="noopener">Netcraft</a> · <a href="https://lawyerd.net/blog/top-igaming-brand-protection-companies-2026/" target="_blank" rel="noopener">Lawyered</a> · <a href="https://growthmarketreports.com/report/brand-protection-software-market-global-industry-analysis" target="_blank" rel="noopener">GrowthMarketReports</a></p>
+          </article>
+
+          <article class="pcard">
+            <div class="head"><h3>CloudSEK — XVigil</h3><span class="badge part">部分符合</span></div>
+            <p class="sub">印度，全球化运营 · 成立年份未在本次检索来源中核实 <span class="flag tbd">待核实</span></p>
+            <p class="targets"><b>针对环节：</b>被盗数据交易（泄露凭证、infostealer 日志、会话 cookie）、钓鱼套件与钓鱼基础设施、假域名/假 App/假客服号码、Telegram/Discord 上的欺诈讨论与数据买卖</p>
+            <p class="body">持续监测深网、暗网与表层网，包括犯罪论坛、粘贴站、泄露数据市场、加密频道（Telegram、IRC、I2P）、代码托管与文档分享源；按「可利用性与攻击者意图」排序、关联成攻击路径（Nexus AI），并支持对假域名、假 App、欺诈社媒页面与钓鱼基础设施的下架；情报可接入 SIEM/SOAR/API/STIX/TAXII。官网银行案例称用 XVigil 发现假客服号码与泄露客户数据并下架，但未具名银行。它是最接近中国「威胁猎人/重明」的全球对应物，但主线是「与本企业资产相关的外部暴露」，而非主动打击灰产团伙。</p>
+            <dl class="facts">
+              <div><dt>谁付费</dt><dd>银行与企业安全团队，报价制</dd></div>
+              <div><dt>公开定价</dt><dd>未公开</dd></div>
+              <div><dt>规模证据</dt><dd>Gartner Peer Insights 4.8/5（约 370 条验证评价，2026-10-15 核查）<span class="flag second">二手引述</span></dd></div>
+            </dl>
+            <p class="src">来源：<a href="https://www.cloudsek.com/knowledge-base/dark-web-telegram-groups-for-cybersecurity-teams" target="_blank" rel="noopener">CloudSEK</a> · <a href="https://www.cloudsek.com/casestudies/how-leading-banks-combat-threats-using-xvigil" target="_blank" rel="noopener">CloudSEK 银行案例</a> · <a href="https://tech-insider.org/best-threat-intelligence-platforms-security-teams/" target="_blank" rel="noopener">Tech-Insider</a></p>
+          </article>
+
+          <article class="pcard">
+            <div class="head"><h3>Chainalysis / TRM Labs</h3><span class="badge part">部分符合 · 事后追踪</span></div>
+            <p class="sub">Chainalysis 美国纽约；TRM Labs 美国旧金山（总部城市未逐一核实 <span class="flag tbd">待核实</span>）</p>
+            <p class="targets"><b>针对环节：</b>杀猪盘与加密诈骗钱包、中文洗钱网络（CMLN）、Huione/Xinbi 等担保平台、诈骗资金的归集与分流钱包</p>
+            <p class="body">Chainalysis Reactor 与 Crypto Investigations Solution 做链上图谱与聚类：从受害者转账出发，追踪到诈骗钱包、归集钱包与交易所入金地址，再交执法冻结；TRM Labs 同理做钱包归因与制裁/诈骗标签。两者均不与骗子对话、不提前发现钱骡账户——情报来自受害者已付款之后的链上资金流，与 Apate / BeeSafe 的「骗子亲口给出、付款前发现」正好相反。入选只因其直接针对杀猪盘资金基础设施；若按「主动打击运营者」标准，它属事后取证，不应与诱饵类并列。</p>
+            <dl class="facts">
+              <div><dt>谁付费</dt><dd>执法机构、交易所、银行与加密机构，企业级订阅</dd></div>
+              <div><dt>公开定价</dt><dd>未公开</dd></div>
+              <div><dt>客户/案例</dt><dd>Chainalysis 与 OKX、Binance、Tether 合作追踪东南亚杀猪盘资金至 5 个钱包，Tether 冻结近 5,000 万美元 USDT（2024 年 6 月）；TRM Labs 参与 Prince Group 案钱包追踪（127,271 枚比特币扣押，2025 年 10 月起诉）<span class="flag second">二手报道引述</span><span class="flag tbd">待核实</span></dd></div>
+              <div><dt>规模证据</dt><dd>Chainalysis《2026 加密犯罪报告》估计 2025 年加密诈骗链上收款至少 140 亿美元、预计超 170 亿美元，中文洗钱网络 2025 年处理 161 亿美元</dd></div>
+            </dl>
+            <p class="src">来源：<a href="https://www.chainalysis.com/blog/apac-law-enforcement-freezes-pig-butchering-funds-august-2025/" target="_blank" rel="noopener">Chainalysis</a> · <a href="https://www.mindremix.com/2025/11/unveiling-chen-zhi-scandal-how-us.html" target="_blank" rel="noopener">MindRemix（二手）</a></p>
+          </article>
+
+          <article class="pcard">
+            <div class="head"><h3>Flashpoint / Intel 471 / Recorded Future</h3><span class="badge part">部分符合 · 通用情报</span></div>
+            <p class="sub">均为美国公司；Recorded Future 2024 年被 Mastercard 收购</p>
+            <p class="targets"><b>针对环节：</b>地下论坛与市场（Exploit、XSS、RAMP、DarkForums 等）上的初始访问代理（IAB）、被盗访问权、钓鱼套件、凭证与数据买卖、勒索软件附属关系——广义网络犯罪市场，非专门针对诈骗/杀猪盘/钱骡</p>
+            <p class="body">爬取与人工渗透地下论坛、市场与 Telegram 频道，做发帖量、价格、运营者 handle 归因、PGP 复用与跨平台画像；Recorded Future 另有 120 万+ 情报源的 Intelligence Graph 与支付欺诈情报模块。它们监测的是灰产交易的「市场」，但产品本身是通用 CTI，不区分诈骗团伙与 APT/勒索团伙，也不提取钱骡账户。CYBERA 的钱骡情报通过 Recorded Future 分发，恰好说明两者是互补而非替代。</p>
+            <dl class="facts">
+              <div><dt>谁付费</dt><dd>大型企业安全团队、金融机构、执法/情报机构</dd></div>
+              <div><dt>公开定价</dt><dd>官方均为报价制；第三方 Vendr 衍生数据称 Recorded Future 入门 4–6 万美元/单模块、中端 7.5–20 万、企业 25–50 万美元+，Flashpoint 入门约 4 万美元，Intel 471 入门约 3.5 万美元 <span class="flag second">二手数据</span><span class="flag tbd">待核实</span></dd></div>
+            </dl>
+            <p class="src">来源：<a href="https://research.therenoproject.org/corpus/playbook-phase-b" target="_blank" rel="noopener">Reno Project</a> · <a href="https://underdefense.com/blog/recorded-future-pricing-guide/" target="_blank" rel="noopener">UnderDefense</a></p>
+          </article>
+
+          <article class="pcard wide">
+            <div class="head"><h3>SpyCloud / DarkOwl / Flare / Cyble</h3><span class="badge part">部分符合 · 组列</span></div>
+            <p class="targets"><b>针对环节：</b>被盗数据交易的上游——infostealer 日志、泄露凭证、会话 cookie、API 密钥在暗网/Telegram 市场的流通</p>
+            <p class="body">SpyCloud 从 infostealer 恶意软件、钓鱼套件与泄露库中「recapture」凭证并做密码破解与验证，触发强制重置/会话吊销，其 2025 年度报告称 2024 年 recapture 533 亿条身份记录 <span class="flag self">公司自称</span>。DarkOwl Vision 是最大的商业暗网内容数据库之一，API 优先、面向调查团队；Flare 做 Telegram/stealer 日志/论坛/粘贴站的自动化监测与分流，面向无专职情报团队的中型企业；Cyble Vision 覆盖 Tor/I2P/ZeroNet、Telegram/Discord/IRC 与 250+ 应用商店，自称分析 3,500 亿+ 暗网记录、下架成功率 98.5% <span class="flag self">公司自称</span><span class="flag tbd">待核实</span>。判断：它们打击的是被盗数据的供给侧，不直接针对诈骗呼叫中心、杀猪盘运营者或钱骡网络；客户痛点是「账号接管」时它们是核心产品，痛点是「杀猪盘团伙」时它们只是外围。</p>
+            <p class="src">来源：<a href="https://cyble.com/knowledge-hub/best-dark-web-monitoring-services/" target="_blank" rel="noopener">Cyble</a> · <a href="https://www.joinmassive.com/blog/the-osint-stack-in-2026-93-osint-tools-across-12-categories" target="_blank" rel="noopener">Massive</a></p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="china">
+      <div class="wrap">
+        <h2>中国针对灰产的产品（重点）</h2>
+        <p class="sec-lede">总体判断先行：中国入选产品全部是「情报/监测/研判」型，没有一家做 AI 诱饵与骗子对话、套取钱骡账户。检索中唯一出现 AI 诱饵讨论的中文资料，是一篇讨论 Apate 合法性的法律文章（引用《反电信网络诈骗法》第 32 条的「反制技术」），未提及任何国内同类产品。</p>
+        <div class="cards">
+          <article class="pcard wide">
+            <div class="head"><h3>威胁猎人 Threat Hunter</h3><span class="badge core">核心符合</span></div>
+            <p class="sub">深圳永安在线科技有限公司 · 2017 年 1 月成立（前身即「威胁猎人」），核心团队来自腾讯安全团队；北京、上海、重庆、新加坡设分公司，深圳与重庆设数字风险应急响应中心（DRRC），7×24 服务。获猎豹移动、泰岳梧桐、真格基金等投资，轮次与金额未核实 <span class="flag tbd">待核实</span></p>
+            <p class="targets"><b>针对环节：</b>业务欺诈（薅羊毛、营销作弊、刷单）、数据泄露与被盗数据交易、钓鱼仿冒（域名/网站/App/社交账号）、水军与团伙、API 滥用、黑产工具/渠道/物料/团伙活动</p>
+            <p class="body">以黑灰产情报为底层能力，分四类产品平台：（1）业务反欺诈情报平台——持续监测黑灰产工具、渠道、物料与团伙活动，为账号、交易与营销场景提供外部攻击情报；（2）数据泄露风险情报平台——发现涉及企业、员工与用户的数据泄露线索，呈现风险证据、影响对象与跟踪状态；（3）钓鱼仿冒风险情报平台——发现仿冒域名、网站、应用、社交账号与欺诈内容，沉淀事件证据并支持处置协同（自称 24 小时内处置下架）；（4）水军检测与团伙溯源平台——围绕舆情事件识别协同行为、梳理团伙关联并交付可核验的调查依据。另有风险画像产品（手机号/IP/邮箱/设备画像）与专家情报服务。情报分团伙、工具、流量、资源四个维度交付，可订阅情报源、接收情报事件预警或调用画像 API。</p>
+            <dl class="facts">
+              <div><dt>谁付费</dt><dd>金融、政务、物流、互联网、科技、零售等行业企业客户（B2B 情报订阅 + 平台 + 专业服务），报价制</dd></div>
+              <div><dt>公开定价</dt><dd>未公开</dd></div>
+              <div><dt>客户/案例</dt><dd>自称已服务 300 多家客户、覆盖 85% 头部互联网企业，每年帮助客户减少数十亿元资金损失 <span class="flag self">公司自称，未经独立核实</span>；客户名录中出现腾讯、百度、阿里、华为、字节、美团、滴滴、知乎等，多为历史合作表述，具体合同 <span class="flag tbd">待核实</span></dd></div>
+              <div><dt>规模证据</dt><dd>2024 年 Q1 监测暗网、私密群聊等 42,529 个黑产渠道（环比新增 3,123 个）；2024 年全年监测数据泄露情报 3.03 亿条、验证有效事件 37,575 起、涉及 2,598 家企业；2026 年上半年验证有效数据泄露事件 23,645 起、钓鱼仿冒与品牌滥用事件 45,321 起（其中 SEO 污染 20,726 起、仿冒网站占 29.56%）。多次入选 Gartner 技术成熟度曲线报告与 IDC 威胁情报领域代表厂商（第三方收录，非业绩证明）</dd></div>
+              <div><dt>不做什么</dt><dd>不与骗子对话、不提取钱骡账户、不做资金拦截；输出的是「风险线索 + 研判 + 行动依据」，打击与冻结仍需客户或公安执行</dd></div>
+            </dl>
+            <p class="src">来源：<a href="https://www.threathunter.cn/" target="_blank" rel="noopener">威胁猎人官网</a> · <a href="https://www.threathunter.cn/products/phishing-platform" target="_blank" rel="noopener">钓鱼仿冒平台</a> · <a href="https://www.sdyanbao.com/detail/903697" target="_blank" rel="noopener">数说安全</a> · <a href="https://rivers.chaitin.cn/blog/cq94ts90lnechd2449lg" target="_blank" rel="noopener">长亭百川云</a> · <a href="https://telecom.chinabyte.com/151/364151.shtml" target="_blank" rel="noopener">ChinaByte</a> · <a href="https://cn.technode.com/post/2022-02-23/yazx-ever-security-new/" target="_blank" rel="noopener">动点科技</a></p>
+          </article>
+
+          <article class="pcard">
+            <div class="head"><h3>无糖信息 NoSugar —「重明」</h3><span class="badge core">核心符合</span></div>
+            <p class="sub">中国成都 · 2017 年 7 月 19 日成立，创始成员来自国内安全团队 PKAV；2023 年 12 月完成 B 轮融资，高成资本独家领投（金额未公开）；另有「赤狐—网络犯罪综合研判平台」</p>
+            <p class="targets"><b>针对环节：</b>Telegram 与其他匿名通信软件上的黑灰产群组、暗网市场、网络犯罪社群交易：赌博、数据贩卖、洗钱、实物洗钱、非法证件、黑客技术、刷单、假烟假酒等</p>
+            <p class="body">针对 Telegram 等「拒绝调证」的匿名通信软件做自动化采集—清洗—还原监控：对各类黑灰产平台布控，每日捕获数千万条情报、汇聚百亿级数据，自动提取虚拟身份信息（联系方式、网络社会关系、虚拟实体等）以确定犯罪人员身份，提供多维检索与智能分析模型；按案件类型（实物洗钱、非法证件、黑客技术、刷单等）建模，可一键查询相关情报；另有基于调度器与分布式爬虫引擎的分类标签与情报知识图谱。</p>
+            <dl class="facts">
+              <div><dt>谁付费</dt><dd>主要是公安机关，另有运营商、金融银行与互联网单位；以标准化 SaaS 产品为核心，覆盖案前宣传、预警、案件研判、取证全流程。重明可通过无糖浏览器免费使用基础版、联系客服开通 7 天试用，完整版报价制</dd></div>
+              <div><dt>公开定价</dt><dd>未公开（基础版可免费试用）</dd></div>
+              <div><dt>客户/案例</dt><dd>自称已为全国 600 余家公安、运营商、金融与互联网单位提供反网络犯罪解决方案，阻止千万起电信诈骗事件、挽回上百亿元直接经济损失 <span class="flag self">公司自称，未经独立核实</span>；与公安部、多省市公安厅、四川大学、腾讯、蚂蚁金服成立联合实验室；多个产品入选工信部网络安全技术应用试点示范项目</dd></div>
+              <div><dt>融资/规模</dt><dd>B 轮高成资本独家领投；30 余项技术专利、百余项软件资质；国家高新技术企业、「专精特新」企业</dd></div>
+              <div><dt>不做什么</dt><dd>不与骗子对话、不提取钱骡账户；输出的是犯罪人员身份与线索，供公安研判与抓捕使用</dd></div>
+            </dl>
+            <p class="src">来源：<a href="https://www.goupsec.com/news/16421.html" target="_blank" rel="noopener">GoUpSec（重明）</a> · <a href="https://www.goupsec.com/news/15053.html" target="_blank" rel="noopener">GoUpSec（B 轮）</a> · <a href="https://m.lejucaijing.com/news-7137736622460303191.html" target="_blank" rel="noopener">乐居财经</a> · <a href="https://rivers.chaitin.cn/blog/cq94nip0lnechd243qn0" target="_blank" rel="noopener">长亭百川云</a></p>
+          </article>
+
+          <article class="pcard">
+            <div class="head"><h3>奇安信 QAX —「星源」</h3><span class="badge core">核心符合</span></div>
+            <p class="sub">中国北京，奇安信科技集团（科创板上市）· 成立年份未在本次检索来源中核实 <span class="flag tbd">待核实</span></p>
+            <p class="targets"><b>针对环节：</b>涉诈网址与涉诈 App 背后的犯罪基础设施：后台管理网站、第三方服务 SDK、可疑身份、关键网络地址、犯罪家族（同页面/同图标/同模板/同家族聚类）</p>
+            <p class="body">对 APK/IPA/网站做智能研判，输出涉及犯罪的可疑身份、第三方服务、后台管理网站与关键网络地址；做 10 余种维度关联拓展（相似网页、同图标、同模板、同家族、同第三方服务等），实现拓线与串并；汇集第三方服务类可调证专题、后台管理网站类专题、高风险地区专题与家族专题。2026 年 6 月新型号上市，整合多年涉诈情报能力与自研检测模型引擎，提供涉诈网址/App 基础与增强检测及情报服务。</p>
+            <dl class="facts">
+              <div><dt>谁付费</dt><dd>公安、运营商与金融行业的反诈实战与风险管控部门</dd></div>
+              <div><dt>公开定价</dt><dd>未公开</dd></div>
+              <div><dt>客户/案例</dt><dd>自称 2025 年在某市关键区域协助公安日均预警近 20 万涉诈资产，当地重点区域案发率下降约 35%、事前预警率高达 93% <span class="flag self">公司自称、单城市、未具名</span><span class="flag tbd">待核实</span>；平台已为多家国企事业单位提供长期服务（未具名）。另有 XLab 大网威胁感知能力：2025 年春节发现超 2,000 个仿冒 DeepSeek 的钓鱼网站、披露 30 多个全球影响力僵尸网络</dd></div>
+              <div><dt>不做什么</dt><dd>不与骗子对话、不提取钱骡账户；输出的是涉诈资产检测与情报，封堵与抓捕由公安/运营商执行</dd></div>
+            </dl>
+            <p class="src">来源：<a href="https://www.qianxin.com/product/detail/pid/351" target="_blank" rel="noopener">奇安信产品页</a> · <a href="https://www.qianxin.com/news/detail?news_id=14511" target="_blank" rel="noopener">奇安信新闻</a> · <a href="https://pdf.dfcfw.com/pdf/H2_AN202608271828548893_1.pdf" target="_blank" rel="noopener">东方财富研报 PDF</a></p>
+          </article>
+
+          <article class="pcard">
+            <div class="head"><h3>微步在线 ThreatBook — ATI</h3><span class="badge part">部分符合</span></div>
+            <p class="sub">中国北京 · 2015 年 7 月成立，中国威胁情报行业开创者之一；北京、武汉、上海设研发中心</p>
+            <p class="targets"><b>针对环节：</b>暗网与 Telegram 上的数据泄露与账号凭证交易、钓鱼网站/仿冒应用/仿冒社交账号、黑产组织活动（银狐、黑猫等）</p>
+            <p class="body">ATI（高级威胁情报平台）按企业关心的行业、地域、业务资产、技术栈、供应商与关键词配置筛选，持续监测暗网及 Telegram 上与品牌、域名、邮箱后缀、关键词相关的数据泄露、账号凭证与攻击交易；对钓鱼网站、仿冒应用、仿冒社交账号实现「发现—取证—处置下架」全程闭环跟踪；另有云沙箱文件分析、漏洞情报与团伙情报，通过 API 接入 SIEM/SOAR/TIP/EDR/XDR。入选理由是暗网/Telegram 监测 + 钓鱼下架闭环直接针对灰产基础设施；不入选核心的理由是主线是通用威胁情报（APT、勒索、漏洞），黑产只是其中一类追踪对象，且不提取钱骡账户。</p>
+            <dl class="facts">
+              <div><dt>谁付费</dt><dd>金融、能源、政府、互联网、智能制造等行业的企业安全团队</dd></div>
+              <div><dt>公开定价</dt><dd>未公开</dd></div>
+              <div><dt>规模证据</dt><dd>自称实时追踪 180+ 全球 APT 组织及大型黑产组织、威胁情报准确度高达 99.99% <span class="flag self">公司自称</span><span class="flag tbd">待核实</span></dd></div>
+            </dl>
+            <p class="src">来源：<a href="https://www.fromgeek.com/daily/1044-730410.html" target="_blank" rel="noopener">FromGeek</a> · <a href="https://www.ithome.com/1/011/030.htm" target="_blank" rel="noopener">IT之家</a> · <a href="https://caifuhao.eastmoney.com/news/20260414171023505539100" target="_blank" rel="noopener">东方财富</a></p>
+          </article>
+
+          <article class="pcard">
+            <div class="head"><h3>运营商 + 公安反诈基础设施</h3><span class="badge pub">核心符合 · 公共项目</span></div>
+            <p class="sub">主体：中国移动（及中国电信、中国联通）、公安部国家反诈中心、工信部反诈专班。这不是一家公司，但在中国收窄答案中不可或缺——没有它，中国的图景不完整</p>
+            <p class="targets"><b>针对环节：</b>涉诈号码、GoIP/猫池设备、诈骗窝点、涉诈网站/域名、涉诈引流资源、黑卡（电话卡/银行卡）</p>
+            <p class="body">中国移动搭建网络侧、终端侧、浏览器侧、互联网侧四维防护，实时识别高危来电、恶意网页与异常访问；涉诈风险智能分析平台整合全网涉诈号码、发送行为与地域分布数据，用 AI 识别「仿冒催收、虚假取件、婚恋交友、虚假招聘」等百余种诈骗话术；GoIP 监测预警平台（「打猫杀手」/广东「猫头鹰反诈平台」）实时监控 GoIP 窝点并输出线索；联合公安封堵涉诈网址。</p>
+            <dl class="facts">
+              <div><dt>谁付费</dt><dd>无商业销售——运营商按《反电信网络诈骗法》与工信部责任清单履责，成本内部消化；公安的「断卡」「断流」「拔钉」「长城」与金融黑灰产集群打击为专项行动经费</dd></div>
+              <div><dt>规模证据</dt><dd>中国移动 2025 年累计向公安报送黑灰产线索 562.9 万条，协助查获 GoIP 设备 3.4 万台、捣毁诈骗窝点 1.5 万个、抓获嫌疑人 2.2 万人；累计拦截诈骗信息超 6,400 万条，封堵涉诈网站约 5,500 个、阻断访问超 9 亿次（官方/运营商自称）。公安部「断卡」行动以来打掉「两卡」团伙 1.5 万个，缴获涉诈电话卡 373.3 万张、银行卡 56.6 万张，惩戒失信人员 17.3 万名。2025 年 6–11 月公安部会同国家金融监督管理总局首次金融黑灰产集群打击：立案 1,500 余起、打掉职业化团伙 200 余个、涉案金额近 300 亿元；2026 年 4 月部署新一轮集群打击</dd></div>
+              <div><dt>不做什么</dt><dd>不向企业出售情报产品；不与骗子对话套取钱骡账户；其封堵是网络层与号码层的「断源」，与诱饵类的「套取收款账户」机制不同</dd></div>
+            </dl>
+            <p class="src">来源：<a href="https://www.c114.com.cn/news/118/a1320182.html" target="_blank" rel="noopener">C114（中国移动反诈）</a> · <a href="https://m.c114.com.cn/w118-1194577.html" target="_blank" rel="noopener">C114（GoIP/猫头鹰）</a> · <a href="http://www.sasac.gov.cn/n2588025/n2588139/c35431888/content.html" target="_blank" rel="noopener">国资委</a> · <a href="http://www.chinapeace.gov.cn/chinapeace/c100007/2021-06/17/content_12500169.shtml" target="_blank" rel="noopener">中国长安网（断卡行动）</a> · <a href="https://jrj.sh.gov.cn/zwdt-fxts-jgdt/20260407/c7897af244a84f0e82bbdbef2d1439c5.html" target="_blank" rel="noopener">上海市金融局（集群打击）</a></p>
+          </article>
+        </div>
+
+        <h3>考察后部分相关、不单独展开</h3>
+        <p class="sec-lede" style="margin-bottom:0">360 Netlab 与奇安信 XLab 在僵尸网络、大网威胁感知与仿冒域名监测上有公开研究（如 2026 年中报告称累计 3,500+ 仿冒域名），奇安信 TIP 是面向企业本地部署的通用威胁情报平台；但未找到以「灰产团伙/钱骡/Telegram 灰市」为独立产品线的证据。奇安信最接近的产品已在上文作为「星源」单独列出，此处不重复。来源：<a href="https://www.qianxin.com/threat/reportdetail?report_id=349" target="_blank" rel="noopener">奇安信威胁报告</a> · <a href="https://www.qianxin.com/product/detail/pid/390" target="_blank" rel="noopener">奇安信 TIP 产品页</a></p>
+      </div>
+    </section>
+
+    <section id="compare">
+      <div class="wrap">
+        <h2>与 Apate.ai / BeeSafe AI 的对照表</h2>
+        <p class="sec-lede">只列收窄后入选的产品。「—」表示未公开/未找到，不是零。所有规模数字均为公司自称或二手引述，未经独立审计。</p>
+        <div class="filters" role="group" aria-label="对照表筛选">
+          <button class="chip" data-filter="all" aria-pressed="true">全部（17）</button>
+          <button class="chip" data-filter="bait" aria-pressed="false">AI 诱饵 · 同机制（5）</button>
+          <button class="chip" data-filter="monitor" aria-pressed="false">监测 / 下架 / 追踪（7）</button>
+          <button class="chip" data-filter="china" aria-pressed="false">中国（5）</button>
+        </div>
+        <div class="tablewrap">
+          <table class="cmp">
+            <thead>
+              <tr><th>产品</th><th>针对的灰产环节</th><th>手段</th><th>付费客户</th><th>情报输出</th><th>公开定价</th><th>规模证据</th></tr>
+            </thead>
+            <tbody>
+              <tr data-cat="bait"><td class="name" data-label="产品">Apate.ai<span class="geo">澳大利亚 · 2024</span></td><td data-label="针对的灰产环节">诈骗呼叫中心、杀猪盘、钱骡账户、加密钱包、钓鱼站、冒充品牌</td><td data-label="手段">AI 诱饵受害者：语音+文本，拖住骗子、永不付款，套取收款信息；Insights 门户可下达定向任务</td><td data-label="付费客户">银行、电信、政府、公用事业</td><td data-label="情报输出">钱骡账户、加密钱包、电话、钓鱼站、品牌、话术；结构化推送</td><td data-label="公开定价">未公开</td><td data-label="规模证据">公司自称：250 万次对话、17 年骗子时间、25 万+情报；TPG 转接近 59 万通；CBA 损失 -76%（公司自称）</td></tr>
+              <tr data-cat="bait"><td class="name" data-label="产品">BeeSafe AI<span class="geo">美国 · YC W26</span></td><td data-label="针对的灰产环节">杀猪盘/信任型诈骗、钱骡账户、加密盗取器、恶意域名</td><td data-label="手段">AI 诱饵人设，长周期（7–8 天）多平台对话，绘制作案全貌</td><td data-label="付费客户">金融/加密（AML）、电信、政府</td><td data-label="情报输出">钱骡账户、欺诈资产、恶意域名、盗取器、关联基建；实时、高保真、非概率评分</td><td data-label="公开定价">未公开</td><td data-label="规模证据">公司自称：数万次对话、数千个钱骡账户+关联基建</td></tr>
+              <tr data-cat="bait"><td class="name" data-label="产品">CYBERA Money Mule Intelligence<span class="geo">美国 · 2020 或 2022，待核实</span></td><td data-label="针对的灰产环节">钱骡账户、诈骗资金洗钱链路</td><td data-label="手段">AI 人设与骗子互动，套取收款详情；经确认、有证据的 feed</td><td data-label="付费客户">银行、保险、金融科技；经 Recorded Future 分发</td><td data-label="情报输出">钱骡账户 feed（付款/新增受益人筛查用）；SOC 2 Type II</td><td data-label="公开定价">未公开</td><td data-label="规模证据">Mastercard 报道：欧洲银行拦截 6 万欧元已授权付款；融资 500 万美元种子轮（2022）</td></tr>
+              <tr data-cat="bait"><td class="name" data-label="产品">Lurely<span class="geo">总部未公开 · 发布前</span></td><td data-label="针对的灰产环节">钱骡账户、加密钱包、支付应用号、钓鱼站</td><td data-label="手段">AI 诱饵，至骗子说出「打到这里」即退出、永不付款；按开户行分发+完整对话证据</td><td data-label="付费客户">银行、支付/发卡、电信、执法/监管（设计合作伙伴招募中）</td><td data-label="情报输出">每家银行只收自家钱骡账户+对话证据</td><td data-label="公开定价">未公开</td><td data-label="规模证据">无（发布前）</td></tr>
+              <tr data-cat="bait"><td class="name" data-label="产品">ScamBuster<span class="geo">法国 · 开源</span></td><td data-label="针对的灰产环节">邮件钓鱼团伙收款层：IBAN、支付域名、电话前缀、加密钱包</td><td data-label="手段">仅入站 AI 诱饵邮件，6 智能体分工，GPT-4o-mini，低成本</td><td data-label="付费客户">无付费客户（研究者/安全团队自部署）</td><td data-label="情报输出">STIX 2.1 / MISP 结构化情报；聚类成团伙画像</td><td data-label="公开定价">免费（MIT），自付 LLM 成本</td><td data-label="规模证据">无公开规模；2025-11 起生产运行，2026-08 Black Hat 发布</td></tr>
+              <tr data-cat="monitor"><td class="name" data-label="产品">Netcraft<span class="geo">英国</span></td><td data-label="针对的灰产环节">钓鱼站/域名、仿冒品牌、假商店/App、加密诈骗</td><td data-label="手段">发现→验证→取证→封堵→下架→再监测；不与骗子对话</td><td data-label="付费客户">品牌方、金融、Web 服务商</td><td data-label="情报输出">钓鱼情报、下架状态</td><td data-label="公开定价">未公开（Vendr 中位约 $35k/年，二手，待核实）</td><td data-label="规模证据">自称：封堵 &lt;5 分钟，下架中位 33 分钟</td></tr>
+              <tr data-cat="monitor"><td class="name" data-label="产品">Group-IB DRP<span class="geo">新加坡</span></td><td data-label="针对的灰产环节">诈骗网络：域名/账户/支付资源/钓鱼页关联基建</td><td data-label="手段">图分析+自动归因，下架三阶段；不与骗子对话</td><td data-label="付费客户">品牌、金融、博彩/游戏</td><td data-label="情报输出">团伙结构图谱、下架协同</td><td data-label="公开定价">报价制（托管计划下架不限）</td><td data-label="规模证据">2026-05 与 Google SecOps 集成</td></tr>
+              <tr data-cat="monitor"><td class="name" data-label="产品">ZeroFox<span class="geo">美国</span></td><td data-label="针对的灰产环节">社交/域名/暗网钓鱼与冒充（通用）</td><td data-label="手段">监测+下架（按年计额度）；不提取钱骡</td><td data-label="付费客户">大型企业（品牌/高管保护）</td><td data-label="情报输出">冒充与钓鱼事件、下架</td><td data-label="公开定价">未公开（Vendr 中位约 $45.6k/年，二手，待核实）</td><td data-label="规模证据">自称：年下架超 100 万次、70+ 财富 500 强</td></tr>
+              <tr data-cat="monitor"><td class="name" data-label="产品">CloudSEK XVigil<span class="geo">印度</span></td><td data-label="针对的灰产环节">被盗数据交易、钓鱼套件/基建、假域名/App/客服号、Telegram 欺诈讨论</td><td data-label="手段">深/暗网+Telegram 监测，按可利用性排序，关联攻击路径，下架支持</td><td data-label="付费客户">银行、企业安全团队</td><td data-label="情报输出">与本企业资产相关的泄露/仿冒/钓鱼情报；SIEM/SOAR/STIX/TAXII</td><td data-label="公开定价">未公开</td><td data-label="规模证据">Gartner Peer 4.8/5（约 370 评，二手）</td></tr>
+              <tr data-cat="monitor"><td class="name" data-label="产品">Chainalysis / TRM Labs<span class="geo">美国</span></td><td data-label="针对的灰产环节">杀猪盘加密钱包、中文洗钱网络、担保平台</td><td data-label="手段">链上图谱/聚类，事后追踪至交易所入金地址交执法冻结；不与骗子对话</td><td data-label="付费客户">执法、交易所、银行/加密机构</td><td data-label="情报输出">钱包归因、资金流图谱、冻结线索</td><td data-label="公开定价">未公开</td><td data-label="规模证据">Chainalysis：2025 加密诈骗 ≥$140 亿（预计 &gt;$170 亿）；APAC 案冻结近 $5,000 万 USDT</td></tr>
+              <tr data-cat="monitor"><td class="name" data-label="产品">Flashpoint / Intel 471 / Recorded Future<span class="geo">美国</span></td><td data-label="针对的灰产环节">地下论坛/市场：IAB、被盗访问权、钓鱼套件、凭证买卖（通用网络犯罪）</td><td data-label="手段">论坛/市场/Telegram 爬取+人工渗透，运营者归因、价格追踪</td><td data-label="付费客户">大型企业安全、金融、执法/情报</td><td data-label="情报输出">地下市场情报、运营者画像、IoC</td><td data-label="公开定价">官方报价制（Vendr 衍生：入门 $35–60k，二手，待核实）</td><td data-label="规模证据">Recorded Future 120 万+情报源（自称）</td></tr>
+              <tr data-cat="monitor"><td class="name" data-label="产品">SpyCloud / DarkOwl / Flare<span class="geo">美国/加拿大 · 组列</span></td><td data-label="针对的灰产环节">被盗数据供给侧：infostealer 日志、泄露凭证、会话 cookie</td><td data-label="手段">Recapture 凭证并验证，触发重置/吊销；暗网数据库 API</td><td data-label="付费客户">企业安全/IAM、调查团队</td><td data-label="情报输出">泄露凭证/会话情报</td><td data-label="公开定价">未公开</td><td data-label="规模证据">SpyCloud 自称 2024 年 recapture 533 亿条身份记录</td></tr>
+              <tr data-cat="china"><td class="name" data-label="产品">威胁猎人<span class="geo">中国深圳 · 2017</span></td><td data-label="针对的灰产环节">业务欺诈、数据泄露交易、钓鱼仿冒、水军团伙、黑产工具/渠道/资源</td><td data-label="手段">黑灰产情报监测：暗网/私密群聊/社媒/二手平台；四平台+画像+专家服务</td><td data-label="付费客户">金融、政务、物流、互联网、科技、零售企业</td><td data-label="情报输出">情报事件预警、画像标签、情报源订阅；2026H1 验证泄露 23,645 起、钓鱼仿冒 45,321 起</td><td data-label="公开定价">未公开</td><td data-label="规模证据">300+ 客户、覆盖 85% 头部互联网（公司自称）；2024 Q1 监测 42,529 个黑产渠道</td></tr>
+              <tr data-cat="china"><td class="name" data-label="产品">无糖信息「重明」<span class="geo">中国成都 · 2017</span></td><td data-label="针对的灰产环节">Telegram/暗网黑灰产社群：赌博、数据贩卖、洗钱、假证、刷单等</td><td data-label="手段">匿名社群自动化采集—清洗—还原监控；虚拟身份提取与身份确定；案件建模</td><td data-label="付费客户">公安（主）、运营商、金融、互联网</td><td data-label="情报输出">犯罪人员身份、多维检索、情报知识图谱、案件线索</td><td data-label="公开定价">未公开（基础版可免费试用）</td><td data-label="规模证据">600+ 公安/运营商/金融/互联网单位（公司自称）；每日数千万条情报</td></tr>
+              <tr data-cat="china"><td class="name" data-label="产品">奇安信「星源」<span class="geo">中国北京</span></td><td data-label="针对的灰产环节">涉诈网址/App 背后基建：后台管理站、第三方服务、可疑身份、犯罪家族</td><td data-label="手段">涉诈网址/App 智能研判 + 10 余维关联拓展、拓线串并</td><td data-label="付费客户">公安、运营商、金融</td><td data-label="情报输出">涉诈网址/App 情报、关联图谱、高风险专题</td><td data-label="公开定价">未公开</td><td data-label="规模证据">公司自称：某市日均预警近 20 万涉诈资产、案发率 -35%、事前预警 93%（单城市，未具名，待核实）</td></tr>
+              <tr data-cat="china"><td class="name" data-label="产品">微步在线 ATI<span class="geo">中国北京 · 2015</span></td><td data-label="针对的灰产环节">暗网/Telegram 数据泄露交易、钓鱼/仿冒</td><td data-label="手段">按资产/关键词监测暗网+Telegram；钓鱼发现—取证—下架闭环</td><td data-label="付费客户">金融、能源、政府、互联网、智能制造</td><td data-label="情报输出">泄露/仿冒情报、下架跟踪；API 接 SIEM/SOAR</td><td data-label="公开定价">未公开</td><td data-label="规模证据">自称追踪 180+ APT/大型黑产组织</td></tr>
+              <tr data-cat="china"><td class="name" data-label="产品">中国移动/公安反诈基建<span class="geo">中国 · 公共项目</span></td><td data-label="针对的灰产环节">涉诈号码、GoIP/猫池、诈骗窝点、涉诈网站、黑卡</td><td data-label="手段">四维防护+AI 话术识别+GoIP 监测+封堵；断卡/断流/集群打击</td><td data-label="付费客户">无商业客户（履责+专项行动）</td><td data-label="情报输出">黑灰产线索报送公安、封堵清单</td><td data-label="公开定价">—（非商业）</td><td data-label="规模证据">2025 年报送线索 562.9 万条、查获 GoIP 3.4 万台、捣毁窝点 1.5 万个；断卡缴获电话卡 373.3 万张</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note-under">对照表读法：只有前 5 行（Apate、BeeSafe、CYBERA、Lurely、ScamBuster）与 Apate / BeeSafe 是同一机制（诱饵智能体）；其余行是同一目标、不同机制（监测、下架、链上追踪）。</p>
+      </div>
+    </section>
+
+    <section id="excluded">
+      <div class="wrap">
+        <h2>排除说明（中国）</h2>
+        <p class="sec-lede">以下公司检索过、有名气，但无证据表明其有针对灰产运营者/基础设施的独立产品线，故不进核心名单。这里写清它们做什么、不做什么。</p>
+        <div class="tablewrap">
+          <table class="exc">
+            <thead><tr><th style="width:22%">公司/产品</th><th style="width:39%">做什么</th><th>不做什么（为何不入选核心）</th></tr></thead>
+            <tbody>
+              <tr><td class="name">腾讯天御 / 灵鲲</td><td>天御：金融反欺诈评分、设备/行为/关系图谱、营销反作弊，称有 20+ 年黑产攻防经验沉淀；灵鲲：金融犯罪监管可视化，非法集资/传销「打早打小」识别覆盖率自称 99.99%，合作百余家银行/支付机构</td><td>不与骗子对话、不提取钱骡账户、无 Telegram/暗网灰市产品对外销售；黑产经验是内部风控能力的来源，不是针对运营者的产品线</td></tr>
+              <tr><td class="name">蚂蚁集团 / 阿里巴巴</td><td>蚂蚁 2014 年起设跨部门黑灰产联合治理团队，协助执法侦破金融黑灰产案件 6,000 余起；「反诈联盟链」共享 2,000 多万条黑灰产信息、协同处置风险账户 2 万余个；科技反诈开放平台开放 18 件专利与 5 套产品（叫醒热线、延时到账、电诈风险识别、受害人预警等）。阿里近一年提醒用户 48 亿人次、拦截风险行为 1,146 万次、处置风险账户 147 万个</td><td>均为平台内部治理 + 受害者保护/预警，不对外销售「打击灰产运营者」的产品；联盟链是信息共享机制，不是诱饵或钱骡提取产品</td></tr>
+              <tr><td class="name">同盾科技</td><td>设备指纹、代理检测、黑产工具识别、全网黑产名单库（虚假号码、通信小号、代理 IP、作弊设备等）、欺诈情报（行业报告）与交易反欺诈决策平台</td><td>主线是信贷/交易风控评分与决策，欺诈情报是研究报告与标签库，不针对灰产团伙做监测、互动或下架</td></tr>
+              <tr><td class="name">数美科技</td><td>注册/登录保护、设备指纹、团伙挖掘（手机号/设备/IP 时域关联网络）、撞库/洗号/养号识别；黑产研究院（2017 年成立）做黑产动向监测预警、海量黑产手机/IP 库、暗网情报与账号价格行情，服务内部风控与市场客户</td><td>黑产研究院是研究与策略支持部门，不是独立出售的「灰产打击产品」；天网产品主线是业务风控（营销欺诈、交易风控），属排除类</td></tr>
+              <tr><td class="name">顶象 / 邦盛</td><td>设备指纹、模拟器/群控识别、实时流式风控决策；邦盛以亚毫秒级实时识别见长</td><td>设备与交易风控，无灰产团伙监测/互动/下架产品线</td></tr>
+              <tr><td class="name">科大讯飞</td><td>未找到任何针对灰产/黑灰产的独立产品线（明确说明：检索无结果，非未检索）。语音识别曾被报道用于公安声纹等，但与灰产打击产品无关</td><td>—</td></tr>
+              <tr><td class="name">容联云</td><td>未找到针对灰产的产品线</td><td>相反，2022 年 3·15 晚会点名其关联企业容联七陌等呼叫中心企业涉骚扰电话黑产，工信部责令关停涉事语音专线并核查处罚——属「曾涉黑产链路」的通讯服务商，不属反灰产产品厂商</td></tr>
+              <tr><td class="name">马上消费金融「天星洞察」等</td><td>一站式智能决策平台，2025 年内累计处置 9 万条黑灰产信息；另有「黑灰产套路识别模型」在非法代理维权场景识别精确率自称超 90%</td><td>是持牌金融机构的内部风控工具，不对外销售，不属商业产品</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note-under">来源：<a href="https://cloud.tencent.com/developer/article/2592014" target="_blank" rel="noopener">腾讯云（天御）</a> · <a href="https://m.qudong.com/index.php/article/333211.html" target="_blank" rel="noopener">驱动中国（灵鲲）</a> · <a href="https://www.bianews.com/news/details?id=156898" target="_blank" rel="noopener">鞭牛士（蚂蚁治理）</a> · <a href="http://www.21jingji.com/article/20221216/cfc474fc8aabae0a0f1638ee49d9a3be.html" target="_blank" rel="noopener">21世纪经济报道（反诈开放平台）</a> · <a href="https://www.cidf.net/458113/2026/05-12/40268936.html" target="_blank" rel="noopener">CIDF（阿里反诈）</a> · <a href="https://www.tongdun.com/platform/" target="_blank" rel="noopener">同盾官网</a> · <a href="https://www.ishumei.com/research/research.html" target="_blank" rel="noopener">数美黑产研究院</a> · <a href="https://cloud.ofweek.com/news/2022-03/ART-178804-8420-30554613.html" target="_blank" rel="noopener">OFweek（容联云 3·15）</a> · <a href="https://www.mittrchina.com/news/detail/15673" target="_blank" rel="noopener">MIT 科技评论中文版（天星洞察）</a></p>
+      </div>
+    </section>
+
+    <section id="china-market">
+      <div class="wrap">
+        <h2>中国市场的特殊性</h2>
+        <p class="sec-lede">为什么这类产品在中国多为公安/运营商主导、商业公司只能做供应商——五个结构性原因。</p>
+        <ol class="reasons">
+          <li><b>打击权在公安，不在企业</b>中国的反诈打击是公安专项行动体系（「断卡」「断流」「拔钉」「长城」、金融黑灰产集群打击），商业公司没有执法权、冻结权与抓捕权，只能输出线索与情报。威胁猎人、无糖、奇安信的付费方名义上是企业，但最核心的落地场景是「协助公安」——无糖自称 600 余家客户中公安是主体，奇安信星源明确适用于「公安、运营商、金融行业的反诈实战」，威胁猎人也称「为公安提供网络犯罪打击工具」。</li>
+          <li><b>封堵权在运营商与监管，不在 SaaS</b>涉诈号码、域名与网站的封堵由运营商与工信部反诈专班执行，中国移动 2025 年封堵涉诈网站约 5,500 个、阻断访问超 9 亿次，是任何商业下架服务都无法比拟的规模；商业公司的下架只能针对品牌仿冒类内容，且需走平台投诉流程。</li>
+          <li><b>法律只给「反制技术」留了原则口子</b>《反电信网络诈骗法》第 32 条写了「反制技术」，但中文检索中未出现任何一家公司据此推出商业诱饵产品；法律讨论也反复划线——可以拖住骗子时间、记下其报出的账户并上报，但绝不能用真卡真账户收款、绝不能拿走骗子的钱，否则性质从反诈变为诈骗。在合规不确定下，商业公司宁愿做「监测+研判」的供应商，也不做「与骗子对话」的运营方。</li>
+          <li><b>数据主权与调证壁垒</b>Telegram 的端到端加密与身份隐匿形成「拒绝调证」能力，重明等产品的卖点正是「对拒绝调证的匿名通信软件做采集—还原监控」；但这类采集只能由有资质的供应商在公安授权下做，不能作为面向全行业的通用 SaaS 售卖。暗网/Telegram 监测在中国天然是「公安采购」，不是「企业订阅」。</li>
+          <li><b>付费意愿的结构性差异</b>全球诱饵类产品的付费逻辑是「银行为避免强制赔付而买单」（英国 2024 年 10 月起 push-payment 强制赔付、欧盟 2025 年 11 月新规、澳大利亚 2026 年 7 月 Scams Prevention Framework，见 Lurely 官网梳理）。中国没有同等力度的「银行全额赔付」机制，银行买「钱骡情报」的动力弱于买「交易风控评分」；而公安的采购是项目制、地域制，难以形成可复制的 SaaS 收入。</li>
+        </ol>
+
+        <div class="duo">
+          <div class="panel">
+            <h4>CEO 视角（商业判断）</h4>
+            <ul>
+              <li><b>第一个问题不是技术，是「谁为情报的法律后果负责」</b>：诱饵报出的虚拟身份、电话号码与对话记录能否作为证据？套取的钱骡账户交给谁、多快冻结、误伤谁负责？没有公安的联合运营协议，这些问题没有商业答案。</li>
+              <li><b>收入天花板由采购方决定</b>：全球诱饵公司卖给银行与电信（可规模化订阅）；中国同类能力的买家是公安与运营商（项目制、招投标、地域分割），且头部供应商已被威胁猎人、无糖、奇安信等占据，新进入者没有「银行订阅」这条第二曲线。</li>
+              <li><b>最现实的切入点不是「再造一个 Apate」，而是「做中国版 CYBERA 的某一环」</b>：例如只做涉诈网址/App 情报（星源已在做）、只做 Telegram 灰市监测（重明已在做）、只做钓鱼下架（威胁猎人已在做）——每一环都有在位者，且都绑定公安关系，纯技术差异化很难转化为订单。</li>
+            </ul>
+          </div>
+          <div class="panel">
+            <h4>CTO 视角（技术与合规判断）</h4>
+            <ul>
+              <li><b>技术上不难，难的是「安全运营」</b>：需要大量虚拟身份、电话号码、社媒账号与支付「诱饵位」，而这些资源本身就是灰产交易的标的（养号、接码、黑卡），采购与持有环节极易触碰合规红线；诱饵若使用真实手机号/账户，一旦被骗子用于收赃，运营方即从反诈方变为洗钱链路一环。</li>
+              <li><b>长周期信任型诈骗（BeeSafe 的强项）比语音拖时间（Apate 的强项）更难</b>：需要跨平台（短信→WhatsApp/Telegram/微信/Signal）维持人设一致性、处理多语言与方言、识别「换平台」节点；在中国语境下，微信/QQ 的风控与实名会先于骗子拦截诱饵账号，存活率是第一瓶颈。</li>
+              <li><b>「监测」与「诱饵」的证据等级不同</b>：威胁猎人/重明/星源输出的是「线索 + 关联 + 研判」，需人工核验；诱饵输出的是「骗子亲口给出的账户 + 完整对话」，证据等级更高，但也意味着更高的误报责任与数据合规成本（录音、个人信息、跨境传输）。</li>
+              <li><b>架构上应是三端联动，而非单一 SaaS</b>：「公安侧部署 + 运营商侧封堵 + 银行侧拦截」——诱饵只解决「发现钱骡」，冻结需银行、封堵需运营商、抓捕需公安；任何只做一端的产品都会在客户现场被问「然后呢」。</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="summary">
+      <div class="wrap">
+        <h2>总结</h2>
+        <ol class="takeaways">
+          <li><b>收窄后全球的答案是「诱饵智能体」这个新品类</b>：Apate.ai、BeeSafe AI、CYBERA 是已商业化的三家，Lurely 是发布前的第四家，ScamBuster 是开源的第五个实现。共同的商业逻辑是「骗子必须报出收款账户，诱饵在付款前拿到它」，与传统风控「付款后从交易模式中推断钱骡」正好相反。</li>
+          <li><b>收窄后中国的答案是「情报供应商 + 公安/运营商基建」，没有诱饵产品</b>：威胁猎人（业务欺诈/数据泄露/钓鱼仿冒情报）、无糖重明（Telegram/黑灰产社群监测）、奇安信星源（涉诈网址/App 情报）是三家核心符合的商业产品，微步 ATI 部分符合；真正的规模打击来自公安专项行动与运营商封堵体系。</li>
+          <li><b>不要把「通用威胁情报/品牌保护/链上追踪」误读为「灰产打击产品」</b>：Flashpoint、Intel 471、Recorded Future、Netcraft、Group-IB、ZeroFox、CloudSEK、Chainalysis、TRM Labs、SpyCloud/DarkOwl/Flare 都有与灰产相关的一块，但主线不是针对诈骗运营者；本页已按「核心/部分/不入选」分级，并在对照表中只列其相关产品线。</li>
+          <li><b>最大的空白是「中国版诱饵」</b>：技术可行、法律有原则口子、公安有需求，但商业模式、证据责任与合规边界均未跑通；任何进入者都应先拿到公安联合运营的授权与银行/运营商的联动协议，再谈模型与规模。</li>
+          <li><b>所有「规模」数字都应打折阅读</b>：Apate 的 250 万次对话、BeeSafe 的数千钱骡账户、威胁猎人的 300+ 客户、无糖的 600+ 单位、奇安信的「案发率 -35%」均为公司自称或单城市、未具名口径，未见独立审计；本页已逐处标注，引用时请保留该限定。</li>
+        </ol>
+
+        <h3>未核实 / 未找到（开放问题）</h3>
+        <ul class="plain">
+          <li>Apate 融资口径：815 万美元（TechCrunch）vs 1,140 万澳元（AInvest），汇率换算后大致接近但口径不一，<b>待核实</b>。</li>
+          <li>Apate 规模口径：智能体数量在「数千个」「约 35 万个」「约 19.7 万个人设」之间摇摆，<b>待核实</b>；2% 识破率、76% 损失下降、22 个活动打掉均为公司自称。</li>
+          <li>CYBERA 成立年份：2020 年（PitchBook/CB Insights）vs 2022 年（LinkedIn/LeadIQ），<b>待核实</b>；总融资额 580 万–1,371 万美元口径不一，<b>待核实</b>。</li>
+          <li>BeeSafe、Lurely 的成立年份、融资额、定价与具名客户：均未公开，<b>待核实/未找到</b>。</li>
+          <li>Netcraft、Group-IB、ZeroFox、CloudSEK、Flashpoint、Intel 471、Recorded Future 的定价：官方均为报价制，本页引用的 Vendr/第三方衍生价均为<b>二手数据，待核实</b>。</li>
+          <li>中国公司（威胁猎人、无糖、奇安信、微步）的客户数、挽回损失、预警率等：均为公司自称，部分为单城市、未具名口径，<b>待核实</b>。</li>
+          <li><b>未找到</b>：中国公开的 AI 诱饵/钱骡提取商业产品；全球以 SIM 农场/养号/假流量农场为独立卖点的商业产品；同盾/数美/顶象/邦盛针对灰产运营者的独立产品线；科大讯飞针对灰产的产品线。</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="sources">
+      <div class="wrap">
+        <h2>来源</h2>
+        <div class="sources">
+          <ul>
+            <li>Apate.ai — <a href="https://techcrunch.com/2026/10/14/apate-sends-ai-agents-undercover-to-get-scammed-so-they-can-gather-fraud-intelligence/" target="_blank" rel="noopener">TechCrunch, 2026-10-14</a></li>
+            <li>Apate.ai — <a href="https://www.ainvest.com/news/ai-fraud-abundant-scarce-asset-scammer-time-2610/" target="_blank" rel="noopener">AInvest</a></li>
+            <li>Apate.ai — <a href="https://www.yourlifechoices.com.au/life/the-picnic-phone-call-that-sparked-a-very-sneaky-revenge/" target="_blank" rel="noopener">YourLifeChoices</a></li>
+            <li>Apate.ai — <a href="https://www.webpronews.com/apate-turns-ai-agents-into-perfect-scam-victims-to-harvest-fraudster-secrets/" target="_blank" rel="noopener">WebProNews</a></li>
+            <li>BeeSafe AI — <a href="https://www.ycombinator.com/companies/beesafe-ai" target="_blank" rel="noopener">Y Combinator</a></li>
+            <li>BeeSafe AI — <a href="https://www.scworld.com/news/talk-to-the-llm-how-ai-exposes-pig-butchering-scams" target="_blank" rel="noopener">SCWorld</a></li>
+            <li>BeeSafe AI — <a href="https://www.paymentvillage.org/def-con-34/speakers" target="_blank" rel="noopener">DEF CON 34 / Payment Village</a></li>
+            <li>CYBERA — <a href="https://www.mastercard.com/us/en/news-and-trends/stories/2026/cybera-ai-scam-money-mule-accounts.html" target="_blank" rel="noopener">Mastercard, 2026-10-27</a></li>
+            <li>CYBERA — <a href="https://www.linkedin.com/company/cyberaglobal" target="_blank" rel="noopener">LinkedIn</a> · <a href="https://pitchbook.com/profiles/company/481266-01" target="_blank" rel="noopener">PitchBook</a> · <a href="https://leadiq.com/c/cybera/5e29ab4a62be9f43ca5b532c" target="_blank" rel="noopener">LeadIQ</a></li>
+            <li><a href="https://lurely.ai/" target="_blank" rel="noopener">Lurely 官网</a></li>
+            <li>ScamBuster — <a href="https://scambuster.ai/" target="_blank" rel="noopener">官网</a> · <a href="https://www.darkreading.com/cyberattacks-data-breaches/turning-tables-email-scammers-scambuster" target="_blank" rel="noopener">Dark Reading</a> · <a href="https://kingy.ai/news/scambuster-ai-bot-tricks-email-scammers/" target="_blank" rel="noopener">Kingy AI</a></li>
+            <li>Netcraft / Group-IB / ZeroFox — <a href="https://www.netcraft.com/blog/best-phishing-detection-tools-web-services" target="_blank" rel="noopener">Netcraft blog</a></li>
+            <li>Group-IB / ZeroFox — <a href="https://www.techdogs.com/blogs/blog-detail/9-best-digital-risk-protection-platforms-for-2026" target="_blank" rel="noopener">TechDogs</a></li>
+            <li>ZeroFox / Netcraft 定价 — <a href="https://lawyerd.net/blog/top-igaming-brand-protection-companies-2026/" target="_blank" rel="noopener">Lawyered</a></li>
+            <li>CloudSEK XVigil — <a href="https://www.cloudsek.com/knowledge-base/dark-web-telegram-groups-for-cybersecurity-teams" target="_blank" rel="noopener">官网知识库</a> · <a href="https://www.cloudsek.com/casestudies/how-leading-banks-combat-threats-using-xvigil" target="_blank" rel="noopener">银行案例</a></li>
+            <li>Flashpoint / Intel 471 / Recorded Future 定价 — <a href="https://underdefense.com/blog/recorded-future-pricing-guide/" target="_blank" rel="noopener">UnderDefense</a></li>
+            <li>SpyCloud / DarkOwl / Flare — <a href="https://cyble.com/knowledge-hub/best-dark-web-monitoring-services/" target="_blank" rel="noopener">Cyble</a></li>
+            <li>Chainalysis — <a href="https://www.chainalysis.com/blog/apac-law-enforcement-freezes-pig-butchering-funds-august-2025/" target="_blank" rel="noopener">APAC 杀猪盘资金冻结案例</a></li>
+            <li>TRM Labs / Prince Group — <a href="https://www.mindremix.com/2025/11/unveiling-chen-zhi-scandal-how-us.html" target="_blank" rel="noopener">MindRemix（二手）</a></li>
+            <li>威胁猎人 — <a href="https://www.threathunter.cn/" target="_blank" rel="noopener">官网</a> · <a href="https://www.threathunter.cn/products/phishing-platform" target="_blank" rel="noopener">钓鱼仿冒平台</a> · <a href="https://rivers.chaitin.cn/blog/cq94ts90lnechd2449lg" target="_blank" rel="noopener">2024 Q1 产品升级</a> · <a href="https://www.sdyanbao.com/detail/903697" target="_blank" rel="noopener">2025 上半年报告</a> · <a href="https://telecom.chinabyte.com/151/364151.shtml" target="_blank" rel="noopener">2026 上半年数据</a></li>
+            <li>无糖信息「重明」 — <a href="https://www.goupsec.com/news/16421.html" target="_blank" rel="noopener">GoUpSec</a> · <a href="https://www.goupsec.com/news/15053.html" target="_blank" rel="noopener">B 轮融资</a> · <a href="https://m.lejucaijing.com/news-7137736622460303191.html" target="_blank" rel="noopener">乐居财经</a></li>
+            <li>奇安信「星源」 — <a href="https://www.qianxin.com/product/detail/pid/351" target="_blank" rel="noopener">产品页</a> · <a href="https://www.qianxin.com/news/detail?news_id=14511" target="_blank" rel="noopener">网络犯罪防治/星源新闻</a></li>
+            <li>微步在线 ATI — <a href="https://www.fromgeek.com/daily/1044-730410.html" target="_blank" rel="noopener">FromGeek</a> · <a href="https://www.ithome.com/1/011/030.htm" target="_blank" rel="noopener">IT之家</a></li>
+            <li>腾讯天御 — <a href="https://cloud.tencent.com/developer/article/2592014" target="_blank" rel="noopener">腾讯云开发者社区</a>；灵鲲 — <a href="https://m.qudong.com/index.php/article/333211.html" target="_blank" rel="noopener">驱动中国</a></li>
+            <li>蚂蚁集团黑灰产治理 — <a href="https://www.bianews.com/news/details?id=156898" target="_blank" rel="noopener">鞭牛士</a> · <a href="http://www.21jingji.com/article/20221216/cfc474fc8aabae0a0f1638ee49d9a3be.html" target="_blank" rel="noopener">科技反诈开放平台</a> · <a href="https://www.cidf.net/458113/2026/05-12/40268936.html" target="_blank" rel="noopener">阿里/蚂蚁反诈实践</a></li>
+            <li>同盾科技 — <a href="https://www.tongdun.com/platform/" target="_blank" rel="noopener">官网平台页</a></li>
+            <li>数美科技 — <a href="https://www.ishumei.com/research/research.html" target="_blank" rel="noopener">黑产研究院</a> · <a href="https://www.ishumei.com/product/bs-post-register.html" target="_blank" rel="noopener">注册登录保护</a></li>
+            <li>容联云 3·15 — <a href="https://cloud.ofweek.com/news/2022-03/ART-178804-8420-30554613.html" target="_blank" rel="noopener">OFweek</a></li>
+            <li>中国移动反诈 — <a href="https://www.c114.com.cn/news/118/a1320182.html" target="_blank" rel="noopener">C114</a> · <a href="https://m.c114.com.cn/w118-1194577.html" target="_blank" rel="noopener">GoIP / 猫头鹰平台</a></li>
+            <li>金融黑灰产集群打击 — <a href="https://jrj.sh.gov.cn/zwdt-fxts-jgdt/20260407/c7897af244a84f0e82bbdbef2d1439c5.html" target="_blank" rel="noopener">上海市金融局</a></li>
+            <li>断卡行动 — <a href="http://www.chinapeace.gov.cn/chinapeace/c100007/2021-06/17/content_12500169.shtml" target="_blank" rel="noopener">中国长安网</a></li>
+            <li>AI 诱饵合法性讨论（《反电信网络诈骗法》第 32 条）— <a href="https://www.mankunlaw.com/insights/ai-counter-fraud-legality/" target="_blank" rel="noopener">曼昆律师事务所</a></li>
+            <li>金融黑灰产规模（马上消费天星洞察）— <a href="https://www.mittrchina.com/news/detail/15673" target="_blank" rel="noopener">MIT 科技评论中文版</a></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="history">
+      <div class="wrap">
+        <h2>历史任务记录</h2>
+        <div class="history">
+          <div class="row"><span class="d">2026-11-03</span><span class="t">Apate.ai 公司调研（重点：产品与商业模式）——报告页 + 13 页高端 PDF 已交付</span><span class="s done">已完成</span></div>
+          <div class="row"><span class="d">2026-11-04</span><span class="t">全球与中国类似公司对比（直接同类 + 相邻赛道两层）——对比页已交付</span><span class="s done">已完成</span></div>
+          <div class="row"><span class="d">2026-11-04</span><span class="t">BeeSafe AI 专项调研（Apate 同标准，含与 Apate 对照）——调研完成，报告页与 PDF 制作中</span><span class="s doing">进行中</span></div>
+          <div class="row"><span class="d">2026-11-04</span><span class="t">收窄版调研：只针对灰产运营者/基础设施的产品（全球 + 中国）——本页</span><span class="s done">已完成</span></div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="wrap">
+        <p>本页基于 2026-11-04 的公开资料深度调研整理。所有效果与规模数字均按来源标注证据等级（公司自称 / 待核实 / 二手数据），未做独立验证，不构成投资或采购建议。</p>
+      </div>
+    </footer>
+
+    <script>
+      (function(){
+        var chips = document.querySelectorAll('.chip[data-filter]');
+        var rows = document.querySelectorAll('table.cmp tbody tr');
+        chips.forEach(function(chip){
+          chip.addEventListener('click', function(){
+            chips.forEach(function(c){ c.setAttribute('aria-pressed','false'); });
+            chip.setAttribute('aria-pressed','true');
+            var f = chip.getAttribute('data-filter');
+            rows.forEach(function(r){
+              r.style.display = (f === 'all' || r.getAttribute('data-cat') === f) ? '' : 'none';
+            });
+          });
+        });
+      })();
+    </script>
+  </body>
+</html>
