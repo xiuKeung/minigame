@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f5f5f0">
+  <meta name="description" content="从十八张积木照片重建的机械翼龙战车。旋转、缩放、展开双翼，在 3D 中重新发现你的创作。">
+  <title>机械翼龙战车 · 积木档案</title>
+  <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./style.css?v=8">
+</head>
+<body>
+  <header class="header">
+    <a class="brand" href="./" aria-label="积木档案首页"><span class="brand-icon" aria-hidden="true">▦</span>积木档案<span class="brand-en">BRICK ARCHIVE</span></a>
+    <nav aria-label="页面导航"><a class="active" href="#exhibit">模型展厅</a><a href="./game.html">空中冒险</a><a href="./rescue/">遗迹救援</a><a href="./galaxian/">翼龙小蜜蜂</a><a href="#references">参考图库 <span>23</span></a></nav>
+    <span class="header-note"><i></i> 让想象，立体起来</span>
+  </header>
+
+  <main>
+    <section id="exhibit" aria-labelledby="title">
+      <div class="intro">
+        <div><p class="eyebrow"><span>藏品 001</span><b></b> PHOTO TO FORM</p><h1 id="title">机械翼龙战车<span class="title-dot">.</span></h1><p class="subtitle">一只机械翼龙，一辆探索战车。让积木里的想象，走进 3D 世界。</p><div class="collection-summary"><p>伏在车顶的机械翼龙，以长喙、折翼和关节勾勒轮廓；四轮底盘，承载下一段冒险。</p><div class="tags"><span>机械翼龙</span><span>四轮战车</span><span>积木创作</span></div></div></div>
+        <a class="download" href="./assets/mechanical-pterosaur.glb" download><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M5 16v4h14v-4"/></svg>下载 3D 模型<span>GLB</span></a>
+      </div>
+
+      <div class="exhibit-layout">
+        <div class="viewer" id="viewer">
+          <div class="stage-label"><span class="live-dot"></span> 交互式 3D 预览<span class="stage-label-sub">TRANSFORMATION / V3</span></div>
+          <div id="canvas-host" role="img" aria-label="机械翼龙战车三维模型，可用鼠标拖动旋转、滚轮缩放，或使用下方视角按钮"></div>
+          <div class="cinema-caption" id="cinema-caption" hidden><span id="chapter-number">01 / 07</span><h3 id="chapter-title">战车驶入</h3><p id="chapter-detail">四轮滚动，进入展示区域</p></div>
+          <section class="playback" id="playback" aria-label="变身动画播放器" hidden>
+            <div class="playback-top"><span class="film-label">TRANSFORM <b>20s</b></span><span id="playback-status" role="status">已暂停</span><button id="exit-animation">退出动画 ×</button></div>
+            <input id="animation-seek" type="range" min="0" max="20" step="0.01" value="0" aria-label="动画进度（秒）">
+            <div class="playback-buttons"><button id="animation-play" aria-label="播放动画">播放</button><button id="animation-restart" aria-label="从头重播">↺ 重播</button><button id="animation-reverse" aria-pressed="false">倒放</button><label class="speed-label">速度 <select id="animation-speed" aria-label="动画播放速度"><option value="0.5">0.5×</option><option value="1" selected>1×</option><option value="1.5">1.5×</option><option value="2">2×</option></select></label><output id="animation-clock" for="animation-seek">00.0 / 20.0</output></div>
+          </section>
+          <div class="loading" id="loading"><span class="loader"></span><span>正在搭建你的积木世界…</span></div>
+          <div class="view-tools"><button id="reset" class="icon-button" aria-label="重置视角" title="重置视角"><svg viewBox="0 0 24 24"><path d="M4 10a8 8 0 1 1 1 7M4 4v6h6"/></svg></button><button id="fullscreen" class="icon-button" aria-label="全屏查看" title="全屏查看"><svg viewBox="0 0 24 24"><path d="M8 4H4v4m12-4h4v4M4 16v4h4m12-4v4h-4"/></svg></button></div>
+          <span class="orientation" aria-hidden="true"><span>Y</span><svg viewBox="0 0 60 55"><path d="M30 30V5M30 30 8 44M30 30l22 14"/><circle cx="30" cy="30" r="3"/></svg><b>X</b><i>Z</i></span>
+          <div class="stage-bottom"><span class="gesture-hint"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="6"/><path d="M12 6v5"/></svg><span>拖动旋转 <em>·</em> 滚动缩放</span></span><div class="views" role="group" aria-label="模型视角"><button data-view="perspective" class="selected" aria-pressed="true">透视</button><button data-view="side" aria-pressed="false">侧面</button><button data-view="front" aria-pressed="false">正面</button><button data-view="top" aria-pressed="false">俯视</button></div></div>
+        </div>
+
+        <aside class="panel" aria-label="模型控制">
+          <div class="panel-heading"><span class="small-label">互动控制</span></div>
+          <button id="start-animation" class="animation-launch"><span aria-hidden="true">▶</span><span>播放变身动画<small>脱离 · 站立 · 展翼 · 合体</small></span><b>20s</b></button>
+          <p class="animation-disclaimer">动画为结构演示；空中移位由演出编排完成。</p>
+          <div class="divider"></div>
+          <label class="small-label">展示模式</label>
+          <div class="mode-switch" role="group" aria-label="展示模式"><button data-mode="combined" class="selected" aria-pressed="true">完整作品</button><button data-mode="split" aria-pressed="false">分离同屏</button><button data-mode="creature" aria-pressed="false">机械翼龙</button><button data-mode="chassis" aria-pressed="false">独立战车</button></div>
+          <p id="mode-detail" class="mode-detail" aria-live="polite">翼龙伏在车顶，四点接口连接两部分。</p>
+          <div id="pose-controls" hidden><span class="small-label">翼龙姿态</span><div class="pose-switch" role="group" aria-label="翼龙姿态"><button data-pose="standing" aria-pressed="true" class="selected">站立姿态</button><button data-pose="resting" aria-pressed="false">伏卧姿态</button></div></div>
+          <div class="toggle-row"><label for="rotate">自动旋转</label><button id="rotate" class="switch" role="switch" aria-checked="false" aria-label="自动旋转"><span></span></button></div>
+          <div class="toggle-row"><label for="wireframe">查看线框</label><button id="wireframe" class="switch" role="switch" aria-checked="false" aria-label="查看线框"><span></span></button></div>
+          <div class="slider-heading"><label for="wings">翼部关节</label><output id="wing-value" for="wings">0%</output></div>
+          <input id="wings" type="range" min="0" max="100" value="0" aria-label="翼部关节角度">
+          <div class="slider-labels"><span>照片姿态</span><span>抬起双翼</span></div>
+          <div class="slider-heading"><label for="head-pitch">头部俯仰</label><output id="head-value" for="head-pitch">0°</output></div>
+          <input id="head-pitch" type="range" min="-15" max="25" value="0" aria-label="头部俯仰角度">
+          <button id="separate" class="separate-button" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3 9 5-9 5-9-5 9-5Zm-9 9 9 5 9-5M3 16l9 5 9-5"/></svg><span>分层查看结构</span><span aria-hidden="true">↗</span></button>
+          <p class="model-note"><span>关于模型</span>结合 18 张实拍校正部件归属、车顶接口与站立姿态。遮挡细节和关节运动仍为近似。</p>
+        </aside>
+      </div>
+      <div class="exhibit-footer"><span><b class="yellow-square"></b> 经典明黄 <span class="muted">/</span> 石墨黑 <span class="muted">/</span> 机械灰</span><span>源于真实积木 · 可自由探索</span></div>
+    </section>
+
+    <section class="tank-showcase" id="tank-model" aria-labelledby="tank-title">
+      <div class="intro tank-intro"><div><p class="eyebrow"><span>藏品 002</span><b></b> PHOTO TO FORM</p><h1 id="tank-title">黄色双炮坦克<span class="title-dot">.</span></h1><p class="subtitle">一辆双炮装甲战术坦克。旋转、缩放，并调整炮塔与炮管，细看积木里的机械结构。</p><div class="collection-summary"><p>黄色楔形车体、黑色履带、侧面灰色格栅，以及可旋转的双管炮塔。</p><div class="tags"><span>双炮</span><span>履带底盘</span><span>可动炮塔</span></div></div></div><a class="download" href="./assets/yellow-twin-cannon-tank.glb" download><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12m-4-4 4 4 4-4M5 16v4h14v-4"/></svg>下载 3D 模型<span>GLB</span></a></div>
+      <div class="exhibit-layout">
+        <div class="viewer" id="tank-viewer">
+          <div class="stage-label"><span class="live-dot"></span> 交互式 3D 预览<span class="stage-label-sub">TACTICAL ARMOUR / V1</span></div>
+          <div id="tank-canvas-host" role="img" aria-label="黄色双炮坦克三维模型，可用鼠标拖动旋转、滚轮缩放，或使用下方视角按钮"></div>
+          <div class="view-tools"><button id="tank-reset" class="icon-button" aria-label="重置坦克视角" title="重置视角"><svg viewBox="0 0 24 24"><path d="M4 10a8 8 0 1 1 1 7M4 4v6h6"/></svg></button><button id="tank-fullscreen" class="icon-button" aria-label="坦克全屏" title="全屏查看"><svg viewBox="0 0 24 24"><path d="M8 4H4v4m12-4h4v4M4 16v4h4m12-4v4h-4"/></svg></button></div>
+          <span class="orientation" aria-hidden="true"><span>Y</span><svg viewBox="0 0 60 55"><path d="M30 30V5M30 30 8 44M30 30l22 14"/><circle cx="30" cy="30" r="3"/></svg><b>X</b><i>Z</i></span>
+          <div class="stage-bottom"><span class="gesture-hint"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="6"/><path d="M12 6v5"/></svg><span>拖动旋转 <em>·</em> 滚动缩放</span></span><div class="views" role="group" aria-label="坦克模型视角"><button data-tank-view="perspective" class="selected" aria-pressed="true">透视</button><button data-tank-view="side" aria-pressed="false">侧面</button><button data-tank-view="front" aria-pressed="false">正面</button><button data-tank-view="top" aria-pressed="false">俯视</button></div></div>
+        </div>
+        <aside class="panel" aria-label="坦克模型控制">
+          <div class="panel-heading"><span class="small-label">互动控制</span></div><div class="divider"></div>
+          <div class="toggle-row"><label for="tank-rotate">自动旋转</label><button id="tank-rotate" class="switch" role="switch" aria-checked="false" aria-label="坦克自动旋转"><span></span></button></div>
+          <div class="toggle-row"><label for="tank-wireframe">查看线框</label><button id="tank-wireframe" class="switch" role="switch" aria-checked="false" aria-label="坦克查看线框"><span></span></button></div>
+          <div class="slider-heading"><label for="tank-turret">炮塔转向</label><output for="tank-turret">左右</output></div><input id="tank-turret" type="range" min="-90" max="90" value="0" aria-label="炮塔转向">
+          <div class="slider-heading"><label for="tank-barrel">炮管仰角</label><output for="tank-barrel">0° — 80°</output></div><input id="tank-barrel" type="range" min="0" max="80" value="0" aria-label="炮管仰角，范围零至八十度">
+          <button id="tank-auto-aim" class="separate-button" aria-pressed="false"><span aria-hidden="true">◎</span><span>演示炮塔扫描</span><span aria-hidden="true">↗</span></button>
+          <p class="model-note"><span>关于模型</span>根据五个实拍角度制作；未拍到的内部连接与底面按外形补全。</p>
+        </aside>
+      </div>
+      <div class="exhibit-footer"><span><b class="yellow-square"></b> 经典明黄 <span class="muted">/</span> 石墨黑 <span class="muted">/</span> 机械灰</span><span id="tank-mesh-count">源于真实积木 · 可自由探索</span></div>
+    </section>
+
+    <section class="references" id="references" aria-labelledby="references-title">
+      <div class="section-heading"><div><p class="eyebrow">BEHIND THE BUILD</p><h2 id="references-title">全部模型参考照片<span>23</span></h2></div><p>按模型形态归类，保留每一个还原线索。<br>点击照片，查看原始细节。</p></div>
+      <div class="photo-filters" role="group" aria-label="参考照片分类"><button data-filter="all" class="selected" aria-pressed="true">全部 <span>23</span></button><button data-filter="combined" aria-pressed="false">翼龙战车组合 <span>6</span></button><button data-filter="creature" aria-pressed="false">机械翼龙 <span>6</span></button><button data-filter="chassis" aria-pressed="false">独立战车 <span>6</span></button><button data-filter="tank" aria-pressed="false">黄色双炮坦克 <span>5</span></button></div>
+      <div class="photo-grid">
+        <button class="photo" data-category="combined" data-photo="0"><div><img src="./assets/photos/01.jpg" alt="机械翼龙战车俯视，车尾朝上" loading="lazy"></div><span><b>01</b> 整体俯视 <i>↗</i></span></button>
+        <button class="photo" data-category="combined" data-photo="1"><div><img src="./assets/photos/02.jpg" alt="机械翼龙战车反向俯视，长喙朝上" loading="lazy"></div><span><b>02</b> 反向俯视 <i>↗</i></span></button>
+        <button class="photo" data-category="combined" data-photo="2"><div><img src="./assets/photos/03.jpg" alt="战车左侧面，展示车轮、长喙及灰色关节" loading="lazy"></div><span><b>03</b> 左侧结构 <i>↗</i></span></button>
+        <button class="photo" data-category="combined" data-photo="3"><div><img src="./assets/photos/04.jpg" alt="战车右侧面，展示底盘及红色尾杆" loading="lazy"></div><span><b>04</b> 右侧结构 <i>↗</i></span></button>
+        <button class="photo" data-category="combined" data-photo="4"><div><img src="./assets/photos/05.jpg" alt="从长喙一端斜上方拍摄的机械翼龙" loading="lazy"></div><span><b>05</b> 正面轮廓 <i>↗</i></span></button>
+        <button class="photo" data-category="combined" data-photo="5"><div><img src="./assets/photos/06.jpg" alt="机械翼龙背部及两侧三角形折翼" loading="lazy"></div><span><b>06</b> 翼部细节 <i>↗</i></span></button>
+        <button class="photo new-reference" data-category="creature" data-photo="6"><div><img src="./assets/photos/thumbs/07.jpg" data-full="./assets/photos/07.jpg" alt="翼龙正面，脱离组合后的实拍细节" loading="lazy"></div><span><b>07</b> 翼龙正面 <i>↗</i></span></button>
+        <button class="photo new-reference" data-category="creature" data-photo="7"><div><img src="./assets/photos/thumbs/08.jpg" data-full="./assets/photos/08.jpg" alt="翼龙右侧，脱离组合后的实拍细节" loading="lazy"></div><span><b>08</b> 翼龙右侧 <i>↗</i></span></button>
+        <button class="photo new-reference" data-category="creature" data-photo="8"><div><img src="./assets/photos/thumbs/09.jpg" data-full="./assets/photos/09.jpg" alt="翼龙背部，脱离组合后的实拍细节" loading="lazy"></div><span><b>09</b> 翼龙背部 <i>↗</i></span></button>
+        <button class="photo new-reference" data-category="creature" data-photo="9"><div><img src="./assets/photos/thumbs/10.jpg" data-full="./assets/photos/10.jpg" alt="翼龙左侧，脱离组合后的实拍细节" loading="lazy"></div><span><b>10</b> 翼龙左侧 <i>↗</i></span></button>
+        <button class="photo new-reference" data-category="creature" data-photo="10"><div><img src="./assets/photos/thumbs/11.jpg" data-full="./assets/photos/11.jpg" alt="头部与翼根，脱离组合后的实拍细节" loading="lazy"></div><span><b>11</b> 头部与翼根 <i>↗</i></span></button>
+        <button class="photo new-reference" data-category="chassis" data-photo="11"><div><img src="./assets/photos/thumbs/12.jpg" data-full="./assets/photos/12.jpg" alt="战车俯视，脱离组合后的实拍细节" loading="lazy"></div><span><b>12</b> 战车俯视 <i>↗</i></span></button>
+        <button class="photo new-reference" data-category="chassis" data-photo="12"><div><img src="./assets/photos/thumbs/13.jpg" data-full="./assets/photos/13.jpg" alt="战车左侧，脱离组合后的实拍细节" loading="lazy"></div><span><b>13</b> 战车左侧 <i>↗</i></span></button>
+        <button class="photo new-reference" data-category="chassis" data-photo="13"><div><img src="./assets/photos/thumbs/14.jpg" data-full="./assets/photos/14.jpg" alt="战车右侧，脱离组合后的实拍细节" loading="lazy"></div><span><b>14</b> 战车右侧 <i>↗</i></span></button>
+        <button class="photo new-reference" data-category="chassis" data-photo="14"><div><img src="./assets/photos/thumbs/15.jpg" data-full="./assets/photos/15.jpg" alt="尾部双杆，脱离组合后的实拍细节" loading="lazy"></div><span><b>15</b> 尾部双杆 <i>↗</i></span></button>
+        <button class="photo new-reference" data-category="chassis" data-photo="15"><div><img src="./assets/photos/thumbs/16.jpg" data-full="./assets/photos/16.jpg" alt="底盘细节，脱离组合后的实拍细节" loading="lazy"></div><span><b>16</b> 底盘细节 <i>↗</i></span></button>
+        <button class="photo new-reference" data-category="chassis" data-photo="16"><div><img src="./assets/photos/thumbs/17.jpg" data-full="./assets/photos/17.jpg" alt="车头正面，脱离组合后的实拍细节" loading="lazy"></div><span><b>17</b> 车头正面 <i>↗</i></span></button>
+        <button class="photo new-reference" data-category="creature" data-photo="17"><div><img src="./assets/photos/thumbs/18.jpg" data-full="./assets/photos/18.jpg" alt="翼龙伏卧，脱离组合后的实拍细节" loading="lazy"></div><span><b>18</b> 翼龙伏卧 <i>↗</i></span></button>
+        <button class="photo tank-reference" data-category="tank" data-photo="18"><div><img src="./assets/photos/tank/tank-front.jpg" alt="黄色双炮坦克前方照片" loading="lazy"></div><span><b>19</b> 坦克前方 <i>↗</i></span></button>
+        <button class="photo tank-reference" data-category="tank" data-photo="19"><div><img src="./assets/photos/tank/tank-left-side.jpg" alt="黄色双炮坦克左侧照片" loading="lazy"></div><span><b>20</b> 坦克左侧 <i>↗</i></span></button>
+        <button class="photo tank-reference" data-category="tank" data-photo="20"><div><img src="./assets/photos/tank/tank-right-side.jpg" alt="黄色双炮坦克右侧照片" loading="lazy"></div><span><b>21</b> 坦克右侧 <i>↗</i></span></button>
+        <button class="photo tank-reference" data-category="tank" data-photo="21"><div><img src="./assets/photos/tank/tank-rear.jpg" alt="黄色双炮坦克后方照片" loading="lazy"></div><span><b>22</b> 坦克后方 <i>↗</i></span></button>
+        <button class="photo tank-reference" data-category="tank" data-photo="22"><div><img src="./assets/photos/tank/tank-top.jpg" alt="黄色双炮坦克俯视照片" loading="lazy"></div><span><b>23</b> 坦克俯视 <i>↗</i></span></button>
+      </div>
+    </section>
+    <footer class="footer"><a class="brand" href="#exhibit"><span class="brand-icon" aria-hidden="true">▦</span>积木档案</a><span>小小积木，大大世界。</span><a href="#exhibit">回到展厅 ↑</a></footer>
+  </main>
+  <dialog id="photo-dialog" aria-label="参考照片大图"><button id="close-photo" class="dialog-close" aria-label="关闭照片">×</button><button id="prev-photo" class="photo-arrow prev" aria-label="上一张照片">←</button><img id="large-photo" alt=""><button id="next-photo" class="photo-arrow next" aria-label="下一张照片">→</button><p id="photo-caption"></p></dialog>
+  <div id="toast" role="status" aria-live="polite"></div>
+  <noscript><p class="noscript">请开启 JavaScript 以浏览交互式 3D 模型。下方参考照片仍可查看。</p></noscript>
+  <script type="module" src="./main.js?v=9"></script>
+</body>
+</html>

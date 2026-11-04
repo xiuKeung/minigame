@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#0b1c26"><title>空地搭档 · 机械翼龙冒险</title><link rel="icon" href="./assets/icon.svg"><link rel="stylesheet" href="./game.css?v=3"></head>
+<body>
+<header><a class="game-brand" href="./"><span>▦</span> 积木档案 <small>PLAY LAB</small></a><a class="back" href="./">返回 3D 展厅 ↗</a></header>
+<main>
+  <div class="game-heading"><div><p id="chapter-label">CHAPTER 01 / 初入风谷</p><h1>空地搭档<span>.</span></h1></div><div class="heading-note">你在天空闯关，它在地面接应。<br><b>一只翼龙，一辆战车，八次机会。</b></div></div>
+  <div class="level-bar"><label for="level-select">航线选择 <select id="level-select" aria-label="选择关卡"></select></label><div class="level-meta"><span id="level-details">20 条航线 · 难度逐步递进</span><div class="difficulty" aria-hidden="true"><i id="difficulty-fill"></i></div></div><small>飞行中暂停即可选关</small></div>
+  <section class="game-stage" id="game-stage" aria-label="机械翼龙冒险游戏">
+    <div id="game-canvas" role="img" aria-label="3D 横向闯关场景：翼龙在上方飞行，战车在地面跟随"></div>
+    <div class="hud" id="hud"><div class="health"><div><span>翼龙血量</span><strong id="hp-text">100</strong></div><div class="bar"><i id="hp-fill"></i></div></div><div class="lives"><span>剩余生命</span><strong id="lives-text">♥ 8</strong></div><div class="score"><span>能量</span><strong id="score-text">000</strong></div><button id="pause-button" aria-label="暂停游戏" disabled>Ⅱ</button></div>
+    <div class="route"><span>出发</span><div><i id="progress-fill"></i></div><span id="progress-text">0%</span></div>
+    <div class="overlay" id="game-overlay"><div class="intro-card"><p class="eyebrow" id="overlay-kicker">一场空地协作的冒险</p><h2 id="overlay-title">准备好起飞了吗？</h2><p id="overlay-description">飞越风谷，避开障碍并收集能量。受伤后，下降到自动跟随的战车上回血。</p><div id="intro-rules"><span>♥ 8 条命</span><span>✦ 20 个关卡</span><span>＋ 车顶回血</span></div><button id="primary-action">起飞出发 <span>→</span></button><button id="restart-action" hidden>重新开始</button><p class="overlay-note" id="overlay-note">翼龙自动向前飞；↑ / ↓ 或 W / S 控制高度，空格起飞。<br>按住下降会自动减速，落稳车顶后恢复血量。</p></div></div>
+    <div class="game-message" id="game-message" role="status" aria-live="polite">加载场景中…</div>
+    <div class="flight-state" id="flight-state">READY TO FLY</div>
+  </section>
+  <div class="controls-area"><div class="control-tips"><strong>只需控制上下</strong><span>↑ / ↓ 或 W / S 控制高度 · 空格起飞 · Esc 暂停</span><small>自动向前飞行。下拉摇杆返回车顶，松手保持高度。</small></div><div class="touch-controls" aria-label="触屏操作"><span class="stick-guide">上推爬升<br>下拉回血</span><div id="joystick" class="joystick" role="slider" tabindex="0" aria-label="上下飞行摇杆" aria-orientation="vertical" aria-valuemin="-100" aria-valuemax="100" aria-valuenow="0" aria-valuetext="保持高度"><span class="stick-up" aria-hidden="true">↑</span><span class="stick-track" aria-hidden="true"></span><span id="stick-thumb" aria-hidden="true">≡</span><span class="stick-down" aria-hidden="true">↓</span></div><button id="launch-button" aria-label="起飞" class="launch-key">起飞 ↗</button></div></div>
+  <div class="mission-notes"><div><span>01</span><p><b>空中探索</b>绕过悬浮石柱、移动机关与窄通道，收集金色能量。</p></div><div><span>02</span><p><b>地面接应</b>战车会跟随你。下降时自动减速，落稳后每秒恢复 20 点血量。</p></div><div><span>03</span><p><b>一起抵达</b>保住至少一条命到达终点。休息不会推进关卡，准备好了再出发。</p></div></div>
+</main><footer>由真实积木模型构建 · 20 关递进挑战 · 每关 8 条生命 · 休息时间不限</footer>
+<noscript>请启用 JavaScript 运行游戏。</noscript><script type="module" src="./game.js?v=4"></script>
+</body></html>

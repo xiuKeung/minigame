@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>黄色双炮坦克 · 积木 3D 档案</title><link rel="stylesheet" href="./style.css">
+  <script>location.replace('../#tank-model');</script>
+</head>
+<body>
+  <header><a class="brand" href="../index.html">← 机械翼龙战车</a><span>BRICK STUDY / 05 PHOTOS</span></header>
+  <main>
+    <section class="intro"><div><p class="eyebrow">BRICK RECONSTRUCTION · 2026</p><h1>黄色双炮坦克<span>·</span></h1><p>依照五张实拍照片重建。拖动旋转，双指缩放；炮塔和双炮管可单独观察。</p></div><a class="download" href="../assets/yellow-twin-cannon-tank.glb" download>下载 3D 模型 <small>GLB</small></a></section>
+    <section class="layout">
+      <div class="viewer">
+        <div id="canvas-host"></div><div id="loading">正在装配 3D 积木…</div>
+        <div class="stage-tag"><i></i> 交互模型 <span id="mesh-count"></span></div>
+        <div class="tools"><button id="spin" aria-pressed="false" title="自动旋转">↻</button><button id="wire" aria-pressed="false" title="线框">⌗</button><button id="fullscreen" title="全屏">⛶</button></div>
+        <div class="views"><button data-view="perspective">透视</button><button data-view="front">前方</button><button data-view="side">侧方</button><button data-view="top">俯视</button></div>
+        <p class="hint">拖动旋转　·　滚轮／双指缩放</p>
+      </div>
+      <aside>
+        <p class="eyebrow">TANK PROFILE</p><h2>双炮装甲<br>战术坦克</h2><p class="note">黄色楔形车体、黑色履带、侧面灰色格栅，以及可旋转的双管炮塔。</p>
+        <div class="chips"><span>双炮</span><span>履带底盘</span><span>可动炮塔</span></div>
+        <hr><label>炮塔转向 <output>左右</output><input id="turret" type="range" min="-90" max="90" value="0"></label>
+        <label>炮管仰角 <output>0° — 80°</output><input id="barrel" type="range" min="0" max="80" value="0"></label>
+        <button id="auto-aim" class="wide" aria-pressed="false">◎ 演示炮塔扫描</button>
+        <p class="fine">模型为根据可见积木结构制作的几何近似；未拍到的内部连接与底面按外形补全。</p>
+      </aside>
+    </section>
+    <section class="references"><div><p class="eyebrow">REFERENCE PHOTOS</p><h2>五个重命名后的参考角度</h2></div><div class="photos">
+      <figure><img src="../assets/photos/tank/tank-front.jpg" alt="坦克前方照片"><figcaption>tank-front.jpg<br>前方</figcaption></figure>
+      <figure><img src="../assets/photos/tank/tank-left-side.jpg" alt="坦克左侧照片"><figcaption>tank-left-side.jpg<br>左侧</figcaption></figure>
+      <figure><img src="../assets/photos/tank/tank-right-side.jpg" alt="坦克右侧照片"><figcaption>tank-right-side.jpg<br>右侧</figcaption></figure>
+      <figure><img src="../assets/photos/tank/tank-rear.jpg" alt="坦克后方照片"><figcaption>tank-rear.jpg<br>后方</figcaption></figure>
+      <figure><img src="../assets/photos/tank/tank-top.jpg" alt="坦克俯视照片"><figcaption>tank-top.jpg<br>俯视</figcaption></figure>
+    </div></section>
+  </main>
+  <footer>黄色双炮坦克 · 5 张实拍参考 · 本地 Three.js 几何重建</footer>
+  <script type="module" src="./main.js"></script>
+</body>
+</html>

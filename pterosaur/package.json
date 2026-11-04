@@ -1,0 +1,14 @@
+{
+  "name": "mechanical-pterosaur-gallery",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "python3 -m http.server 8080",
+    "test": "node --test *.test.mjs rescue/*.test.mjs tactics/*.test.mjs galaxian/*.test.mjs",
+    "export": "node export-model.mjs",
+    "build:galaxian": "esbuild galaxian/game.js --bundle --format=iife --target=es2017 --minify --outfile=galaxian/game.bundle.js"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2"
+  }
+}
