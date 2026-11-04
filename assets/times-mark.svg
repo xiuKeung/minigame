@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title desc">
+  <title id="title">九九星球图标</title>
+  <desc id="desc">带有乘号和轨道的数学星球</desc>
+  <defs>
+    <linearGradient id="bg" x1="20" y1="18" x2="145" y2="148" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#536FE0"/>
+      <stop offset="1" stop-color="#334799"/>
+    </linearGradient>
+  </defs>
+  <rect x="10" y="10" width="140" height="140" rx="43" fill="url(#bg)"/>
+  <circle cx="40" cy="52" r="12" fill="#56D7C0"/>
+  <text x="40" y="59" fill="#243654" font-family="Arial Rounded MT Bold, Arial, sans-serif" font-size="21" font-weight="900" text-anchor="middle">9</text>
+  <circle cx="120" cy="52" r="12" fill="#FFC84E"/>
+  <text x="120" y="59" fill="#314B78" font-family="Arial Rounded MT Bold, Arial, sans-serif" font-size="21" font-weight="900" text-anchor="middle">9</text>
+  <circle cx="80" cy="87" r="38" fill="#F9FBFF"/>
+  <ellipse cx="80" cy="87" rx="51" ry="21" fill="none" stroke="#56D7C0" stroke-width="8" transform="rotate(-14 80 87)"/>
+  <path d="M66 73l28 28M94 73 66 101" stroke="#314B78" stroke-width="10" stroke-linecap="round"/>
+  <circle cx="103" cy="69" r="5" fill="#FF866F"/>
+  <circle cx="57" cy="105" r="5" fill="#FF866F"/>
+</svg>

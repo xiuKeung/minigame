@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title desc">
+  <title id="title">积木档案图标</title>
+  <desc id="desc">三块色彩鲜明的拼装积木</desc>
+  <defs>
+    <linearGradient id="bg" x1="18" y1="16" x2="145" y2="149" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38527F"/>
+      <stop offset="1" stop-color="#202B48"/>
+    </linearGradient>
+  </defs>
+  <rect x="10" y="10" width="140" height="140" rx="43" fill="url(#bg)"/>
+  <path d="m32 104 17-13h64l-17 13H32z" fill="#FFE08A"/>
+  <path d="M32 104h64v26H32z" fill="#FFC84E"/>
+  <path d="m96 104 17-13v26l-17 13v-26z" fill="#D89B25"/>
+  <path d="m48 82 17-13h55L103 82H48z" fill="#FFB29E"/>
+  <path d="M48 82h55v25H48z" fill="#FF866F"/>
+  <path d="m103 82 17-13v25l-17 13V82z" fill="#C9564B"/>
+  <path d="m63 60 17-13h42l-17 13H63z" fill="#A8F1E5"/>
+  <path d="M63 60h42v25H63z" fill="#56D7C0"/>
+  <path d="m105 60 17-13v25l-17 13V60z" fill="#299B8A"/>
+</svg>
