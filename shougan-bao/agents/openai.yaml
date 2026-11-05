@@ -1,0 +1,4 @@
+interface:
+  display_name: "游戏手感包"
+  short_description: "按需调用游戏手感规范与可运行示例，适配引擎、调优反馈并逐项验收"
+  default_prompt: "用 $game-feel 分析当前游戏最需要改善的手感，按相关章节实现并验收。"
