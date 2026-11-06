@@ -13,7 +13,7 @@ button { font: inherit; border: 0; cursor: pointer; -webkit-tap-highlight-color:
 .confetti { position: absolute; inset: 0; z-index: 5; overflow: hidden; pointer-events: none; }.confetti i { position: absolute; top: 22%; left: var(--x); width: 7px; height: 13px; border-radius: 2px; background: var(--c); transform: rotate(var(--r)); animation: confetti-fall 700ms ease-out var(--d) forwards; }.confetti i:nth-child(3n) { width: 11px; height: 6px; border-radius: 6px; }@keyframes confetti-fall { from { opacity: 0; transform: translateY(-15px) rotate(var(--r)); } 18% { opacity: 1; } to { opacity: 0; transform: translateY(210px) translateX(18px) rotate(calc(var(--r) + 180deg)); } }
 @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 .brand { text-align: center; margin: 7vh 0 26px; }
-.brand-mark { width: 156px; height: 156px; display: block; margin: 0 auto 20px; filter: drop-shadow(0 9px 0 rgba(36, 50, 74, .08)); }
+.brand-mark { position: relative; left: -3px; width: 156px; height: 156px; display: block; margin: 0 auto 20px; }
 h1, h2, h3, p { margin: 0; } h1 { font-size: clamp(33px, 10vw, 46px); letter-spacing: .05em; } h2 { font-size: 27px; } .subtitle { color: var(--muted); margin-top: 9px; font-size: 16px; }
 .home-actions { display: grid; gap: 14px; margin-top: auto; }
 .mode-card { min-height: 116px; border-radius: 24px; padding: 20px; display: flex; align-items: center; gap: 16px; text-align: left; color: var(--ink); box-shadow: var(--shadow); }

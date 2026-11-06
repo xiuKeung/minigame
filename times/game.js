@@ -23,7 +23,7 @@ function render() {
   return results();
 }
 function home() {
-  app.innerHTML = shell(`<div class="brand"><img class="brand-mark" src="../assets/times-mark.svg" alt="九九星球" /><h1>九九星球</h1><p class="subtitle">边玩边记住九九乘法表</p></div><div class="home-actions"><button class="mode-card play" data-go="difficulty"><span class="mode-icon">🚀</span><span><strong>开始闯关</strong><span>练习一轮或限时挑战</span></span></button><button class="mode-card learn" data-go="learn"><span class="mode-icon">📖</span><span><strong>口诀课堂</strong><span>直接看答案，轻松学口诀</span></span></button></div><p class="home-note">每次答错都会告诉你正确口诀</p>`);
+  app.innerHTML = shell(`<div class="brand"><img class="brand-mark" src="../assets/times-mark.svg?v=1" alt="九九星球" /><h1>九九星球</h1><p class="subtitle">边玩边记住九九乘法表</p></div><div class="home-actions"><button class="mode-card play" data-go="difficulty"><span class="mode-icon">🚀</span><span><strong>开始闯关</strong><span>练习一轮或限时挑战</span></span></button><button class="mode-card learn" data-go="learn"><span class="mode-icon">📖</span><span><strong>口诀课堂</strong><span>直接看答案，轻松学口诀</span></span></button></div><p class="home-note">每次答错都会告诉你正确口诀</p>`);
 }
 function headerBar(title, back) { return `<header class="topbar"><button class="back" data-go="${back}">‹ 返回</button><span class="title">${title}</span><span aria-hidden="true">　</span></header>`; }
 function difficulty() {
