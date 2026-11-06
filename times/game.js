@@ -23,7 +23,7 @@ function render() {
   return results();
 }
 function home() {
-  app.innerHTML = shell(`<div class="brand"><img class="brand-mark" src="../assets/minigame-mark.svg" alt="小游戏乐园" /><h1>九九星球</h1><p class="subtitle">边玩边记住九九乘法表</p></div><div class="home-actions"><button class="mode-card play" data-go="difficulty"><span class="mode-icon">🚀</span><span><strong>开始闯关</strong><span>练习一轮或限时挑战</span></span></button><button class="mode-card learn" data-go="learn"><span class="mode-icon">📖</span><span><strong>口诀课堂</strong><span>直接看答案，轻松学口诀</span></span></button></div><p class="home-note">每次答错都会告诉你正确口诀</p>`);
+  app.innerHTML = shell(`<div class="brand"><img class="brand-mark" src="../assets/times-mark.svg" alt="九九星球" /><h1>九九星球</h1><p class="subtitle">边玩边记住九九乘法表</p></div><div class="home-actions"><button class="mode-card play" data-go="difficulty"><span class="mode-icon">🚀</span><span><strong>开始闯关</strong><span>练习一轮或限时挑战</span></span></button><button class="mode-card learn" data-go="learn"><span class="mode-icon">📖</span><span><strong>口诀课堂</strong><span>直接看答案，轻松学口诀</span></span></button></div><p class="home-note">每次答错都会告诉你正确口诀</p>`);
 }
 function headerBar(title, back) { return `<header class="topbar"><button class="back" data-go="${back}">‹ 返回</button><span class="title">${title}</span><span aria-hidden="true">　</span></header>`; }
 function difficulty() {
@@ -37,7 +37,7 @@ function learnMenu() {
     const items = facts.filter(f => f.a === group);
     return `<section class="chant-group"><h3>${cn(group)}的口诀</h3>${items.map(item => `<p><b>${factText(item)}</b><span>${item.chant}</span></p>`).join('')}</section>`;
   }).join('');
-  app.innerHTML = shell(`${headerBar('口诀课堂','home')}<div class="panel center"><p class="eyebrow">直接看答案</p><h2>想先学哪一组？</h2><p class="subtitle">选一组口诀，慢慢看一遍</p><div class="learn-grid">${Array.from({length:8},(_,i)=>i+2).map(n=>`<button class="${saved.learned.includes(n)?'done':''}" data-group="${n}">${cn(n)}的口诀</button>`).join('')}</div></div><section class="all-chants"><h2>全部口诀</h2><p class="subtitle">算式和口诀一起看</p>${allChants}</section><p class="home-note">学习完成后，随时可以回到闯关模式</p>`, 'learn-screen');
+  app.innerHTML = shell(`${headerBar('','home')}<div class="panel center"><p class="eyebrow">直接看答案</p><h2>想先学哪一组？</h2><p class="subtitle">选一组口诀，慢慢看一遍</p><div class="learn-grid">${Array.from({length:8},(_,i)=>i+2).map(n=>`<button class="${saved.learned.includes(n)?'done':''}" data-group="${n}">${cn(n)}的口诀</button>`).join('')}</div></div><section class="all-chants"><h2>全部口诀</h2><p class="subtitle">算式和口诀一起看</p>${allChants}</section><p class="home-note">学习完成后，随时可以回到闯关模式</p>`, 'learn-screen');
 }
 function lessonFacts() { return facts.filter(f => f.a === state.lessonGroup); }
 function lesson() {
