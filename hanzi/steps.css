@@ -1,0 +1,6 @@
+.stroke-guide { margin: 16px 0 18px; }
+.stroke-guide > p { margin: 0 0 8px; color: #8b694f; font-size: 13px; font-weight: 850; }
+.stroke-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(48px, 1fr)); gap: 7px; width: 100%; padding: 2px 1px; }
+.stroke-step { min-width: 0; padding: 4px 3px 5px; border: 1px solid #efd6bc; border-radius: 9px; background: #fffaf4; }
+.stroke-step svg { display: block; width: 100%; height: auto; aspect-ratio: 1; }
+.stroke-step span { display: block; margin-top: 1px; color: #a1603c; font-size: 10px; font-weight: 850; text-align: center; white-space: nowrap; }
