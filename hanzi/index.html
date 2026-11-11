@@ -11,16 +11,18 @@
     <link rel="stylesheet" href="grid.css" />
     <link rel="stylesheet" href="steps.css" />
     <link rel="stylesheet" href="topbar.css" />
+    <link rel="stylesheet" href="offline.css" />
+    <link rel="stylesheet" href="input.css" />
     <link rel="manifest" href="manifest.webmanifest" />
   </head>
   <body>
     <main class="app">
       <div class="topbar"><button id="install-app" type="button">＋ 添加到主屏幕</button></div>
       <header><p class="eyebrow">HANZI STROKE SHOW</p><h1>笔画小剧场</h1><p class="intro">输入汉字，看每一笔依次出现。</p></header>
-      <form id="word-form" class="word-form"><label for="word-input">想看的汉字</label><div class="input-row"><input id="word-input" value="你好" maxlength="12" autocomplete="off" inputmode="text" aria-describedby="input-help" /><button type="submit">开始演示</button></div><p id="input-help">Demo 内置 23 个常用字：你、好、永、学、汉、字、笔、画、演、示、中国等。</p></form>
+      <form id="word-form" class="word-form"><div class="input-row"><input id="word-input" aria-label="输入汉字" placeholder="输入汉字" maxlength="12" autocomplete="off" inputmode="text" aria-describedby="input-help" /><button type="submit">演示</button></div><p id="input-help">覆盖 9,574 个汉字。</p></form>
       <section class="stage" aria-labelledby="stage-title"><div class="stage-heading"><div><p class="eyebrow">NOW SHOWING</p><h2 id="stage-title">你好</h2></div><p id="progress" aria-live="polite">第 1 / 2 个字</p></div><div class="stroke-guide" aria-label="笔顺分解"><p>笔顺分解</p><div id="stroke-steps" class="stroke-steps"></div></div><div id="character-card" class="character-card" aria-label="汉字笔画动画"></div><p id="status" class="status" aria-live="polite"></p><div class="controls"><button id="previous" class="secondary" type="button">← 上一个</button><button id="replay" type="button">↻ 再看一遍</button><button id="next" class="secondary" type="button">下一个 →</button></div></section>
-      <section class="suggestions" aria-labelledby="suggestions-title"><h2 id="suggestions-title">试试这些</h2><div class="chips"><button type="button" data-word="你好">你好</button><button type="button" data-word="中国">中国</button><button type="button" data-word="汉字">汉字</button><button type="button" data-word="笔画演示">笔画演示</button><button type="button" data-word="我爱学习">我爱学习</button></div></section>
+      <section class="offline-library" aria-labelledby="offline-title"><div><h2 id="offline-title">完整离线字库</h2><p id="offline-status">需要时下载完整字库，之后断网也能使用所有汉字。</p></div><button id="download-library" type="button">下载离线字库</button><progress id="offline-progress" max="100" value="0" hidden></progress></section>
     </main>
-    <script src="vendor/hanzi-writer.min.js"></script><script src="data.js"></script><script src="steps.js"></script><script src="install.js"></script><script src="app.js"></script>
+    <script src="vendor/hanzi-writer.min.js"></script><script src="data-index.js"></script><script src="steps.js"></script><script src="install.js"></script><script src="app.js"></script><script src="offline.js"></script>
   </body>
 </html>

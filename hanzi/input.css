@@ -1,0 +1,3 @@
+.input-row { display: flex; flex-wrap: nowrap; }
+.input-row button { min-height: 46px; padding-inline: 14px; white-space: nowrap; }
+@media(max-width:420px) { .input-row { display: flex; grid-template-columns: none; }.input-row button { min-height: 46px; } }

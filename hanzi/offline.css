@@ -1,0 +1,3 @@
+.offline-library { display: grid; grid-template-columns: 1fr auto; gap: 10px 14px; align-items: center; margin-top: 14px; padding: 14px 16px; border: 1px solid #ecd8c1; border-radius: 18px; background: #fffaf4; }
+.offline-library h2 { margin: 0 0 3px; font-size: 15px; }.offline-library p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }.offline-library button { padding: 10px 12px; font-size: 13px; white-space: nowrap; }.offline-library progress { grid-column: 1 / -1; width: 100%; height: 8px; accent-color: var(--orange); }
+@media(max-width:420px) { .offline-library { grid-template-columns: 1fr; }.offline-library button { width: 100%; min-height: 40px; } }
