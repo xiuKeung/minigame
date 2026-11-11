@@ -1,0 +1,5 @@
+const CACHE='minigame-entrance-v1';
+const ASSETS=['./','./index.html','./style.css','./layout.css','./install.js','./manifest.webmanifest','../assets/minigame-mark.svg','../assets/minigame-mark-180.png','../assets/minigame-mark-192.png','../assets/minigame-mark-512.png','../assets/hanzi-mark.svg?v=2','../assets/times-mark.svg?v=1','../assets/pterosaur-mark.svg','../assets/pterosaur-air-mark.svg','../assets/pterosaur-rescue-mark.svg','../assets/pterosaur-galaxian-mark.svg'];
+self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting())));
+self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('minigame-entrance-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));
+self.addEventListener('fetch',event=>{if(event.request.method!=='GET')return;event.respondWith(fetch(event.request).then(response=>{if(response.ok){const copy=response.clone();caches.open(CACHE).then(cache=>cache.put(event.request,copy));}return response;}).catch(()=>caches.match(event.request)));});

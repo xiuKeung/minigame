@@ -23,3 +23,7 @@
 .card-copy {
   align-self: center;
 }
+
+@media (max-width: 420px) {
+  .topbar { right: 14px; }
+}

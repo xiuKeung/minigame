@@ -7,7 +7,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <title>笔画小剧场</title>
-    <link rel="icon" href="../assets/hanzi-mark.svg" type="image/svg+xml" />
+    <link rel="icon" href="../assets/hanzi-mark.svg?v=2" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="../assets/hanzi-mark-180.png" />
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="grid.css" />
     <link rel="stylesheet" href="steps.css" />
@@ -18,7 +19,7 @@
   </head>
   <body>
     <main class="app">
-      <div class="topbar"><button id="install-app" type="button">＋ 添加到主屏幕</button></div>
+      <div class="topbar"><button id="install-app" type="button" hidden>＋ 添加到主屏幕</button></div>
       <header><p class="eyebrow">HANZI STROKE SHOW</p><h1>笔画小剧场</h1></header>
       <form id="word-form" class="word-form"><div class="input-row"><input id="word-input" aria-label="输入汉字" placeholder="输入汉字" maxlength="12" autocomplete="off" inputmode="text" /><button type="submit">演示</button></div></form>
       <section class="stage" aria-labelledby="stage-title"><div class="stage-heading"><div><h2 id="stage-title">你好</h2></div><p id="progress" aria-live="polite">第 1 / 2 个字</p></div><div class="stroke-guide"><div id="stroke-steps" class="stroke-steps"></div></div><div id="character-card" class="character-card" aria-label="汉字笔画动画"></div><p id="status" class="status" aria-live="polite"></p><div class="controls"><button id="previous" class="secondary" type="button">← 上一个</button><button id="replay" type="button">↻ 再看一遍</button><button id="next" class="secondary" type="button">下一个 →</button></div></section>

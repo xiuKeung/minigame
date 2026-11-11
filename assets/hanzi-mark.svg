@@ -2,5 +2,5 @@
   <rect width="120" height="120" rx="24" fill="#fff8ed"/>
   <rect x="3" y="3" width="114" height="114" rx="21" fill="none" stroke="#f0c8a7" stroke-width="4"/>
   <path d="M60 5v110M5 60h110" stroke="#f6dfc8" stroke-width="2"/>
-  <text x="60" y="83" text-anchor="middle" fill="#c8522b" font-family="KaiTi, STKaiti, serif" font-size="76" font-weight="700">永</text>
+  <text x="60" y="83" text-anchor="middle" fill="#c8522b" font-family="KaiTi, STKaiti, serif" font-size="76" font-weight="700">汉</text>
 </svg>
