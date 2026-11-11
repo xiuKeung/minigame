@@ -1,0 +1,29 @@
+/* 入口保持单列卡片，不因窗口放大切换为展示墙。 */
+.game-list,
+.archive-list {
+  grid-template-columns: 1fr;
+}
+
+.archive-group {
+  grid-column: auto;
+}
+
+.game-card {
+  grid-template-columns: 90px 1fr;
+  min-height: 126px;
+}
+
+.card-art,
+.hanzi-mark {
+  justify-self: stretch;
+  width: 90px;
+  height: 90px;
+}
+
+.hanzi-mark {
+  font-size: 57px;
+}
+
+.card-copy {
+  align-self: center;
+}
