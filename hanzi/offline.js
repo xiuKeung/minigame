@@ -1,10 +1,10 @@
 const downloadButton=document.querySelector('#download-library');
 const offlineStatus=document.querySelector('#offline-status');
 const offlineProgress=document.querySelector('#offline-progress');
-const libraryVersion=window.HANZI_LIBRARY_VERSION||'1';
-const offlineCacheName=`hanzi-offline-${libraryVersion}`;
+const offlineLibraryVersion=window.HANZI_LIBRARY_VERSION||'1';
+const offlineCacheName=`hanzi-offline-${offlineLibraryVersion}`;
 const bundleNames=[...new Set(Object.values(window.HANZI_INDEX||{}))];
-const bundleUrl=(bundle)=>new URL(`data/chunks/${bundle}.js?v=${libraryVersion}`,document.baseURI).href;
+const bundleUrl=(bundle)=>new URL(`data/chunks/${bundle}.js?v=${offlineLibraryVersion}`,document.baseURI).href;
 
 async function cachedBundleCount(){
   const cache=await caches.open(offlineCacheName);
