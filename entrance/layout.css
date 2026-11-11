@@ -9,19 +9,15 @@
 }
 
 .game-card {
-  grid-template-columns: 90px 1fr;
-  min-height: 126px;
+  grid-template-columns: 76px 1fr;
+  min-height: 108px;
+  padding: 12px;
 }
 
-.card-art,
-.hanzi-mark {
+.card-art {
   justify-self: stretch;
-  width: 90px;
-  height: 90px;
-}
-
-.hanzi-mark {
-  font-size: 57px;
+  width: 76px;
+  height: 76px;
 }
 
 .card-copy {
