@@ -1,3 +1,4 @@
-.topbar { display: flex; justify-content: end; min-height: 34px; }
+.topbar { position: absolute; top: max(12px, env(safe-area-inset-top)); right: 20px; z-index: 2; }
+@media(max-width:420px) { .topbar { right: 14px; } }
 .topbar button { padding: 7px 11px; border: 1px solid #efc9aa; border-radius: 99px; color: #a34e29; background: #fff1e3; font-size: 12px; }
 .topbar button:hover { background: #ffe2ca; }
