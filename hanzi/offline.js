@@ -19,9 +19,18 @@ async function refreshOfflineState(){
     offlineStatus.textContent='当前本地文件夹已包含完整字库，无需再次下载。';
     return;
   }
-  if(!('caches'in window))return;
-  const count=await cachedBundleCount();
-  const cacheNames=await caches.keys();
+  if(!('caches'in window)){
+    offlineStatus.textContent='当前浏览器不支持离线字库下载。';
+    downloadButton.disabled=true;
+    return;
+  }
+  let count,cacheNames;
+  try{
+    [count,cacheNames]=await Promise.all([cachedBundleCount(),caches.keys()]);
+  }catch(error){
+    offlineStatus.textContent='无法读取离线字库缓存，请在 HTTPS 页面中重试。';
+    return;
+  }
   const hasOlderVersion=cacheNames.some(name=>name.startsWith('hanzi-offline-')&&name!==offlineCacheName);
   if(count===bundleNames.length){
     downloadButton.disabled=true;
@@ -34,12 +43,16 @@ async function refreshOfflineState(){
 }
 
 downloadButton.addEventListener('click',async()=>{
-  if(!('caches'in window))return;
+  if(!('caches'in window)){
+    offlineStatus.textContent='当前浏览器不支持离线字库下载。';
+    return;
+  }
   downloadButton.disabled=true;
   offlineProgress.hidden=false;
-  const cache=await caches.open(offlineCacheName);
-  let complete=await cachedBundleCount();
+  offlineStatus.textContent='正在准备离线字库…';
   try{
+    const cache=await caches.open(offlineCacheName);
+    let complete=await cachedBundleCount();
     for(const bundle of bundleNames){
       const url=bundleUrl(bundle);
       if(await cache.match(url))continue;
@@ -55,7 +68,8 @@ downloadButton.addEventListener('click',async()=>{
     offlineStatus.textContent='完整离线字库已下载，可在断网时使用。';
     downloadButton.textContent='已下载';
   }catch(error){
-    offlineStatus.textContent=`下载在 ${complete} / ${bundleNames.length} 个数据包后中断，可再次点击继续。`;
+    const completed=await cachedBundleCount().catch(()=>0);
+    offlineStatus.textContent=`下载在 ${completed} / ${bundleNames.length} 个数据包后中断，可再次点击继续。`;
     downloadButton.disabled=false;
   }
 });
