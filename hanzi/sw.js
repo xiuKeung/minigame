@@ -1,4 +1,4 @@
-const CACHE='hanzi-strokes-v21';
+const CACHE='hanzi-strokes-v22';
 const ASSETS=['./','./index.html','./style.css','./grid.css','./steps.css','./topbar.css','./offline.css','./input.css','./dictionary.css','./lookup.css','./app.js','./steps.js','./install.js','./offline.js?v=8','./dictionary.js','./lookup.js','./data-index.js','./data-library-version.js','./lookup-index.js','./vendor/hanzi-writer.min.js','./manifest.webmanifest','../assets/hanzi-mark-180.png','../assets/hanzi-mark-192.png','../assets/hanzi-mark-512.png'];
 self.addEventListener('install',event=>event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',event=>event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(key=>key.startsWith('hanzi-strokes-')&&key!==CACHE).map(key=>caches.delete(key)))).then(()=>self.clients.claim())));

@@ -32,14 +32,14 @@ const createChoice=(container,value,label,onClick,selectionContainer=container)=
 const clearResults=()=>{lookupResults.replaceChildren();lookupResults.classList.remove('plain-results');lookupStatus.textContent='';};
 const enterResult=(title,{filters=false}={})=>{selectionScrollTop=lookupSheet.scrollTop;lookupSelection.hidden=true;lookupResultView.hidden=false;lookupResultTitle.textContent=title;lookupResultFilters.hidden=!filters;lookupResultFilters.replaceChildren();clearResults();lookupSheet.scrollTop=0;};
 const leaveResult=()=>{lookupResultView.hidden=true;lookupSelection.hidden=false;lookupResultFilters.replaceChildren();clearResults();lookupSheet.scrollTop=selectionScrollTop;};
-const resetLookup=()=>{if(!lookupResultView.hidden)leaveResult();lookupModal.hidden=true;lookupToggle.focus();};
+const resetLookup=()=>{if(!lookupResultView.hidden)leaveResult();lookupModal.hidden=true;document.body.classList.remove('lookup-open');lookupToggle.focus();};
 
 for(let stroke=1;stroke<=30;stroke+=1)createChoice(lookupStrokesList,stroke,`${stroke}画`,findStrokes);
 const radicalsByStrokes=new Map();
 Object.keys(radicalIndex).forEach(radical=>{const strokes=radicalStrokes[radical]||99;if(!radicalsByStrokes.has(strokes))radicalsByStrokes.set(strokes,[]);radicalsByStrokes.get(strokes).push(radical);});
 [...radicalsByStrokes.entries()].sort(([a],[b])=>a-b).forEach(([strokes,radicals])=>{const group=document.createElement('div');group.className='lookup-radical-group';const title=document.createElement('p');title.textContent=strokes===99?'其他':`${strokes}画`;const choices=document.createElement('div');choices.className='lookup-radical-choices';radicals.sort((a,b)=>a.localeCompare(b,'zh-CN')).forEach(radical=>createChoice(choices,radical,radical,findRadical,lookupRadicalsList));group.append(title,choices);lookupRadicalsList.append(group);});
 
-lookupToggle.addEventListener('click',()=>{lookupModal.hidden=false;lookupPinyinInput.focus();});
+lookupToggle.addEventListener('click',()=>{lookupModal.hidden=false;document.body.classList.add('lookup-open');lookupPinyinInput.focus();});
 lookupClose.addEventListener('click',resetLookup);
 lookupBackdrop.addEventListener('click',resetLookup);
 lookupResultBack.addEventListener('click',leaveResult);
