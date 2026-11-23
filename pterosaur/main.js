@@ -29,7 +29,7 @@ function nextPhoto(direction) {
 }
 $$('[data-filter]').forEach(button => button.addEventListener('click', () => {
   photoCategory = button.dataset.filter;
-  photos.forEach(p => { p.hidden = photoCategory !== 'all' && p.dataset.category !== photoCategory; });
+  photos.forEach(p => { const hidden = photoCategory !== 'all' && p.dataset.category !== photoCategory; p.toggleAttribute('hidden', hidden); p.setAttribute('aria-hidden', String(hidden)); });
   $$('[data-filter]').forEach(b => { const selected = b === button; b.classList.toggle('selected', selected); b.setAttribute('aria-pressed', selected); });
 }));
 function showPhoto(index) {
@@ -309,10 +309,14 @@ function startTankShowcase() {
 function startWhenNear(selector, start) {
   const target = $(selector); if (!target) return;
   let started = false;
-  const observer = new IntersectionObserver(entries => {
-    if (started || !entries.some(entry => entry.isIntersecting)) return;
-    started = true; observer.disconnect();
+  const run = () => {
+    if (started) return; started = true;
     try { start(); } catch (error) { console.error(`3D viewer could not start: ${selector}`, error); }
+  };
+  if (!('IntersectionObserver' in window)) { run(); return; }
+  const observer = new IntersectionObserver(entries => {
+    if (!entries.some(entry => entry.isIntersecting)) return;
+    observer.disconnect(); run();
   }, { rootMargin: '620px 0px' });
   observer.observe(target);
 }
