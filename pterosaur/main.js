@@ -291,8 +291,11 @@ function startTankShowcase() {
   function resize() { const {width,height} = tankHost.getBoundingClientRect(); if (!width || !height) return; camera.aspect = width / height; camera.updateProjectionMatrix(); framing.refresh(); renderer.setSize(width, height, false); }
   new ResizeObserver(resize).observe(tankHost); resize(); moveCamera(view, true);
   controls.addEventListener('start', () => { cameraMotion = null; setAutoRotate(false); root.querySelectorAll('[data-tank-view]').forEach(button => { button.classList.remove('selected'); button.setAttribute('aria-pressed', 'false'); }); });
+  let visible = true;
+  new IntersectionObserver(entries => { visible = entries[0].isIntersecting; }, { rootMargin: '120px' }).observe(root);
   function frame(now) {
     requestAnimationFrame(frame); const dt = Math.min(.05, (now-last)/1000); last = now;
+    if (document.hidden || !visible) return;
     if (autoAim) { turret.rotation.y = Math.sin(now*.00065)*.62; cannons.rotation.z = .42 + Math.sin(now*.00105)*.12; }
     if (cameraMotion) {
       camera.position.lerp(cameraMotion.position, .09); controls.target.lerp(cameraMotion.target, .09);
@@ -303,8 +306,24 @@ function startTankShowcase() {
   requestAnimationFrame(frame);
 }
 
-try { startGallery(); startTankShowcase(); startNewModelsShowcase(); }
-catch (error) {
+function startWhenNear(selector, start) {
+  const target = $(selector); if (!target) return;
+  let started = false;
+  const observer = new IntersectionObserver(entries => {
+    if (started || !entries.some(entry => entry.isIntersecting)) return;
+    started = true; observer.disconnect();
+    try { start(); } catch (error) { console.error(`3D viewer could not start: ${selector}`, error); }
+  }, { rootMargin: '620px 0px' });
+  observer.observe(target);
+}
+
+try {
+  // Keep the above-the-fold winged carrier responsive; the two lower viewers
+  // allocate WebGL contexts only when the visitor is about to reach them.
+  startGallery();
+  startWhenNear('#tank-model', startTankShowcase);
+  startWhenNear('#new-models', startNewModelsShowcase);
+} catch (error) {
   console.error('3D gallery could not start:', error);
   loading.innerHTML = '<span>当前设备暂时无法显示 3D。请使用支持 WebGL 的浏览器，或下载模型查看。</span>';
   loading.style.padding = '35px'; loading.style.textAlign = 'center';

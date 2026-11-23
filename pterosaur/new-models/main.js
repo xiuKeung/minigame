@@ -28,6 +28,7 @@ export function startNewModelsShowcase(){
  $('#new-models-fullscreen').addEventListener('click',()=>$('#new-models-viewer').requestFullscreen?.());
  controls.addEventListener('start',()=>{cameraMotion=null;setAuto(false);});
  const resize=()=>{const {width,height}=host.getBoundingClientRect();if(!width||!height)return;camera.aspect=width/height;camera.updateProjectionMatrix();framing?.refresh();renderer.setSize(width,height,false);};new ResizeObserver(resize).observe(host);
- function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,(now-last)/1000);last=now;if(cameraMotion){camera.position.lerp(cameraMotion.position,.09);controls.target.lerp(cameraMotion.target,.09);if(camera.position.distanceTo(cameraMotion.position)<.02){camera.position.copy(cameraMotion.position);controls.target.copy(cameraMotion.target);cameraMotion=null;}}controls.update();renderer.render(scene,camera);}
+ let visible=true;new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;},{rootMargin:'120px'}).observe(root);
+ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,(now-last)/1000);last=now;if(document.hidden||!visible)return;if(cameraMotion){camera.position.lerp(cameraMotion.position,.09);controls.target.lerp(cameraMotion.target,.09);if(camera.position.distanceTo(cameraMotion.position)<.02){camera.position.copy(cameraMotion.position);controls.target.copy(cameraMotion.target);cameraMotion=null;}}controls.update();renderer.render(scene,camera);}
  select('crossbow');resize();requestAnimationFrame(frame);
 }
