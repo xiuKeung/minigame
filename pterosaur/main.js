@@ -2,6 +2,7 @@ import * as THREE from './vendor/three.module.js';
 import { OrbitControls } from './vendor/OrbitControls.js';
 import { buildModel } from './model.js?v=2';
 import { buildTank } from './tank/model.js?v=1';
+import { startNewModelsShowcase } from './new-models/main.js?v=1';
 import { AnimationPlayer, sampleAnimation, CHAPTERS, DURATION } from './animation.js?v=3';
 import { addArchiveLighting, addArchiveStage, createModelFraming, DEFAULT_MODEL_HEADING } from './viewer-framing.js?v=2';
 
@@ -302,7 +303,7 @@ function startTankShowcase() {
   requestAnimationFrame(frame);
 }
 
-try { startGallery(); startTankShowcase(); }
+try { startGallery(); startTankShowcase(); startNewModelsShowcase(); }
 catch (error) {
   console.error('3D gallery could not start:', error);
   loading.innerHTML = '<span>当前设备暂时无法显示 3D。请使用支持 WebGL 的浏览器，或下载模型查看。</span>';

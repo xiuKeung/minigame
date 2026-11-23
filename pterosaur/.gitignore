@@ -1,0 +1,4 @@
+# Original reference photos are kept locally; compact curated previews are tracked for the gallery.
+assets/photos/tank2/*.jpg
+!assets/photos/tank2/thumbs/
+!assets/photos/tank2/thumbs/*.jpg

@@ -70,5 +70,5 @@ export function addArchiveStage(scene, frame) {
   const grid = new THREE.GridHelper(100, 100, 0xd1d6c6, 0xdde1d2); grid.position.y = floor.position.y + .005; grid.material.transparent = true; grid.material.opacity = .40; scene.add(grid);
   const ring = new THREE.Mesh(new THREE.TorusGeometry(frame.platformRadius - .3, .008, 3, 128), new THREE.MeshBasicMaterial({ color: 0xc4ccb7 }));
   ring.rotation.x = Math.PI / 2; ring.position.y = frame.floorY + .005; scene.add(ring);
-  return { platform, ring };
+  return { platform, ring, floor, grid };
 }

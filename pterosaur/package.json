@@ -6,7 +6,8 @@
     "start": "python3 -m http.server 8080",
     "test": "node --test *.test.mjs rescue/*.test.mjs tactics/*.test.mjs galaxian/*.test.mjs",
     "export": "node export-model.mjs",
-    "build:galaxian": "esbuild galaxian/game.js --bundle --format=iife --target=es2017 --minify --outfile=galaxian/game.bundle.js"
+    "build:galaxian": "esbuild galaxian/game.js --bundle --format=iife --target=es2017 --minify --outfile=galaxian/game.bundle.js",
+    "export:new-models": "node new-models/export-models.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.28.2"
