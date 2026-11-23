@@ -320,7 +320,7 @@ function startWhenNear(selector, start) {
 try {
   // Keep the above-the-fold winged carrier responsive; the two lower viewers
   // allocate WebGL contexts only when the visitor is about to reach them.
-  startGallery();
+  startWhenNear('#exhibit', startGallery);
   startWhenNear('#tank-model', startTankShowcase);
   startWhenNear('#new-models', startNewModelsShowcase);
 } catch (error) {
