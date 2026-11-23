@@ -6,7 +6,7 @@
 
 不要将它改为依赖在线 CDN 或服务端接口。笔画数据和 `HanziWriter` 均随仓库发布，以确保弱网和断网可用。
 
-入口位于 [`../entrance/index.html`](../entrance/index.html)，对应的卡片图标、浏览器标签图标和主屏幕图标均来自 `hanzi-mark` 资源。SVG 用于网页展示；`hanzi-mark-180.png`、`hanzi-mark-192.png` 与 `hanzi-mark-512.png` 分别用于 iOS 和 PWA 安装。
+入口位于 [`../entrance/index.html`](../entrance/index.html)，对应的卡片图标、浏览器标签图标和主屏幕图标均来自 `hanzi-mark` PNG 资源，以避免不同浏览器渲染 SVG 中文字形时出现重影。`hanzi-mark-180.png`、`hanzi-mark-192.png` 与 `hanzi-mark-512.png` 分别用于 iOS、浏览器标签与网页/PWA 图标。
 
 ## 目录与职责
 
@@ -81,7 +81,7 @@ Object.assign(window.HANZI_CHUNK_DATA,{"永":{"strokes":[/* SVG path */],"median
 - 激活时只能清理旧 `hanzi-strokes-*` 页面缓存，**不能清掉** `hanzi-offline-*`。
 - 不要把 `/data/chunks/` 或 `/data/dictionary-chunks/` 写入页面壳缓存；这些文件由 `offline.js` 按版本精确管理。
 
-若改动 `index.html`、任一 JS/CSS 或 Service Worker 预缓存清单，请同步提高 `sw.js` 内的 `CACHE` 版本（当前为 `hanzi-strokes-v22`），让已安装页面获得新壳资源。对更新频繁的脚本（目前是 `offline.js`）还应同步更新 `index.html` 中的查询版本，避免旧浏览器 HTTP 缓存继续执行旧脚本。
+若改动 `index.html`、任一 JS/CSS 或 Service Worker 预缓存清单，请同步提高 `sw.js` 内的 `CACHE` 版本（当前为 `hanzi-strokes-v23`），让已安装页面获得新壳资源。对更新频繁的脚本（目前是 `offline.js`）还应同步更新 `index.html` 中的查询版本，避免旧浏览器 HTTP 缓存继续执行旧脚本。
 
 通过 `file://` 直接打开页面时，浏览器通常不能注册 Service Worker 或稳定使用 Cache Storage。此时页面显示“本地文件已完整”；部署验证请使用 HTTP(S)。
 
