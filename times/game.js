@@ -6,9 +6,15 @@ function chantFor(a, b) { const answer = a * b; const product = answer === 10 ? 
 const facts = Array.from({ length: 9 }, (_, i) => i + 1).flatMap(a =>
   Array.from({ length: 9 }, (_, i) => i + 1).filter(b => b >= a).map(b => ({ a, b, answer: a * b, chant: chantFor(a, b) }))
 );
-const state = { screen: 'home', difficulty: 'easy', playMode: 'practice', selectedFactors: [2,3,4,5,6,7,8,9], lessonGroup: 2, lessonIndex: 0, seconds: DURATION, score: 0, total: 0, roundSize: 0, misses: [], coverageQueue: [], reviewQueue: [], timer: null, nextQuestionTimer: null, question: null, inputValue: '', skipGameAnimation: false, locked: false };
+const state = { screen: 'home', difficulty: 'easy', playMode: 'practice', selectedFactors: [2,3,4,5,6,7,8,9], lessonGroup: 2, lessonIndex: 0, seconds: DURATION, score: 0, total: 0, roundSize: 0, misses: [], coverageQueue: [], reviewQueue: [], timer: null, nextQuestionTimer: null, question: null, inputValue: '', skipGameAnimation: false, locked: false, startedAt: null, calendarMonth: new Date(new Date().getFullYear(), new Date().getMonth(), 1), calendarDate: null };
 const saved = JSON.parse(localStorage.getItem('times-progress') || '{"learned":[]}');
+const history = readHistory();
 function save() { localStorage.setItem('times-progress', JSON.stringify(saved)); }
+function readHistory() { try { const value = JSON.parse(localStorage.getItem('times-history') || '[]'); return Array.isArray(value) ? value : []; } catch { return []; } }
+function saveHistory() { localStorage.setItem('times-history', JSON.stringify(history)); }
+function localDateKey(date = new Date()) { const y = date.getFullYear(), m = String(date.getMonth() + 1).padStart(2, '0'), d = String(date.getDate()).padStart(2, '0'); return `${y}-${m}-${d}`; }
+function parseDateKey(key) { const [y, m, d] = key.split('-').map(Number); return new Date(y, m - 1, d); }
+function dayLabel(key) { const date = parseDateKey(key); return `${date.getMonth() + 1}月${date.getDate()}日` + (key === localDateKey() ? ' · 今天' : ''); }
 function shuffle(items) { return [...items].sort(() => Math.random() - .5); }
 function unique(items) { return [...new Set(items)]; }
 function factText(f) { return `${f.a} × ${f.b} = ${f.answer}`; }
@@ -16,14 +22,18 @@ function shell(content, cls = '') { return `<div class="stars"></div><section cl
 function render() {
   clearInterval(state.timer); state.timer = null;
   if (state.screen === 'home') return home();
+  if (state.screen === 'calendar') return calendar();
   if (state.screen === 'difficulty') return difficulty();
   if (state.screen === 'learn') return learnMenu();
   if (state.screen === 'lesson') return lesson();
   if (state.screen === 'game') return game();
-  return results();
+  const output = results();
+  window.dispatchEvent(new Event('times-render'));
+  return output;
 }
 function home() {
-  app.innerHTML = shell(`<div class="brand"><img class="brand-mark" src="../assets/times-mark.svg?v=1" alt="九九星球" /><h1>九九星球</h1><p class="subtitle">边玩边记住九九乘法表</p></div><div class="home-actions"><button class="mode-card play" data-go="difficulty"><span class="mode-icon">🚀</span><span><strong>开始闯关</strong><span>练习一轮或限时挑战</span></span></button><button class="mode-card learn" data-go="learn"><span class="mode-icon">📖</span><span><strong>口诀课堂</strong><span>直接看答案，轻松学口诀</span></span></button></div><p class="home-note">每次答错都会告诉你正确口诀</p>`);
+  app.innerHTML = shell(`<div class="home-top"><button id="install-app" class="install-app" type="button" hidden>＋ 添加到主屏幕</button></div><div class="brand"><img class="brand-mark" src="../assets/times-mark.svg?v=1" alt="九九星球" /><h1>九九星球</h1><p class="subtitle">边玩边记住九九乘法表</p></div><div class="home-actions"><button class="mode-card play" data-go="difficulty"><span class="mode-icon">🚀</span><span><strong>开始闯关</strong><span>练习一轮或限时挑战</span></span></button><button class="mode-card learn" data-go="learn"><span class="mode-icon">📖</span><span><strong>口诀课堂</strong><span>直接看答案，轻松学口诀</span></span></button><button class="mode-card calendar-card" data-go="calendar"><span class="mode-icon calendar-icon">31</span><span><strong>练习日历</strong><span>看看每天的闯关记录</span></span></button></div><p class="home-note">每次答错都会告诉你正确口诀</p>`);
+  window.dispatchEvent(new Event('times-render'));
 }
 function headerBar(title, back) { return `<header class="topbar"><button class="back" data-go="${back}">‹ 返回</button><span class="title">${title}</span><span aria-hidden="true">　</span></header>`; }
 function difficulty() {
@@ -91,8 +101,27 @@ function finishGame() {
   clearTimeout(state.nextQuestionTimer);
   state.timer = null;
   state.nextQuestionTimer = null;
+  saveSession();
   state.screen = 'result';
   render();
+}
+function saveSession() {
+  if (!state.total) return;
+  const finishedAt = new Date();
+  history.unshift({
+    id: `${finishedAt.getTime()}-${Math.random().toString(36).slice(2, 7)}`,
+    date: localDateKey(finishedAt),
+    time: finishedAt.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }),
+    mode: state.playMode,
+    difficulty: state.difficulty,
+    factors: [...state.selectedFactors],
+    correct: state.score,
+    total: state.total,
+    secondsUsed: state.playMode === 'challenge' ? DURATION - state.seconds : Math.max(0, Math.round((finishedAt.getTime() - (state.startedAt || finishedAt.getTime())) / 1000)),
+    mistakes: unique(state.misses.map(f => factKey(f))).map(key => { const [a, b] = key.split('-').map(Number); const f = facts.find(item => item.a === a && item.b === b); return { a, b, chant: f?.chant || '' }; })
+  });
+  history.splice(500);
+  saveHistory();
 }
 function startTimer() { state.timer = setInterval(()=>{ state.seconds--; const bar=document.querySelector('.timer-bar'), time=document.querySelector('.timer'); if(bar) bar.style.width=`${Math.max(0,state.seconds/DURATION*100)}%`; if(time) time.textContent=formatTime(state.seconds); if(state.seconds<=0) finishGame(); },1000); }
 function formatTime(sec) { return `${String(Math.floor(sec/60)).padStart(1,'0')}:${String(sec%60).padStart(2,'0')}`; }
@@ -100,10 +129,12 @@ function feedback(html, kind) { const el=document.querySelector('#feedback'); if
 function celebrate() { const box = document.querySelector('#confetti'); if (!box) return; const colors = ['#ffc94a','#ff8068','#3978e8','#27b99a']; box.innerHTML = Array.from({length: 18}, (_, i) => `<i style="--x:${8 + Math.random() * 84}%;--r:${-150 + Math.random() * 300}deg;--d:${Math.random() * 140}ms;--c:${colors[i % colors.length]}"></i>`).join(''); setTimeout(() => { if (box) box.innerHTML = ''; }, 900); }
 function resolve(correct, message) { if(state.locked) return; state.locked=true; document.querySelectorAll('.answer, .keypad button').forEach(b=>b.classList.add('disabled')); state.total++; if(correct) { state.score++; feedback('答对啦！继续加油 ✦','good'); celebrate(); } else { state.misses.push(state.question.f); if (!state.reviewQueue.some(f => factKey(f) === factKey(state.question.f))) state.reviewQueue.push(state.question.f); feedback(message || `答案是 <b>${factText(state.question.f)}</b>，${state.question.f.chant}。`,'bad'); } state.nextQuestionTimer = setTimeout(()=>{ if(state.screen !== 'game' || (state.playMode === 'challenge' && state.seconds <= 0)) return; state.question = null; state.skipGameAnimation = true; render(); }, correct ? 700 : 1700); }
 function updateInputAnswer() { const display = document.querySelector('#input-answer'); if (display) display.textContent = state.inputValue || '?'; }
-function startGame() { clearTimeout(state.nextQuestionTimer); state.nextQuestionTimer=null; state.screen='game'; state.seconds=DURATION; state.score=0; state.total=0; state.roundSize=0; state.misses=[]; state.coverageQueue=[]; state.reviewQueue=[]; state.question=null; render(); }
+function startGame() { clearTimeout(state.nextQuestionTimer); state.nextQuestionTimer=null; state.screen='game'; state.seconds=DURATION; state.score=0; state.total=0; state.roundSize=0; state.misses=[]; state.coverageQueue=[]; state.reviewQueue=[]; state.question=null; state.startedAt=Date.now(); render(); }
 document.addEventListener('click', e => {
   const el=e.target.closest('button'); if(!el) return;
   if(el.dataset.go) { state.screen=el.dataset.go; render(); return; }
+  if(el.dataset.calendarMonth) { state.calendarMonth = new Date(state.calendarMonth.getFullYear(), state.calendarMonth.getMonth() + Number(el.dataset.calendarMonth), 1); render(); return; }
+  if(el.dataset.calendarDate) { state.calendarDate = el.dataset.calendarDate; render(); return; }
   if(el.dataset.difficulty) {
     state.difficulty = el.dataset.difficulty;
     document.querySelectorAll('[data-difficulty]').forEach(button => {
@@ -160,5 +191,26 @@ document.addEventListener('click', e => {
   if(el.dataset.answer) { const q=state.question; const correct=q.type==='fill'?Number(el.dataset.correct):q.f.answer; const isCorrect=Number(el.dataset.answer)===correct; el.classList.add(isCorrect?'correct':'wrong'); if(!isCorrect) [...document.querySelectorAll('.answer')].find(b=>Number(b.dataset.answer)===correct)?.classList.add('correct'); resolve(isCorrect, `答案是 <b>${correct}</b>。${q.f.chant}。`); return; }
   if(el.dataset.wrong) { const ok=el.dataset.wrong==='yes'; el.classList.add(ok?'correct':'wrong'); resolve(ok, `这一题应该是 <b>${factText(state.question.f)}</b>，${state.question.f.chant}。`); return; }
 });
-function results() { const review=unique(state.misses.map(f=>`${factText(f)}，${f.chant}`)).slice(0,4); const stars=state.score>=12?'★★★':state.score>=6?'★★☆':'★☆☆'; const title = state.playMode === 'challenge' ? '三分钟挑战结束' : '练习一轮完成'; app.innerHTML=shell(`${headerBar('本局完成','home')}<div class="panel center"><p class="eyebrow">做得不错！</p><h2>${title}</h2><div class="result-stars">${stars}</div><div class="stat-row"><div class="stat"><strong>${state.score}</strong><span>答对题数</span></div><div class="stat"><strong>${state.total}</strong><span>练习题数</span></div></div>${review.length?`<div class="review"><h3>这些口诀再看一眼</h3>${review.map(x=>`<div class="review-item"><span>${x}</span></div>`).join('')}</div>`:`<p class="subtitle">这一局全都答对啦！</p>`}<div class="result-actions"><button class="primary" data-action="start-game">再玩一局</button><button class="secondary" data-go="difficulty">换个难度</button><button class="muted-btn" data-go="home">返回首页</button></div></div>`); }
+function calendar() {
+  const month = state.calendarMonth, year = month.getFullYear(), monthIndex = month.getMonth();
+  const firstDay = new Date(year, monthIndex, 1).getDay(), daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
+  const byDate = history.reduce((groups, session) => { (groups[session.date] ||= []).push(session); return groups; }, {});
+  const monthTitle = `${year}年${monthIndex + 1}月`;
+  const days = Array.from({ length: firstDay + daysInMonth }, (_, index) => {
+    if (index < firstDay) return '<span class="calendar-blank" aria-hidden="true"></span>';
+    const day = index - firstDay + 1, key = localDateKey(new Date(year, monthIndex, day)), sessions = byDate[key] || [], correct = sessions.reduce((sum, item) => sum + item.correct, 0), total = sessions.reduce((sum, item) => sum + item.total, 0), active = state.calendarDate === key;
+    return `<button class="calendar-day ${sessions.length ? 'has-record' : ''} ${active ? 'selected' : ''}" data-calendar-date="${key}" aria-label="${dayLabel(key)}${sessions.length ? `，${sessions.length}局` : '，无记录'}"><b>${day}</b>${sessions.length ? `<span>${sessions.length}局</span><i class="${total && correct / total >= .8 ? 'great' : ''}"></i>` : ''}</button>`;
+  }).join('');
+  const selectedIsInMonth = state.calendarDate && parseDateKey(state.calendarDate).getFullYear() === year && parseDateKey(state.calendarDate).getMonth() === monthIndex;
+  const chosenDate = selectedIsInMonth && byDate[state.calendarDate] ? state.calendarDate : Object.keys(byDate).find(key => parseDateKey(key).getFullYear() === year && parseDateKey(key).getMonth() === monthIndex) || null;
+  if (chosenDate !== state.calendarDate) state.calendarDate = chosenDate;
+  const detail = chosenDate ? calendarDetail(chosenDate, byDate[chosenDate]) : `<div class="calendar-empty"><b>这个月还没有闯关记录</b><span>完成一局后，它会出现在这里。</span></div>`;
+  app.innerHTML = shell(`${headerBar('练习日历','home')}<section class="calendar"><div class="calendar-summary"><p class="eyebrow">学习足迹</p><h2>每天练一点，口诀记得更牢</h2><p>圆点表示完成记录，绿色代表当天正确率达到 80%。</p></div><div class="calendar-panel"><div class="calendar-month"><button data-calendar-month="-1" aria-label="上一个月">‹</button><h3>${monthTitle}</h3><button data-calendar-month="1" aria-label="下一个月">›</button></div><div class="calendar-weekdays"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div><div class="calendar-grid">${days}</div></div><section class="calendar-detail"><h3>${chosenDate ? dayLabel(chosenDate) : '当天详情'}</h3>${detail}</section></section>`);
+}
+function calendarDetail(key, sessions) {
+  const labels = { practice: '练习一轮', challenge: '3 分钟挑战', easy: '容易', middle: '中等', hard: '困难' };
+  const allCorrect = sessions.reduce((sum, item) => sum + item.correct, 0), allTotal = sessions.reduce((sum, item) => sum + item.total, 0);
+  return `<div class="day-total"><span>共 ${sessions.length} 局</span><b>答对 ${allCorrect} / ${allTotal}</b></div><div class="session-list">${sessions.map(item => { const accuracy = item.total ? Math.round(item.correct / item.total * 100) : 0; const mistakes = item.mistakes?.length ? item.mistakes.map(f => `${f.a}×${f.b}=${f.a * f.b}（${f.chant}）`).join('、') : '本局没有错题'; return `<article class="session-card"><div><b>${item.time} · ${labels[item.mode]}</b><span>${labels[item.difficulty]} · 练习 ${item.factors.join('、')}</span></div><strong>${item.correct}/${item.total}<small>${accuracy}%</small></strong><p>${item.mode === 'challenge' ? `用时 ${formatTime(item.secondsUsed)}` : '完成完整覆盖'} · ${mistakes}</p></article>`; }).join('')}</div>`;
+}
+function results() { const review=unique(state.misses.map(f=>`${factText(f)}，${f.chant}`)).slice(0,4); const stars=state.score>=12?'★★★':state.score>=6?'★★☆':'★☆☆'; const title = state.playMode === 'challenge' ? '三分钟挑战结束' : '练习一轮完成'; app.innerHTML=shell(`${headerBar('本局完成','home')}<div class="panel center"><p class="eyebrow">做得不错！</p><h2>${title}</h2><div class="result-stars">${stars}</div><div class="stat-row"><div class="stat"><strong>${state.score}</strong><span>答对题数</span></div><div class="stat"><strong>${state.total}</strong><span>练习题数</span></div></div>${review.length?`<div class="review"><h3>这些口诀再看一眼</h3>${review.map(x=>`<div class="review-item"><span>${x}</span></div>`).join('')}</div>`:`<p class="subtitle">这一局全都答对啦！</p>`}<div class="result-actions"><button class="primary" data-action="start-game">再玩一局</button><button class="secondary" data-go="calendar">查看练习日历</button><button class="muted-btn" data-go="home">返回首页</button></div></div>`); }
 render();
