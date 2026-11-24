@@ -1,7 +1,7 @@
 import * as THREE from '../vendor/three.module.js';
 import {OrbitControls} from '../vendor/OrbitControls.js';
 import {addArchiveLighting,addArchiveStage,createModelFraming,DEFAULT_MODEL_HEADING} from '../viewer-framing.js?v=3';
-import {buildCrossbow,buildModernTank,buildGuardianOne,buildGuardianTwo} from './model.js?v=2';
+import {buildCrossbow,buildModernTank,buildGuardianOne,buildGuardianTwo} from './model.js?v=3';
 
 const registry={crossbow:{build:buildCrossbow,file:'crossbow'},modern:{build:buildModernTank,file:'modern-tank'},guardian1:{build:buildGuardianOne,file:'guardian-tank-1'},guardian2:{build:buildGuardianTwo,file:'guardian-tank-2'}};
 const $=selector=>document.querySelector(selector);

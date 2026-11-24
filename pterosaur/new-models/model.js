@@ -19,6 +19,11 @@ function cyl(parent,radius,length,position,material='steel',axis='y',name='Round
  const part=add(parent,new THREE.CylinderGeometry(radius,radius,length,20),material,position,name);if(axis==='x')part.rotation.z=Math.PI/2;if(axis==='z')part.rotation.x=Math.PI/2;return part;
 }
 function stud(parent,position,material='graphite'){return cyl(parent,.115,.07,position,material,'y','Round stud')}
+function beamBetween(parent,start,end,thickness=.16,material='graphite',name='Technic beam'){
+ const a=new THREE.Vector3(...start),b=new THREE.Vector3(...end),direction=b.clone().sub(a),length=direction.length();
+ const part=add(parent,new THREE.BoxGeometry(length,thickness,thickness),material,a.clone().add(b).multiplyScalar(.5).toArray(),name);
+ part.quaternion.setFromUnitVectors(new THREE.Vector3(1,0,0),direction.normalize());return part;
+}
 function wheel(parent,x,z,r=.38){
  cyl(parent,r,.22,[x,.38,z],'rubber','z','Wheel with tread');cyl(parent,r*.5,.235,[x,.38,z],'steel','z','Wheel hub');
 }
@@ -43,45 +48,60 @@ function finish(group,name,description){
 
 export function buildCrossbow(){
  meshes.length=0;const model=new THREE.Group();
- const base=new THREE.Group();model.add(base);trackedBase(base,{length:3.15,width:1.6,wheelCount:3});
- box(base,[2.75,.32,1.34],[-.15,.73,0],'graphite','Crossbow deck');
- for(const x of [-.72,0,.72])stud(base,[x,.93,-.38],'steel');
- const mast=new THREE.Group();mast.position.set(.72,.85,0);base.add(mast);
- box(mast,[.28,2.7,.32],[0,1.25,0],'graphite','Vertical bow mast');
- for(const y of [.35,.95,1.55,2.15])cyl(mast,.12,.18,[0,y,-.18],'steel','z','Mast joint');
- const bow=new THREE.Group();bow.position.set(.04,2.25,0);mast.add(bow);
- box(bow,[2.85,.18,.24],[0,0,0],'graphite','Crossbow limb');
- box(bow,[.32,.42,.4],[0,.04,0],'black','Crossbow centre block');
- cyl(bow,.1,1.35,[0,-.02,0],'steel','x','Arrow shaft');
- const tip=add(bow,new THREE.ConeGeometry(.18,.45,4), 'black',[.9,-.02,0],'Arrow point');tip.rotation.z=-Math.PI/2;
- for(const side of [-1,1])box(bow,[.48,.45,.18],[side*1.18,-.13,0],'graphite','Bow end');
- return finish(model,'弩','带履带底座的竖臂弩，保留高竖杆、横向弓臂和细长箭杆。');
+ // U-shaped floor stand seen in the front, side and top photographs.
+ for(const side of [-1,1]){
+  box(model,[1.75,.22,.24],[.28,.28,side*.72],'graphite','U-frame side rail');
+  cyl(model,.17,.25,[1.08,.28,side*.72],'graphite','z','Rounded front foot');
+  cyl(model,.17,.25,[-.55,.28,side*.72],'graphite','z','Rounded rear foot');
+ }
+ box(model,[.34,.24,1.68],[-.55,.29,0],'graphite','U-frame cross member');
+ for(const z of [-.45,.45]){
+  box(model,[.24,2.15,.24],[-.52,1.38,z],'graphite','Twin elevation upright');
+  for(const y of [.62,1.18,1.74,2.28])cyl(model,.09,.27,[-.52,y,z],'steel','z','Upright pin hole');
+ }
+ box(model,[.28,.22,1.1],[-.52,2.44,0],'graphite','Upper yoke');
+ beamBetween(model,[.4,.42,-.22],[-.28,1.55,-.22],.18,'graphite','Left elevation brace');
+ beamBetween(model,[.4,.42,.22],[-.28,1.55,.22],.18,'graphite','Right elevation brace');
+ // The real upper assembly is a narrow arrow cradle, not a horizontal bow wing.
+ for(const z of [-.2,.2]){
+  cyl(model,.12,1.02,[.03,1.68,z],'black','x','Launcher tension rail');
+  cyl(model,.18,.28,[.5,1.68,z],'steel','x','Front rail collar');
+  cyl(model,.18,.28,[-.43,1.68,z],'steel','x','Rear rail collar');
+ }
+ box(model,[.36,.54,.58],[-.55,1.68,0],'graphite','Launcher pivot block');
+ cyl(model,.075,2.75,[.92,1.76,0],'graphite','x','Long arrow shaft');
+ const tip=add(model,new THREE.ConeGeometry(.15,.5,4),'black',[2.5,1.76,0],'Arrow point');tip.rotation.z=-Math.PI/2;
+ return finish(model,'弩','U 形支架托住双立柱升降架，斜撑连接上方长箭发射组件。');
 }
 
 export function buildModernTank(){
- meshes.length=0;const model=new THREE.Group();trackedBase(model,{length:4.0,width:1.85,wheelCount:5});
- box(model,[3.7,.38,1.52],[0,.78,0],'graphite','Long armoured hull');
- slope(model,1.5,.45,1.1,[1.25,.95,0],'steel','Forward slope');
- box(model,[1.05,.35,1.26],[-1.18,1.1,0],'blue','Rear equipment deck');
- box(model,[.86,.42,1.08],[.06,1.2,0],'black','Central turret base');
- box(model,[.68,.22,.84],[.12,1.49,0],'orange','Transparent orange core');
- const turret=new THREE.Group();turret.position.set(.1,1.32,0);model.add(turret);
- box(turret,[1.72,.3,.72],[.12,.22,0],'graphite','Low dual cannon turret');
+ meshes.length=0;const model=new THREE.Group();
+ // Two thin Technic side frames replace the incorrect solid tracked block.
  for(const side of [-1,1]){
-  const barrel=new THREE.Group();barrel.position.set(.86,.22,side*.22);turret.add(barrel);
-  cyl(barrel,.1,1.38,[.65,0,0],'steel','x','Tank cannon');
-  cyl(barrel,.14,.42,[1.32,0,0],'graphite','Cannon sleeve');
+  box(model,[3.35,.2,.18],[0,.27,side*.72],'black','Lower side frame');
+  for(const x of [-.82,0,.82])cyl(model,.16,.2,[x,.29,side*.73],'steel','z','Side frame roller');
+  for(const x of [-1.48,1.48])cyl(model,.25,.38,[x,.72,side*.8],'black','z','Corner tube');
  }
- for(const side of [-1,1]){box(model,[.95,.22,.16],[-.5,1.08,side*.79],'steel','Side rail');cyl(model,.13,.18,[1.65,.9,side*.88],'black','z','Front wheel cap');}
- for(const x of [-.68,-.34,0,.34])stud(model,[x,1.01,-.55],'blue');
- return finish(model,'新型坦克','低矮履带车体、透明橙色核心和前伸双炮组成的新型坦克。');
+ box(model,[3.2,.24,1.28],[0,.55,0],'graphite','Low tank deck');
+ box(model,[.95,.27,1.12],[-.95,.77,0],'steel','Rear armour tiles');
+ box(model,[.7,.3,1.02],[.08,.78,0],'black','Central cockpit base');
+ for(const side of [-1,1])box(model,[.72,.32,.34],[.25,.91,side*.39],side<0?'orange':'blue','Transparent side canopy');
+ for(const side of [-1,1]){
+  cyl(model,.19,.28,[.92,.92,side*.56],'steel','z','Forward round module');
+  cyl(model,.19,.28,[-1.06,.92,side*.56],'steel','z','Rear round module');
+ }
+ // One long centre cannon is visible in the top and end photographs.
+ cyl(model,.18,2.55,[.05,1.2,0],'steel','x','Central long cannon');
+ cyl(model,.25,.38,[1.22,1.2,0],'steel','x','Cannon muzzle sleeve');
+ cyl(model,.22,.48,[-1.23,1.2,0],'black','x','Cannon rear sleeve');
+ return finish(model,'新型坦克','双侧细梁底盘承载透明座舱、四个角部圆筒与中央长炮。');
 }
 
 export function buildGuardianOne(){
  meshes.length=0;const model=new THREE.Group();trackedBase(model,{length:2.3,width:1.28,wheelCount:3,redHubs:true});
  box(model,[1.75,.35,1.05],[0,.77,0],'black','Guardian one hull');
  const mount=new THREE.Group();mount.position.set(-.1,.98,0);model.add(mount);cyl(mount,.22,.72,[0,.12,0],'graphite','z','Cannon pivot');
- const cannon=new THREE.Group();cannon.position.set(.08,.12,0);cannon.rotation.z=-.62;mount.add(cannon);
+ const cannon=new THREE.Group();cannon.position.set(.08,.12,0);cannon.rotation.z=.62;mount.add(cannon);
  box(cannon,[1.55,.32,.42],[.62,0,0],'graphite','Raised cannon');cyl(cannon,.11,.72,[1.58,0,0],'black','x','Cannon muzzle');
  for(const side of [-1,1])cyl(model,.16,.19,[.72,.95,side*.51],'red','z','Signal hub');
  return finish(model,'守护小坦克 1','红色轮毂的小型履带守卫车，炮管以高仰角固定。');
