@@ -339,11 +339,13 @@ function startTankShowcase() {
   root.querySelector('#tank-fullscreen').addEventListener('click', () => toggleFullscreen(viewer));
   root.querySelector('#tank-mesh-count').textContent = `${meshCount} 个几何部件`;
   function resize() { const {width,height} = tankHost.getBoundingClientRect(); if (!width || !height) return; camera.aspect = width / height; camera.updateProjectionMatrix(); framing.refresh(); renderer.setSize(width, height, false); }
-  new ResizeObserver(resize).observe(tankHost); resize(); moveCamera(view, true);
+  const resizeObserver = new ResizeObserver(resize); resizeObserver.observe(tankHost); resize(); moveCamera(view, true);
   controls.addEventListener('start', () => { cameraMotion = null; setAutoRotate(false); root.querySelectorAll('[data-tank-view]').forEach(button => { button.classList.remove('selected'); button.setAttribute('aria-pressed', 'false'); }); });
-  let visible = true;
-  new IntersectionObserver(entries => { visible = entries[0].isIntersecting; }, { rootMargin: '120px' }).observe(root);
+  let visible = true, disposed = false;
+  const visibilityObserver = 'IntersectionObserver' in window ? new IntersectionObserver(entries => { visible = entries[0].isIntersecting; }, { rootMargin: '120px' }) : null;
+  visibilityObserver?.observe(root);
   function frame(now) {
+    if (disposed) return;
     requestAnimationFrame(frame); const dt = Math.min(.05, (now-last)/1000); last = now;
     if (document.hidden || !visible) return;
     if (autoAim) { turret.rotation.y = Math.sin(now*.00065)*.62; cannons.rotation.z = .42 + Math.sin(now*.00105)*.12; }
@@ -354,6 +356,9 @@ function startTankShowcase() {
     controls.update(); renderer.render(scene,camera);
   }
   requestAnimationFrame(frame);
+  return () => {
+    disposed = true; resizeObserver.disconnect(); visibilityObserver?.disconnect(); controls.dispose(); renderer.dispose(); renderer.forceContextLoss?.(); renderer.domElement.remove();
+  };
 }
 
 function startWhenNear(selector, start) {
@@ -373,12 +378,34 @@ function startWhenNear(selector, start) {
   window.addEventListener('hashchange', () => { if (location.hash === selector) { observer.disconnect(); run(); } });
 }
 
+let activeSecondaryViewer = null;
+function startSecondaryViewer(id, start) {
+  if (activeSecondaryViewer?.id === id) return;
+  activeSecondaryViewer?.dispose?.();
+  try { activeSecondaryViewer = { id, dispose: start() }; }
+  catch (error) {
+    console.error(`3D viewer could not start: ${id}`, error);
+    activeSecondaryViewer = null;
+    const host = id === 'equipment' ? $('#new-models-canvas-host') : $('#tank-canvas-host');
+    if (host) host.innerHTML = '<p class="viewer-error">3D 预览暂时无法启动，请刷新页面后重试。</p>';
+  }
+}
+function watchSecondaryViewer(selector, id, start) {
+  const target = $(selector); if (!target) return;
+  const activate = () => startSecondaryViewer(id, start);
+  if (location.hash === selector) { activate(); return; }
+  if (!('IntersectionObserver' in window)) return;
+  const observer = new IntersectionObserver(entries => { if (entries.some(entry => entry.isIntersecting)) activate(); }, { threshold: .08 });
+  observer.observe(target);
+  window.addEventListener('hashchange', () => { if (location.hash === selector) activate(); });
+}
+
 try {
-  // Keep the above-the-fold winged carrier responsive; the two lower viewers
-  // allocate WebGL contexts only when the visitor is about to reach them.
+  // Keep the main carrier ready, but reuse one secondary WebGL context for the
+  // two lower sections. This prevents mobile browsers from rejecting a third canvas.
   startWhenNear('#exhibit', startGallery);
-  startWhenNear('#tank-model', startTankShowcase);
-  startWhenNear('#new-models', startNewModelsShowcase);
+  watchSecondaryViewer('#tank-model', 'tank', startTankShowcase);
+  watchSecondaryViewer('#new-models', 'equipment', startNewModelsShowcase);
 } catch (error) {
   console.error('3D gallery could not start:', error);
   loading.innerHTML = '<span>当前设备暂时无法显示 3D。请使用支持 WebGL 的浏览器，或下载模型查看。</span>';
