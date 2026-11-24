@@ -4,16 +4,21 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#f5f5f0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="description" content="从十八张积木照片重建的机械翼龙战车。旋转、缩放、展开双翼，在 3D 中重新发现你的创作。">
   <title>机械翼龙战车 · 积木档案</title>
   <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
-  <link rel="stylesheet" href="./style.css?v=8">
+  <link rel="apple-touch-icon" href="./assets/icon.svg">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="stylesheet" href="./style.css?v=9">
 </head>
 <body>
   <header class="header">
     <a class="brand" href="./" aria-label="积木档案首页"><span class="brand-icon" aria-hidden="true">▦</span>积木档案<span class="brand-en">BRICK ARCHIVE</span></a>
     <nav aria-label="页面导航"><a class="active" href="#exhibit">模型展厅</a><a href="#new-models">机械装备库</a><a href="./game.html">空中冒险</a><a href="./rescue/">遗迹救援</a><a href="./galaxian/">翼龙小蜜蜂</a><a href="#references">参考图库 <span>47</span></a></nav>
-    <span class="header-note"><i></i> 让想象，立体起来</span>
+    <div class="header-actions"><button id="install-app" class="install-button" type="button" aria-haspopup="dialog" title="安装到主屏幕"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m-4-4 4 4 4-4M5 16v4h14v-4"/><rect x="4" y="3" width="16" height="18" rx="2"/></svg><span>安装</span></button><span class="header-note"><i></i> 让想象，立体起来</span></div>
   </header>
 
   <main>
@@ -162,8 +167,9 @@
     <footer class="footer"><a class="brand" href="#exhibit"><span class="brand-icon" aria-hidden="true">▦</span>积木档案</a><span>小小积木，大大世界。</span><a href="#exhibit">回到展厅 ↑</a></footer>
   </main>
   <dialog id="photo-dialog" aria-label="参考照片大图"><button id="close-photo" class="dialog-close" aria-label="关闭照片">×</button><button id="prev-photo" class="photo-arrow prev" aria-label="上一张照片">←</button><img id="large-photo" alt=""><button id="next-photo" class="photo-arrow next" aria-label="下一张照片">→</button><p id="photo-caption"></p></dialog>
+  <dialog id="install-dialog" class="install-dialog" aria-labelledby="install-title"><button id="close-install" class="install-close" type="button" aria-label="关闭">×</button><span class="install-mark" aria-hidden="true">▦</span><h2 id="install-title">安装积木档案</h2><p id="install-message">将它放到主屏幕，像应用一样随时打开。</p><ol id="install-steps"><li>在浏览器菜单中选择“安装应用”或“添加到主屏幕”。</li><li>确认安装后，即可从主屏幕进入模型展厅。</li></ol><button id="confirm-install" class="install-confirm" type="button">知道了</button></dialog>
   <div id="toast" role="status" aria-live="polite"></div>
   <noscript><p class="noscript">请开启 JavaScript 以浏览交互式 3D 模型。下方参考照片仍可查看。</p></noscript>
-  <script type="module" src="./main.js?v=11"></script>
+  <script type="module" src="./main.js?v=12"></script>
 </body>
 </html>

@@ -2,7 +2,7 @@ import * as THREE from './vendor/three.module.js';
 import { OrbitControls } from './vendor/OrbitControls.js';
 import { buildModel } from './model.js?v=2';
 import { buildTank } from './tank/model.js?v=1';
-import { startNewModelsShowcase } from './new-models/main.js?v=1';
+import { startNewModelsShowcase } from './new-models/main.js?v=2';
 import { AnimationPlayer, sampleAnimation, CHAPTERS, DURATION } from './animation.js?v=3';
 import { addArchiveLighting, addArchiveStage, createModelFraming, DEFAULT_MODEL_HEADING } from './viewer-framing.js?v=2';
 
@@ -15,6 +15,62 @@ function toast(message) {
   $('#toast').textContent = message; $('#toast').classList.add('visible');
   clearTimeout(toastTimer); toastTimer = setTimeout(() => $('#toast').classList.remove('visible'), 2500);
 }
+
+async function toggleFullscreen(element) {
+  try {
+    if (document.fullscreenElement) await document.exitFullscreen();
+    else if (element.requestFullscreen) await element.requestFullscreen();
+    else toast('当前浏览器不支持全屏，可横屏查看模型');
+  } catch { toast('无法切换全屏，请使用浏览器的全屏功能'); }
+}
+function updateFullscreenButtons() {
+  const active = Boolean(document.fullscreenElement);
+  ['#fullscreen', '#tank-fullscreen', '#new-models-fullscreen'].forEach(selector => {
+    const button = $(selector); if (!button) return;
+    button.setAttribute('aria-label', active ? '退出全屏' : '全屏查看');
+    button.title = active ? '退出全屏' : '全屏查看';
+  });
+}
+document.addEventListener('fullscreenchange', updateFullscreenButtons);
+
+function setupInstall() {
+  const button = $('#install-app');
+  const dialog = $('#install-dialog');
+  const message = $('#install-message');
+  const steps = $('#install-steps');
+  let deferredPrompt = null;
+  const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  const isStandalone = matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+  const openHelp = (title, text, items) => {
+    $('#install-title').textContent = title;
+    message.textContent = text;
+    steps.replaceChildren(...items.map(item => { const li = document.createElement('li'); li.textContent = item; return li; }));
+    dialog.showModal();
+  };
+  button.addEventListener('click', async () => {
+    if (location.protocol === 'file:') {
+      openHelp('需通过本地服务安装', '浏览器不会允许 file:// 页面安装到主屏幕。', ['在项目目录运行 npm start。', '用浏览器打开 http://localhost:8080/ 后，再点此按钮安装。']);
+      return;
+    }
+    if (deferredPrompt) {
+      await deferredPrompt.prompt();
+      const choice = await deferredPrompt.userChoice;
+      deferredPrompt = null;
+      if (choice.outcome === 'accepted') button.hidden = true;
+      return;
+    }
+    if (isStandalone) { toast('积木档案已经安装到主屏幕'); return; }
+    if (isIos) openHelp('添加到 iPhone 主屏幕', '请在 Safari 中完成以下操作：', ['点击底部工具栏的“分享”按钮。', '选择“添加到主屏幕”，然后确认添加。']);
+    else openHelp('安装积木档案', '请通过浏览器菜单完成安装：', ['打开浏览器菜单。', '选择“安装应用”或“添加到主屏幕”。']);
+  });
+  $('#close-install').addEventListener('click', () => dialog.close());
+  $('#confirm-install').addEventListener('click', () => dialog.close());
+  window.addEventListener('beforeinstallprompt', event => { event.preventDefault(); deferredPrompt = event; button.hidden = false; });
+  window.addEventListener('appinstalled', () => { deferredPrompt = null; button.hidden = true; toast('积木档案已安装到主屏幕'); });
+  if (isStandalone) button.hidden = true;
+  if ('serviceWorker' in navigator && location.protocol !== 'file:') window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(() => {}));
+}
+setupInstall();
 
 // Reference viewer works independently of WebGL availability.
 const photos = $$('.photo');
@@ -199,13 +255,7 @@ function startGallery() {
   $('#animation-seek').addEventListener('input',event=>{player.seek(Number(event.target.value));applyAnimation();renderer.render(scene,camera);});
   $('#animation-speed').addEventListener('change',event=>{player.speed=Number(event.target.value);});
   document.addEventListener('visibilitychange',()=>{if(document.hidden&&cinematic){player.playing=false;updatePlayback();}});
-  $('#fullscreen').addEventListener('click', async () => {
-    try {
-      if (document.fullscreenElement) await document.exitFullscreen();
-      else if ($('#viewer').requestFullscreen) await $('#viewer').requestFullscreen();
-      else toast('当前浏览器不支持全屏，可横屏查看模型');
-    } catch { toast('无法进入全屏，请使用浏览器的全屏功能'); }
-  });
+  $('#fullscreen').addEventListener('click', () => toggleFullscreen($('#viewer')));
   controls.addEventListener('start', () => { cameraMotion = null; setAuto(false); $$('[data-view]').forEach(b => { b.classList.remove('selected'); b.setAttribute('aria-pressed', false); }); });
 
   const observer = new ResizeObserver(() => {
@@ -286,7 +336,7 @@ function startTankShowcase() {
   root.querySelector('#tank-barrel').addEventListener('input', event => { setAutoAim(false); cannons.rotation.z = THREE.MathUtils.degToRad(Number(event.target.value)); });
   root.querySelector('#tank-auto-aim').addEventListener('click', () => setAutoAim(!autoAim));
   root.querySelector('#tank-reset').addEventListener('click', reset);
-  root.querySelector('#tank-fullscreen').addEventListener('click', () => viewer.requestFullscreen?.());
+  root.querySelector('#tank-fullscreen').addEventListener('click', () => toggleFullscreen(viewer));
   root.querySelector('#tank-mesh-count').textContent = `${meshCount} 个几何部件`;
   function resize() { const {width,height} = tankHost.getBoundingClientRect(); if (!width || !height) return; camera.aspect = width / height; camera.updateProjectionMatrix(); framing.refresh(); renderer.setSize(width, height, false); }
   new ResizeObserver(resize).observe(tankHost); resize(); moveCamera(view, true);
@@ -313,12 +363,14 @@ function startWhenNear(selector, start) {
     if (started) return; started = true;
     try { start(); } catch (error) { console.error(`3D viewer could not start: ${selector}`, error); }
   };
+  if (location.hash === selector || target.getBoundingClientRect().top < innerHeight + 700) { run(); return; }
   if (!('IntersectionObserver' in window)) { run(); return; }
   const observer = new IntersectionObserver(entries => {
     if (!entries.some(entry => entry.isIntersecting)) return;
     observer.disconnect(); run();
   }, { rootMargin: '620px 0px' });
   observer.observe(target);
+  window.addEventListener('hashchange', () => { if (location.hash === selector) { observer.disconnect(); run(); } });
 }
 
 try {

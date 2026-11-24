@@ -1,10 +1,13 @@
 import * as THREE from '../vendor/three.module.js';
 import {OrbitControls} from '../vendor/OrbitControls.js';
-import {addArchiveLighting,addArchiveStage,createModelFraming,DEFAULT_MODEL_HEADING} from '../viewer-framing.js';
-import {buildCrossbow,buildModernTank,buildGuardianOne,buildGuardianTwo} from './model.js';
+import {addArchiveLighting,addArchiveStage,createModelFraming,DEFAULT_MODEL_HEADING} from '../viewer-framing.js?v=3';
+import {buildCrossbow,buildModernTank,buildGuardianOne,buildGuardianTwo} from './model.js?v=2';
 
 const registry={crossbow:{build:buildCrossbow,file:'crossbow'},modern:{build:buildModernTank,file:'modern-tank'},guardian1:{build:buildGuardianOne,file:'guardian-tank-1'},guardian2:{build:buildGuardianTwo,file:'guardian-tank-2'}};
 const $=selector=>document.querySelector(selector);
+async function toggleFullscreen(element){
+ try{if(document.fullscreenElement)await document.exitFullscreen();else if(element.requestFullscreen)await element.requestFullscreen();}catch{ /* Browser may deny fullscreen outside a user gesture. */ }
+}
 export function startNewModelsShowcase(){
  const root=$('#new-models');if(!root)return;
  const host=$('#new-models-canvas-host'),scene=new THREE.Scene();scene.background=new THREE.Color('#eeefe9');scene.fog=new THREE.Fog('#eeefe9',32,70);
@@ -25,10 +28,10 @@ export function startNewModelsShowcase(){
  root.querySelectorAll('[data-new-view]').forEach(button=>button.addEventListener('click',()=>{setAuto(false);moveCamera(button.dataset.newView);}));
  $('#new-models-rotate').addEventListener('click',()=>setAuto(!auto));$('#new-models-wireframe').addEventListener('click',()=>setWire(!wire));
  $('#new-models-reset').addEventListener('click',()=>{current.model.rotation.y=DEFAULT_MODEL_HEADING;setAuto(false);setWire(false);moveCamera('perspective');});
- $('#new-models-fullscreen').addEventListener('click',()=>$('#new-models-viewer').requestFullscreen?.());
+ $('#new-models-fullscreen').addEventListener('click',()=>toggleFullscreen($('#new-models-viewer')));
  controls.addEventListener('start',()=>{cameraMotion=null;setAuto(false);});
  const resize=()=>{const {width,height}=host.getBoundingClientRect();if(!width||!height)return;camera.aspect=width/height;camera.updateProjectionMatrix();framing?.refresh();renderer.setSize(width,height,false);};new ResizeObserver(resize).observe(host);
- let visible=true;new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;},{rootMargin:'120px'}).observe(root);
+ let visible=true;if('IntersectionObserver'in window)new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;},{rootMargin:'120px'}).observe(root);
  function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,(now-last)/1000);last=now;if(document.hidden||!visible)return;if(cameraMotion){camera.position.lerp(cameraMotion.position,.09);controls.target.lerp(cameraMotion.target,.09);if(camera.position.distanceTo(cameraMotion.position)<.02){camera.position.copy(cameraMotion.position);controls.target.copy(cameraMotion.target);cameraMotion=null;}}controls.update();renderer.render(scene,camera);}
  select('crossbow');resize();requestAnimationFrame(frame);
 }
