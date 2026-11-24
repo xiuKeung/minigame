@@ -11,7 +11,7 @@ async function toggleFullscreen(element){
 export function startNewModelsShowcase(){
  const root=$('#new-models');if(!root)return;
  const host=$('#new-models-canvas-host'),scene=new THREE.Scene();scene.background=new THREE.Color('#eeefe9');scene.fog=new THREE.Fog('#eeefe9',32,70);
- const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'low-power'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.25));renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;host.append(renderer.domElement);
+ const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;host.append(renderer.domElement);
  const camera=new THREE.PerspectiveCamera(36,1,.1,100),controls=new OrbitControls(camera,renderer.domElement);controls.enableDamping=true;controls.dampingFactor=.065;controls.enablePan=false;controls.maxPolarAngle=Math.PI*.5-.018;controls.autoRotateSpeed=.7;
  addArchiveLighting(scene);let current,framing,stage,view='perspective',auto=false,wire=false,cameraMotion=null,last=performance.now();
  function select(key){
@@ -30,9 +30,8 @@ export function startNewModelsShowcase(){
  $('#new-models-reset').addEventListener('click',()=>{current.model.rotation.y=DEFAULT_MODEL_HEADING;setAuto(false);setWire(false);moveCamera('perspective');});
  $('#new-models-fullscreen').addEventListener('click',()=>toggleFullscreen($('#new-models-viewer')));
  controls.addEventListener('start',()=>{cameraMotion=null;setAuto(false);});
- const resize=()=>{const {width,height}=host.getBoundingClientRect();if(!width||!height)return;camera.aspect=width/height;camera.updateProjectionMatrix();framing?.refresh();renderer.setSize(width,height,false);};const resizeObserver=new ResizeObserver(resize);resizeObserver.observe(host);
- let visible=true,disposed=false;const visibilityObserver='IntersectionObserver'in window?new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;},{rootMargin:'120px'}):null;visibilityObserver?.observe(root);
- function frame(now){if(disposed)return;requestAnimationFrame(frame);const dt=Math.min(.05,(now-last)/1000);last=now;if(document.hidden||!visible)return;if(cameraMotion){camera.position.lerp(cameraMotion.position,.09);controls.target.lerp(cameraMotion.target,.09);if(camera.position.distanceTo(cameraMotion.position)<.02){camera.position.copy(cameraMotion.position);controls.target.copy(cameraMotion.target);cameraMotion=null;}}controls.update();renderer.render(scene,camera);}
+ const resize=()=>{const {width,height}=host.getBoundingClientRect();if(!width||!height)return;camera.aspect=width/height;camera.updateProjectionMatrix();framing?.refresh();renderer.setSize(width,height,false);};new ResizeObserver(resize).observe(host);
+ let visible=true;if('IntersectionObserver'in window)new IntersectionObserver(entries=>{visible=entries[0].isIntersecting;},{rootMargin:'120px'}).observe(root);
+ function frame(now){requestAnimationFrame(frame);const dt=Math.min(.05,(now-last)/1000);last=now;if(document.hidden||!visible)return;if(cameraMotion){camera.position.lerp(cameraMotion.position,.09);controls.target.lerp(cameraMotion.target,.09);if(camera.position.distanceTo(cameraMotion.position)<.02){camera.position.copy(cameraMotion.position);controls.target.copy(cameraMotion.target);cameraMotion=null;}}controls.update();renderer.render(scene,camera);}
  select('crossbow');resize();requestAnimationFrame(frame);
- return()=>{disposed=true;resizeObserver.disconnect();visibilityObserver?.disconnect();controls.dispose();renderer.dispose();renderer.forceContextLoss?.();renderer.domElement.remove();};
 }
