@@ -46,7 +46,7 @@ function trackedBase(parent,{length=3.2,width=1.7,wheelCount=4,redHubs=false}={}
 }
 function slope(parent,width,height,length,position,material='graphite',name='Sloped armour'){
  const shape=new THREE.Shape();shape.moveTo(-length/2,0);shape.lineTo(length/2,0);shape.lineTo(length/2,height);shape.lineTo(-length*.22,height);shape.closePath();
- const geo=new THREE.ExtrudeGeometry(shape,{depth:width,bevelEnabled:true,bevelThickness:.02,bevelSize:.02,bevelSegments:1});geo.rotateX(Math.PI/2);geo.translate(0,0,-width/2);return add(parent,geo,material,position,name);
+ const geo=new THREE.ExtrudeGeometry(shape,{depth:width,bevelEnabled:true,bevelThickness:.02,bevelSize:.02,bevelSegments:1});geo.translate(0,0,-width/2);return add(parent,geo,material,position,name);
 }
 function finish(group,name,description){
  group.name=name;group.userData={name,description,materials,meshCount:meshes.length};return {model:group,materials,meshCount:meshes.length,description};
@@ -89,14 +89,15 @@ export function buildCrossbow(){
  const launcher=new THREE.Group();launcher.position.set(.22,1.58,0);hinge.add(launcher);
  cyl(launcher,.16,.47,[.06,0,0],'steel','y','Launcher pivot socket');
  cyl(launcher,.135,.78,[.45,-.21,0],'black','x','Lower tension barrel');
- cyl(launcher,.068,2.22,[1.14,.12,0],'black','x','Arrow shaft');
+ const projectile=new THREE.Group();launcher.add(projectile);
+ cyl(projectile,.068,2.22,[1.14,.12,0],'black','x','Arrow shaft');
  for(const x of [.18,.79]){
   cyl(launcher,.17,.31,[x,.12,0],'steel','x','Arrow guide collar');
   box(launcher,[.18,.24,.25],[x,-.075,0],'steel','Arrow guide support');
  }
- const tip=add(launcher,new THREE.ConeGeometry(.115,.42,4),'black',[2.46,.12,0],'Arrow point');tip.rotation.z=-Math.PI/2;
+ const tip=add(projectile,new THREE.ConeGeometry(.115,.42,4),'black',[2.46,.12,0],'Arrow point');tip.rotation.z=-Math.PI/2;
  const result=finish(model,'弩','单根带孔立梁连接前伸箭杆；左右 L 形支脚形成开放底座，可切换前折的变形姿态。');
- result.rig={hinge,launcher};return result;
+ result.rig={hinge,launcher,projectile};return result;
 }
 
 export function buildModernTank(){
@@ -145,23 +146,27 @@ export function buildModernTank(){
   box(model,[.65,.045,.025],[.51,.91,side*.56],'steel','Cabin lower frame');
  }
  box(model,[.62,.12,.14],[.5,1.28,-.2],'amber','Narrow orange canopy connector');
- box(model,[.85,.18,.42],[-.62,1.15,0],'purple','Purple cannon support');
+ const turret=new THREE.Group();turret.position.set(0,1.3,0);model.add(turret);
+ box(turret,[.85,.18,.42],[-.62,-.15,0],'purple','Purple cannon support');
+ cyl(turret,.19,.48,[-1.18,.18,0],'steel','z','Cannon elevation joint');
+ const barrel=new THREE.Group();barrel.position.set(-1.18,.18,0);turret.add(barrel);
+ for(const x of [-.75,.48])cyl(barrel,.19,1.1,[x+1.18,0,0],'paleBlue','x','Segmented light-blue cannon');
+ cyl(barrel,.235,.1,[1.04,0,0],'steel','x','Cannon segment seam');
+ cyl(barrel,.235,.27,[.91,0,0],'paleBlue','y','Top cannon connector');
+ cyl(barrel,.115,.015,[.91,.145,0],'graphite','y','Top connector recess');
+ cyl(barrel,.125,.018,[2.23,0,0],'black','x','Cannon bore');
+ const muzzleRing=add(barrel,new THREE.TorusGeometry(.16,.027,8,20),'steel',[2.245,0,0],'Cannon muzzle rim');
+ muzzleRing.rotation.y=Math.PI/2;
  box(model,[.48,.3,.52],[1.29,.94,0],'cream','Cream nose block');
  box(model,[.42,.22,.44],[1.47,.75,0],'blue','Blue nose brick');
- for(const x of [-.75,.48])cyl(model,.19,1.1,[x,1.48,0],'paleBlue','x','Segmented light-blue cannon');
- cyl(model,.235,.1,[-.14,1.48,0],'steel','x','Cannon segment seam');
- cyl(model,.235,.27,[-.27,1.48,0],'paleBlue','y','Top cannon connector');
- cyl(model,.115,.015,[-.27,1.625,0],'graphite','y','Top connector recess');
- cyl(model,.125,.018,[1.05,1.48,0],'black','x','Cannon bore');
- const muzzleRing=add(model,new THREE.TorusGeometry(.16,.027,8,20),'steel',[1.065,1.48,0],'Cannon muzzle rim');
- muzzleRing.rotation.y=Math.PI/2;
  cyl(model,.23,.35,[-1.22,1.37,0],'black','y','Rear vertical socket');
  cyl(model,.13,.015,[-1.22,1.552,0],'graphite','y','Rear socket recess');
  for(const x of [-.65,0,.65]){
   cyl(model,.14,.08,[x,.59,0],'paleBlue','y','Underside axle connector');
   cyl(model,.07,.012,[x,.545,0],'black','y','Underside connector hole');
  }
- return finish(model,'新型坦克','带孔双侧履带梁、透明斜面座舱、四角圆筒与分段浅蓝灰主炮。');
+ const result=finish(model,'新型坦克','带孔双侧履带梁、透明斜面座舱、四角圆筒与可转向、可抬升的分段浅蓝灰主炮。');
+ result.rig={turret,barrel};return result;
 }
 
 export function buildGuardianOne(){
@@ -171,17 +176,19 @@ export function buildGuardianOne(){
  const cannon=new THREE.Group();cannon.position.set(.08,.12,0);cannon.rotation.z=.62;mount.add(cannon);
  box(cannon,[1.55,.32,.42],[.62,0,0],'graphite','Raised cannon');cyl(cannon,.11,.72,[1.58,0,0],'black','x','Cannon muzzle');
  for(const side of [-1,1])cyl(model,.16,.19,[.72,.95,side*.51],'red','z','Signal hub');
- return finish(model,'守护小坦克 1','红色轮毂的小型履带守卫车，炮管以高仰角固定。');
+ const result=finish(model,'守护小坦克 1','红色轮毂的小型履带守卫车，炮管仰角可调。');
+ result.rig={barrel:cannon,defaultElevation:35};return result;
 }
 
 export function buildGuardianTwo(){
  meshes.length=0;const model=new THREE.Group();trackedBase(model,{length:2.25,width:1.26,wheelCount:3,redHubs:true});
  box(model,[1.82,.32,1.04],[0,.76,0],'black','Guardian two hull');
- const wedgeGroup=new THREE.Group();wedgeGroup.position.set(.1,.95,0);model.add(wedgeGroup);
- slope(wedgeGroup,.86,.72,1.3,[.25,0,0],'graphite','Armoured wedge cannon');
- wedgeGroup.rotation.z=-.35;
- box(wedgeGroup,[1.14,.26,.52],[.35,.37,0],'graphite','Wedge top rail');
+ const wedgeGroup=new THREE.Group();wedgeGroup.position.set(-.45,1.02,0);model.add(wedgeGroup);
+ slope(wedgeGroup,.86,.72,1.3,[.8,0,0],'graphite','Armoured wedge cannon');
+ wedgeGroup.rotation.z=.35;
+ box(wedgeGroup,[1.14,.26,.52],[.9,.37,0],'graphite','Wedge top rail');
  cyl(model,.13,.2,[-.72,.93,0],'blue','z','Rear joint');
  for(const side of [-1,1])box(model,[.36,.18,.16],[.65,.93,side*.53],'graphite','Side guard');
- return finish(model,'守护小坦克 2','紧凑的低矮履带车，采用向前上方倾斜的楔形炮体。');
+ const result=finish(model,'守护小坦克 2','紧凑的低矮履带车，采用仰角可调的楔形炮体。');
+ result.rig={barrel:wedgeGroup,defaultElevation:20};return result;
 }
