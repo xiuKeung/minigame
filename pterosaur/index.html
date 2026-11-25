@@ -12,7 +12,7 @@
   <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="./assets/icon.svg">
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="stylesheet" href="./style.css?v=10">
+  <link rel="stylesheet" href="./style.css?v=11">
 </head>
 <body>
   <header class="header">
@@ -102,7 +102,8 @@
         <aside class="panel new-models-panel" aria-label="新增模型控制">
           <div class="panel-heading"><span class="small-label">模型选择</span></div>
           <div class="new-model-switch" role="group" aria-label="选择新增模型"><button data-new-model="crossbow" class="selected" aria-pressed="true">弩</button><button data-new-model="modern" aria-pressed="false">新型坦克</button><button data-new-model="guardian1" aria-pressed="false">守护小坦克 1</button><button data-new-model="guardian2" aria-pressed="false">守护小坦克 2</button></div>
-          <div class="divider"></div><h2 id="new-model-name">弩</h2><p class="description" id="new-model-description">U 形支架托住双立柱升降架，斜撑连接上方长箭发射组件。</p>
+          <div class="divider"></div><h2 id="new-model-name">弩</h2><p class="description" id="new-model-description">单根带孔立梁连接前伸箭杆；左右 L 形支脚形成开放底座，可切换前折的变形姿态。</p>
+          <button id="crossbow-pose" class="crossbow-pose" type="button" aria-pressed="false"><span>切换变形姿态</span><span aria-hidden="true">↗</span></button>
           <div class="toggle-row"><label for="new-models-rotate">自动旋转</label><button id="new-models-rotate" class="switch" role="switch" aria-checked="false"><span></span></button></div>
           <div class="toggle-row"><label for="new-models-wireframe">查看线框</label><button id="new-models-wireframe" class="switch" role="switch" aria-checked="false"><span></span></button></div>
           <p class="model-note"><span>关于模型</span>依据实拍照片还原外观与可见部件；照片未覆盖的底部、内部连接采用积木结构近似补全。</p>
@@ -138,13 +139,13 @@
         <button class="photo tank-reference" data-category="tank" data-photo="21"><div><img src="./assets/photos/tank/thumbs/tank-rear.jpg" data-full="./assets/photos/tank/tank-rear.jpg" alt="黄色双炮坦克后方照片" loading="lazy"></div><span><b>22</b> 坦克后方 <i>↗</i></span></button>
         <button class="photo tank-reference" data-category="tank" data-photo="22"><div><img src="./assets/photos/tank/thumbs/tank-top.jpg" data-full="./assets/photos/tank/tank-top.jpg" alt="黄色双炮坦克俯视照片" loading="lazy"></div><span><b>23</b> 坦克俯视 <i>↗</i></span></button>
 
-        <button class="photo new-reference" data-category="crossbow" data-photo="24"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105014.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105014.jpg" alt="弩左前结构参考照片" loading="lazy"></div><span><b>24</b> 弩 · 左前结构 <i>↗</i></span></button>
-        <button class="photo new-reference" data-category="crossbow" data-photo="25"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105020.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105020.jpg" alt="弩正面立柱参考照片" loading="lazy"></div><span><b>25</b> 弩 · 正面立柱 <i>↗</i></span></button>
-        <button class="photo new-reference" data-category="crossbow" data-photo="26"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105024.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105024.jpg" alt="弩发射组件右侧参考照片" loading="lazy"></div><span><b>26</b> 弩 · 发射组件右侧 <i>↗</i></span></button>
-        <button class="photo new-reference" data-category="crossbow" data-photo="27"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105027.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105027.jpg" alt="弩正面轮廓参考照片" loading="lazy"></div><span><b>27</b> 弩 · 正面轮廓 <i>↗</i></span></button>
-        <button class="photo new-reference" data-category="crossbow" data-photo="28"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105035.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105035.jpg" alt="弩俯视箭杆参考照片" loading="lazy"></div><span><b>28</b> 弩 · 俯视箭杆 <i>↗</i></span></button>
-        <button class="photo new-reference" data-category="crossbow" data-photo="29"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105040.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105040.jpg" alt="弩后侧支架参考照片" loading="lazy"></div><span><b>29</b> 弩 · 后侧支架 <i>↗</i></span></button>
-        <button class="photo new-reference" data-category="crossbow" data-photo="30"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105111.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105111.jpg" alt="弩低角度全貌参考照片" loading="lazy"></div><span><b>30</b> 弩 · 低角度全貌 <i>↗</i></span></button>
+        <button class="photo new-reference" data-category="crossbow" data-photo="24"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105014.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105014.jpg" alt="弩左视图" loading="lazy"></div><span><b>24</b> 弩 · 左视图 <i>↗</i></span></button>
+        <button class="photo new-reference" data-category="crossbow" data-photo="25"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105020.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105020.jpg" alt="弩背面" loading="lazy"></div><span><b>25</b> 弩 · 背面 <i>↗</i></span></button>
+        <button class="photo new-reference" data-category="crossbow" data-photo="26"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105024.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105024.jpg" alt="弩右视图" loading="lazy"></div><span><b>26</b> 弩 · 右视图 <i>↗</i></span></button>
+        <button class="photo new-reference" data-category="crossbow" data-photo="27"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105027.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105027.jpg" alt="弩正面" loading="lazy"></div><span><b>27</b> 弩 · 正面 <i>↗</i></span></button>
+        <button class="photo new-reference" data-category="crossbow" data-photo="28"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105035.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105035.jpg" alt="弩俯视图" loading="lazy"></div><span><b>28</b> 弩 · 俯视图 <i>↗</i></span></button>
+        <button class="photo new-reference" data-category="crossbow" data-photo="29"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105040.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105040.jpg" alt="弩底部" loading="lazy"></div><span><b>29</b> 弩 · 底部 <i>↗</i></span></button>
+        <button class="photo new-reference" data-category="crossbow" data-photo="30"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105111.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105111.jpg" alt="弩变形状态" loading="lazy"></div><span><b>30</b> 弩 · 变形状态 <i>↗</i></span></button>
         <button class="photo new-reference" data-category="modern-tank" data-photo="31"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105132.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105132.jpg" alt="新型坦克左侧结构参考照片" loading="lazy"></div><span><b>31</b> 新型坦克 · 左侧结构 <i>↗</i></span></button>
         <button class="photo new-reference" data-category="modern-tank" data-photo="32"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105136.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105136.jpg" alt="新型坦克右侧结构参考照片" loading="lazy"></div><span><b>32</b> 新型坦克 · 右侧结构 <i>↗</i></span></button>
         <button class="photo new-reference" data-category="modern-tank" data-photo="33"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105143.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105143.jpg" alt="新型坦克正面炮塔参考照片" loading="lazy"></div><span><b>33</b> 新型坦克 · 正面炮塔 <i>↗</i></span></button>
@@ -170,6 +171,6 @@
   <dialog id="install-dialog" class="install-dialog" aria-labelledby="install-title"><button id="close-install" class="install-close" type="button" aria-label="关闭">×</button><span class="install-mark" aria-hidden="true">▦</span><h2 id="install-title">安装积木档案</h2><p id="install-message">将它放到主屏幕，像应用一样随时打开。</p><ol id="install-steps"><li>在浏览器菜单中选择“安装应用”或“添加到主屏幕”。</li><li>确认安装后，即可从主屏幕进入模型展厅。</li></ol><button id="confirm-install" class="install-confirm" type="button">知道了</button></dialog>
   <div id="toast" role="status" aria-live="polite"></div>
   <noscript><p class="noscript">请开启 JavaScript 以浏览交互式 3D 模型。下方参考照片仍可查看。</p></noscript>
-  <script type="module" src="./main.js?v=15"></script>
+  <script type="module" src="./main.js?v=16"></script>
 </body>
 </html>

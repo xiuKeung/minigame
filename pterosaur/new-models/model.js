@@ -54,30 +54,49 @@ function finish(group,name,description){
 
 export function buildCrossbow(){
  meshes.length=0;const model=new THREE.Group();
- // U-shaped floor stand seen in the front, side and top photographs.
+ // +X points toward the arrowhead. The first four photographs fix the left,
+ // rear, right and front faces; the fifth and sixth reveal the open base.
  for(const side of [-1,1]){
-  box(model,[1.75,.22,.24],[.28,.28,side*.72],'graphite','U-frame side rail');
-  cyl(model,.17,.25,[1.08,.28,side*.72],'graphite','z','Rounded front foot');
-  cyl(model,.17,.25,[-.55,.28,side*.72],'graphite','z','Rounded rear foot');
+  const foot=new THREE.Shape();foot.moveTo(-.9,.18);foot.lineTo(.93,.18);foot.lineTo(1.08,.29);
+  foot.lineTo(1.08,.83);foot.lineTo(.84,.83);foot.lineTo(.78,.69);foot.lineTo(.78,.47);
+  foot.lineTo(-.9,.47);foot.closePath();
+  for(const [x,y] of [[-.74,.325],[-.29,.325],[.17,.325],[.61,.325],[.94,.68]]){
+   const hole=new THREE.Path();hole.absarc(x,y,.088,0,Math.PI*2,true);foot.holes.push(hole);
+  }
+  const geometry=new THREE.ExtrudeGeometry(foot,{depth:.24,bevelEnabled:false});
+  geometry.translate(0,0,side*.71-.12);
+  add(model,geometry,'steel',[0,0,0],'L-shaped perforated side foot');
+  cyl(model,.075,.255,[-.74,.325,side*.71],'blue','z','Rear foot axle pin');
  }
- box(model,[.34,.24,1.68],[-.55,.29,0],'graphite','U-frame cross member');
- for(const z of [-.45,.45]){
-  box(model,[.24,2.15,.24],[-.52,1.38,z],'graphite','Twin elevation upright');
-  for(const y of [.62,1.18,1.74,2.28])cyl(model,.09,.27,[-.52,y,z],'steel','z','Upright pin hole');
+ // Sparse lateral crossbars and two inner rails leave the open underside visible.
+ for(const x of [-.72,.24])box(model,[.2,.19,1.3],[x,.34,0],'steel','Base lateral crossbar');
+ for(const z of [-.24,.24])box(model,[1.24,.15,.17],[-.2,.38,z],'steel','Inner sliding rail');
+ for(const z of [-.33,0,.33]){
+  cyl(model,.098,.205,[.25,.34,z],'graphite','x','Front crossbar opening');
  }
- box(model,[.28,.22,1.1],[-.52,2.44,0],'graphite','Upper yoke');
- beamBetween(model,[.4,.42,-.22],[-.28,1.55,-.22],.18,'graphite','Left elevation brace');
- beamBetween(model,[.4,.42,.22],[-.28,1.55,.22],.18,'graphite','Right elevation brace');
- // The real upper assembly is a narrow arrow cradle, not a horizontal bow wing.
- for(const z of [-.2,.2]){
-  cyl(model,.12,1.02,[.03,1.68,z],'black','x','Launcher tension rail');
-  cyl(model,.18,.28,[.5,1.68,z],'steel','x','Front rail collar');
-  cyl(model,.18,.28,[-.43,1.68,z],'steel','x','Rear rail collar');
+ const hinge=new THREE.Group();hinge.position.set(-.72,.45,0);model.add(hinge);
+ cyl(model,.17,.66,[-.72,.45,0],'blue','z','Fold hinge pin');
+ // A single central, holed Technic upright is visible from the rear and front.
+ const uprightShape=new THREE.Shape();uprightShape.moveTo(-.18,0);uprightShape.lineTo(.18,0);
+ uprightShape.lineTo(.18,1.93);uprightShape.absarc(0,1.93,.18,0,Math.PI,false);
+ uprightShape.lineTo(-.18,0);
+ for(const y of [.21,.52,.83,1.14,1.45,1.76,1.94]){
+  const hole=new THREE.Path();hole.absarc(0,y,.104,0,Math.PI*2,true);uprightShape.holes.push(hole);
  }
- box(model,[.36,.54,.58],[-.55,1.68,0],'graphite','Launcher pivot block');
- cyl(model,.075,2.75,[.92,1.76,0],'graphite','x','Long arrow shaft');
- const tip=add(model,new THREE.ConeGeometry(.15,.5,4),'black',[2.5,1.76,0],'Arrow point');tip.rotation.z=-Math.PI/2;
- return finish(model,'弩','U 形支架托住双立柱升降架，斜撑连接上方长箭发射组件。');
+ const uprightGeometry=new THREE.ExtrudeGeometry(uprightShape,{depth:.27,bevelEnabled:false});
+ uprightGeometry.rotateY(Math.PI/2);uprightGeometry.translate(-.135,0,0);
+ add(hinge,uprightGeometry,'steel',[0,0,0],'Single perforated folding upright');
+ const launcher=new THREE.Group();launcher.position.set(.22,1.58,0);hinge.add(launcher);
+ cyl(launcher,.16,.47,[.06,0,0],'steel','y','Launcher pivot socket');
+ cyl(launcher,.135,.78,[.45,-.21,0],'black','x','Lower tension barrel');
+ cyl(launcher,.068,2.22,[1.14,.12,0],'black','x','Arrow shaft');
+ for(const x of [.18,.79]){
+  cyl(launcher,.17,.31,[x,.12,0],'steel','x','Arrow guide collar');
+  box(launcher,[.18,.24,.25],[x,-.075,0],'steel','Arrow guide support');
+ }
+ const tip=add(launcher,new THREE.ConeGeometry(.115,.42,4),'black',[2.46,.12,0],'Arrow point');tip.rotation.z=-Math.PI/2;
+ const result=finish(model,'弩','单根带孔立梁连接前伸箭杆；左右 L 形支脚形成开放底座，可切换前折的变形姿态。');
+ result.rig={hinge,launcher};return result;
 }
 
 export function buildModernTank(){
