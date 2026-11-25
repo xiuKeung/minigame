@@ -148,7 +148,7 @@ export function buildModernTank(){
   cyl(model,.14,.08,[x,.59,0],'paleBlue','y','Underside axle connector');
   cyl(model,.07,.012,[x,.545,0],'black','y','Underside connector hole');
  }
- const result=finish(model,'新型坦克','带孔双侧履带梁、透明斜面座舱、四角圆筒与可转向、可抬升的分段浅蓝灰主炮。');
+ const result=finish(model,'苍锋坦克','带孔双侧履带梁、透明斜面座舱、四角圆筒与可转向、可抬升的分段浅蓝灰主炮。');
  result.rig={turret,barrel};return result;
 }
 

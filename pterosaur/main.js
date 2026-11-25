@@ -2,7 +2,7 @@ import * as THREE from './vendor/three.module.js';
 import { OrbitControls } from './vendor/OrbitControls.js';
 import { buildModel } from './model.js?v=2';
 import { buildTank } from './tank/model.js?v=1';
-import { startNewModelsShowcase } from './new-models/main.js?v=10';
+import { startNewModelsShowcase } from './new-models/main.js?v=11';
 import { AnimationPlayer, sampleAnimation, CHAPTERS, DURATION } from './animation.js?v=3';
 import { addArchiveLighting, addArchiveStage, createModelFraming, DEFAULT_MODEL_HEADING } from './viewer-framing.js?v=2';
 
@@ -371,6 +371,35 @@ function startTankShowcase() {
 
 const startedViewers = new Set();
 let newModelsViewer;
+let currentView = viewFromHash();
+let viewReady = false;
+function viewFromHash() {
+  if (location.hash === '#games') return 'games';
+  return 'models';
+}
+function ensureSelectedViewer() {
+  const entry = modelRegistry[selectedModel];
+  try {
+    if (entry.section === '#new-models') {
+      if (!newModelsViewer) newModelsViewer = startNewModelsShowcase(selectedModel);
+      else newModelsViewer.select(selectedModel);
+    } else if (!startedViewers.has(entry.section)) {
+      entry.start(); startedViewers.add(entry.section);
+    }
+  } catch (error) { console.error(`3D viewer could not start: ${selectedModel}`, error); toast('模型暂时无法显示，请刷新页面重试'); }
+}
+function showView(view) {
+  currentView = view;
+  viewReady = true;
+  ['models', 'games'].forEach(id => { $(`#${id}`).hidden = id !== view; });
+  $$('.header nav a').forEach(link => {
+    const active = link.hash === `#${view}`;
+    link.classList.toggle('active', active);
+    if (active) link.setAttribute('aria-current', 'page');
+    else link.removeAttribute('aria-current');
+  });
+  if (view === 'models') ensureSelectedViewer();
+}
 function selectModel(id, updateUrl = false) {
   const entry = modelRegistry[id]; if (!entry) return;
   selectedModel = id;
@@ -378,14 +407,7 @@ function selectModel(id, updateUrl = false) {
   ['#exhibit', '#tank-model', '#new-models'].forEach(selector => { $(selector).hidden = selector !== entry.section; });
   $$('[data-model-id]').forEach(button => { const selected = button.dataset.modelId === id; button.classList.toggle('selected', selected); button.setAttribute('aria-pressed', String(selected)); });
   applyPhotoFilter();
-  try {
-    if (entry.section === '#new-models') {
-      if (!newModelsViewer) newModelsViewer = startNewModelsShowcase(id);
-      else newModelsViewer.select(id);
-    } else if (!startedViewers.has(entry.section)) {
-      entry.start(); startedViewers.add(entry.section);
-    }
-  } catch (error) { console.error(`3D viewer could not start: ${id}`, error); toast('模型暂时无法显示，请刷新页面重试'); }
+  if (viewReady && currentView === 'models') ensureSelectedViewer();
   if (updateUrl) { const url = new URL(location.href); url.searchParams.set('model', id); url.hash = 'models'; history.replaceState(null, '', url); }
 }
 $$('[data-model-id]').forEach(button => button.addEventListener('click', () => selectModel(button.dataset.modelId, true)));
@@ -394,4 +416,11 @@ function modelFromUrl() {
   return legacy[location.hash] || (modelRegistry[new URL(location.href).searchParams.get('model')] ? new URL(location.href).searchParams.get('model') : 'carrier');
 }
 selectModel(modelFromUrl());
-window.addEventListener('hashchange', () => { if (['#exhibit', '#tank-model', '#new-models'].includes(location.hash)) selectModel(modelFromUrl()); });
+showView(currentView);
+if (location.hash === '#references') requestAnimationFrame(() => $('#references').scrollIntoView());
+window.addEventListener('hashchange', () => {
+  showView(viewFromHash());
+  if (['#exhibit', '#tank-model', '#new-models'].includes(location.hash)) selectModel(modelFromUrl());
+  if (location.hash === '#references') requestAnimationFrame(() => $('#references').scrollIntoView());
+  else window.scrollTo(0, 0);
+});

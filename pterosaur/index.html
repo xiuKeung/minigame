@@ -12,12 +12,12 @@
   <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="./assets/icon.svg">
   <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="stylesheet" href="./style.css?v=13">
+  <link rel="stylesheet" href="./style.css?v=15">
 </head>
 <body>
   <header class="header">
     <a class="brand" href="./" aria-label="积木档案首页"><span class="brand-icon" aria-hidden="true">▦</span>积木档案<span class="brand-en">BRICK ARCHIVE</span></a>
-    <nav aria-label="页面导航"><a class="active" href="#models">模型库</a><a href="#games">游戏</a><a href="#references">参考照片 <span>47</span></a></nav>
+    <nav aria-label="页面导航"><a class="active" href="#models" aria-current="page">模型库</a><a href="#games">游戏</a></nav>
     <div class="header-actions"><button id="install-app" class="install-button" type="button" aria-haspopup="dialog" title="安装到主屏幕"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v11m-4-4 4 4 4-4M5 16v4h14v-4"/><rect x="4" y="3" width="16" height="18" rx="2"/></svg><span>安装</span></button><span class="header-note"><i></i> 让想象，立体起来</span></div>
   </header>
 
@@ -26,7 +26,7 @@
       <div class="library-heading"><p class="eyebrow">BRICK ARCHIVE / 3D COLLECTION</p><h2 id="models-title">模型库</h2><p>选择模型，查看立体结构与可动部件。</p></div>
       <div class="model-catalog" role="group" aria-label="选择模型">
         <div class="catalog-group"><h3>翼龙战车</h3><button type="button" data-model-id="carrier" class="selected" aria-pressed="true">机械翼龙战车</button></div>
-        <div class="catalog-group"><h3>坦克</h3><button type="button" data-model-id="yellow" aria-pressed="false">黄色双炮坦克</button><button type="button" data-model-id="modern" aria-pressed="false">新型坦克</button></div>
+        <div class="catalog-group"><h3>坦克</h3><button type="button" data-model-id="yellow" aria-pressed="false">黄色双炮坦克</button><button type="button" data-model-id="modern" aria-pressed="false">苍锋坦克</button></div>
         <div class="catalog-group"><h3>机械装备</h3><button type="button" data-model-id="crossbow" aria-pressed="false">弩</button><button type="button" data-model-id="guardian1" aria-pressed="false">守护小坦克 1</button><button type="button" data-model-id="guardian2" aria-pressed="false">守护小坦克 2</button></div>
       </div>
     <section id="exhibit" aria-labelledby="title">
@@ -108,15 +108,15 @@
         </div>
         <aside class="panel new-models-panel" aria-label="新增模型控制">
           <div class="panel-heading"><span class="small-label">模型选择</span></div>
-          <div class="new-model-switch" role="group" aria-label="选择新增模型"><button data-new-model="crossbow" class="selected" aria-pressed="true">弩</button><button data-new-model="modern" aria-pressed="false">新型坦克</button><button data-new-model="guardian1" aria-pressed="false">守护小坦克 1</button><button data-new-model="guardian2" aria-pressed="false">守护小坦克 2</button></div>
+          <div class="new-model-switch" role="group" aria-label="选择新增模型"><button data-new-model="crossbow" class="selected" aria-pressed="true">弩</button><button data-new-model="modern" aria-pressed="false">苍锋坦克</button><button data-new-model="guardian1" aria-pressed="false">守护小坦克 1</button><button data-new-model="guardian2" aria-pressed="false">守护小坦克 2</button></div>
           <div class="divider"></div><h2 id="new-model-name">弩</h2><p class="description" id="new-model-description">单根带孔立梁连接前伸箭杆；左右 L 形支脚形成开放底座，可切换前折的变形姿态。</p>
           <div id="crossbow-controls" class="new-model-controls">
             <div class="new-model-actions"><button id="crossbow-pose" class="crossbow-pose" type="button" aria-pressed="false">变形</button><button id="crossbow-fire" class="crossbow-fire" type="button">发射</button></div>
             <p class="control-hint">变形后可再次点击恢复展开；发射后箭杆自动复位。</p>
           </div>
           <div id="modern-controls" class="new-model-controls" hidden>
-            <div class="slider-heading"><label for="modern-turret">炮塔转向</label><output id="modern-turret-value" for="modern-turret">0°</output></div><input id="modern-turret" type="range" min="-90" max="90" value="0" aria-label="新型坦克炮塔转向">
-            <div class="slider-heading"><label for="modern-barrel">炮管仰角</label><output id="modern-barrel-value" for="modern-barrel">0°</output></div><input id="modern-barrel" type="range" min="0" max="80" value="0" aria-label="新型坦克炮管仰角，零至八十度">
+            <div class="slider-heading"><label for="modern-turret">炮塔转向</label><output id="modern-turret-value" for="modern-turret">0°</output></div><input id="modern-turret" type="range" min="-90" max="90" value="0" aria-label="苍锋坦克炮塔转向">
+            <div class="slider-heading"><label for="modern-barrel">炮管仰角</label><output id="modern-barrel-value" for="modern-barrel">0°</output></div><input id="modern-barrel" type="range" min="0" max="80" value="0" aria-label="苍锋坦克炮管仰角，零至八十度">
             <button id="modern-scan" class="separate-button" type="button" aria-pressed="false"><span>演示炮塔扫描</span><span aria-hidden="true">↗</span></button>
           </div>
           <div id="guardian-controls" class="new-model-controls" hidden>
@@ -129,15 +129,9 @@
       </div>
     </section>
 
-    </section>
-    <section id="games" class="games-library" aria-labelledby="games-title">
-      <div class="library-heading"><p class="eyebrow">BRICK ARCHIVE / PLAY</p><h2 id="games-title">游戏</h2><p>选择一个玩法，带着这些积木模型开始冒险。</p></div>
-      <div class="game-cards"><a href="./game.html"><span>01 / 空中动作</span><h3>空中冒险</h3><p>驾驶翼龙战车穿越障碍。</p><b>进入游戏 ↗</b></a><a href="./rescue/"><span>02 / 双角色协作</span><h3>遗迹救援</h3><p>配合战车与翼龙完成救援。</p><b>进入游戏 ↗</b></a><a href="./galaxian/"><span>03 / 竖屏射击</span><h3>翼龙小蜜蜂</h3><p>驾驶坦克迎战翼龙战车。</p><b>进入游戏 ↗</b></a></div>
-    </section>
-
     <section class="references" id="references" aria-labelledby="references-title">
       <div class="section-heading"><div><p class="eyebrow">BEHIND THE BUILD</p><h2 id="references-title">模型参考照片<span id="photo-count">18</span></h2></div><p>默认展示当前模型的实拍图；也可以查看全部照片。<br>点击照片，查看原始细节。</p></div>
-      <div class="photo-filters" role="group" aria-label="参考照片分类"><button data-filter="current" class="selected" aria-pressed="true">当前模型</button><button data-filter="all" aria-pressed="false">全部 <span>47</span></button><details class="photo-filter-details"><summary>更多分类</summary><div><button data-filter="combined" aria-pressed="false">翼龙战车组合 <span>6</span></button><button data-filter="creature" aria-pressed="false">机械翼龙 <span>6</span></button><button data-filter="chassis" aria-pressed="false">独立战车 <span>6</span></button><button data-filter="tank" aria-pressed="false">黄色双炮坦克 <span>5</span></button><button data-filter="crossbow" aria-pressed="false">弩 <span>7</span></button><button data-filter="modern-tank" aria-pressed="false">新型坦克 <span>6</span></button><button data-filter="guardian-one" aria-pressed="false">守护小坦克 1 <span>5</span></button><button data-filter="guardian-two" aria-pressed="false">守护小坦克 2 <span>6</span></button></div></details></div>
+      <div class="photo-filters" role="group" aria-label="参考照片分类"><button data-filter="current" class="selected" aria-pressed="true">当前模型</button><button data-filter="all" aria-pressed="false">全部 <span>47</span></button><details class="photo-filter-details"><summary>更多分类</summary><div><button data-filter="combined" aria-pressed="false">翼龙战车组合 <span>6</span></button><button data-filter="creature" aria-pressed="false">机械翼龙 <span>6</span></button><button data-filter="chassis" aria-pressed="false">独立战车 <span>6</span></button><button data-filter="tank" aria-pressed="false">黄色双炮坦克 <span>5</span></button><button data-filter="crossbow" aria-pressed="false">弩 <span>7</span></button><button data-filter="modern-tank" aria-pressed="false">苍锋坦克 <span>6</span></button><button data-filter="guardian-one" aria-pressed="false">守护小坦克 1 <span>5</span></button><button data-filter="guardian-two" aria-pressed="false">守护小坦克 2 <span>6</span></button></div></details></div>
       <div class="photo-grid">
         <button class="photo" data-category="combined" data-photo="0"><div><img src="./assets/photos/thumbs/01.jpg" data-full="./assets/photos/01.jpg" alt="机械翼龙战车俯视，车尾朝上" loading="lazy"></div><span><b>01</b> 整体俯视 <i>↗</i></span></button>
         <button class="photo" data-category="combined" data-photo="1"><div><img src="./assets/photos/thumbs/02.jpg" data-full="./assets/photos/02.jpg" alt="机械翼龙战车反向俯视，长喙朝上" loading="lazy"></div><span><b>02</b> 反向俯视 <i>↗</i></span></button>
@@ -170,12 +164,12 @@
         <button class="photo new-reference" data-category="crossbow" data-photo="28"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105035.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105035.jpg" alt="弩俯视图" loading="lazy"></div><span><b>28</b> 弩 · 俯视图 <i>↗</i></span></button>
         <button class="photo new-reference" data-category="crossbow" data-photo="29"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105040.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105040.jpg" alt="弩底部" loading="lazy"></div><span><b>29</b> 弩 · 底部 <i>↗</i></span></button>
         <button class="photo new-reference" data-category="crossbow" data-photo="30"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105111.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105111.jpg" alt="弩变形状态" loading="lazy"></div><span><b>30</b> 弩 · 变形状态 <i>↗</i></span></button>
-        <button class="photo new-reference" data-category="modern-tank" data-photo="31"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105132.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105132.jpg" alt="新型坦克左侧结构参考照片" loading="lazy"></div><span><b>31</b> 新型坦克 · 左侧结构 <i>↗</i></span></button>
-        <button class="photo new-reference" data-category="modern-tank" data-photo="32"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105136.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105136.jpg" alt="新型坦克右侧结构参考照片" loading="lazy"></div><span><b>32</b> 新型坦克 · 右侧结构 <i>↗</i></span></button>
-        <button class="photo new-reference" data-category="modern-tank" data-photo="33"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105143.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105143.jpg" alt="新型坦克正面炮塔参考照片" loading="lazy"></div><span><b>33</b> 新型坦克 · 正面炮塔 <i>↗</i></span></button>
-        <button class="photo new-reference" data-category="modern-tank" data-photo="34"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105147.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105147.jpg" alt="新型坦克后方结构参考照片" loading="lazy"></div><span><b>34</b> 新型坦克 · 后方结构 <i>↗</i></span></button>
-        <button class="photo new-reference" data-category="modern-tank" data-photo="35"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105200.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105200.jpg" alt="新型坦克俯视布局参考照片" loading="lazy"></div><span><b>35</b> 新型坦克 · 俯视布局 <i>↗</i></span></button>
-        <button class="photo new-reference" data-category="modern-tank" data-photo="36"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105205.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105205.jpg" alt="新型坦克底部侧梁参考照片" loading="lazy"></div><span><b>36</b> 新型坦克 · 底部侧梁 <i>↗</i></span></button>
+        <button class="photo new-reference" data-category="modern-tank" data-photo="31"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105132.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105132.jpg" alt="苍锋坦克左侧结构参考照片" loading="lazy"></div><span><b>31</b> 苍锋坦克 · 左侧结构 <i>↗</i></span></button>
+        <button class="photo new-reference" data-category="modern-tank" data-photo="32"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105136.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105136.jpg" alt="苍锋坦克右侧结构参考照片" loading="lazy"></div><span><b>32</b> 苍锋坦克 · 右侧结构 <i>↗</i></span></button>
+        <button class="photo new-reference" data-category="modern-tank" data-photo="33"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105143.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105143.jpg" alt="苍锋坦克正面炮塔参考照片" loading="lazy"></div><span><b>33</b> 苍锋坦克 · 正面炮塔 <i>↗</i></span></button>
+        <button class="photo new-reference" data-category="modern-tank" data-photo="34"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105147.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105147.jpg" alt="苍锋坦克后方结构参考照片" loading="lazy"></div><span><b>34</b> 苍锋坦克 · 后方结构 <i>↗</i></span></button>
+        <button class="photo new-reference" data-category="modern-tank" data-photo="35"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105200.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105200.jpg" alt="苍锋坦克俯视布局参考照片" loading="lazy"></div><span><b>35</b> 苍锋坦克 · 俯视布局 <i>↗</i></span></button>
+        <button class="photo new-reference" data-category="modern-tank" data-photo="36"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105205.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105205.jpg" alt="苍锋坦克底部侧梁参考照片" loading="lazy"></div><span><b>36</b> 苍锋坦克 · 底部侧梁 <i>↗</i></span></button>
         <button class="photo new-reference" data-category="guardian-one" data-photo="37"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105217.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105217.jpg" alt="守护小坦克 1左侧高炮参考照片" loading="lazy"></div><span><b>37</b> 守护小坦克 1 · 左侧高炮 <i>↗</i></span></button>
         <button class="photo new-reference" data-category="guardian-one" data-photo="38"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105224.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105224.jpg" alt="守护小坦克 1右侧高炮参考照片" loading="lazy"></div><span><b>38</b> 守护小坦克 1 · 右侧高炮 <i>↗</i></span></button>
         <button class="photo new-reference" data-category="guardian-one" data-photo="39"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105237.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105237.jpg" alt="守护小坦克 1正面轮廓参考照片" loading="lazy"></div><span><b>39</b> 守护小坦克 1 · 正面轮廓 <i>↗</i></span></button>
@@ -189,12 +183,18 @@
         <button class="photo new-reference" data-category="guardian-two" data-photo="47"><div><img src="./assets/photos/tank2/thumbs/IMG_20261122_105316.jpg" data-full="./assets/photos/tank2/thumbs/IMG_20261122_105316.jpg" alt="守护小坦克 2底部连接参考照片" loading="lazy"></div><span><b>47</b> 守护小坦克 2 · 底部连接 <i>↗</i></span></button>
       </div>
     </section>
+    </section>
+    <section id="games" class="games-library" aria-labelledby="games-title" hidden>
+      <div class="library-heading"><p class="eyebrow">BRICK ARCHIVE / PLAY</p><h2 id="games-title">游戏</h2><p>选择一个玩法，带着这些积木模型开始冒险。</p></div>
+      <div class="game-cards"><a href="./game.html"><span>01 / 空中动作</span><h3>空中冒险</h3><p>驾驶翼龙战车穿越障碍。</p><b>进入游戏 ↗</b></a><a href="./rescue/"><span>02 / 双角色协作</span><h3>遗迹救援</h3><p>配合战车与翼龙完成救援。</p><b>进入游戏 ↗</b></a><a href="./galaxian/"><span>03 / 竖屏射击</span><h3>翼龙小蜜蜂</h3><p>驾驶坦克迎战翼龙战车。</p><b>进入游戏 ↗</b></a></div>
+    </section>
+
     <footer class="footer"><a class="brand" href="#models"><span class="brand-icon" aria-hidden="true">▦</span>积木档案</a><span>小小积木，大大世界。</span><a href="#models">回到模型库 ↑</a></footer>
   </main>
   <dialog id="photo-dialog" aria-label="参考照片大图"><button id="close-photo" class="dialog-close" aria-label="关闭照片">×</button><button id="prev-photo" class="photo-arrow prev" aria-label="上一张照片">←</button><img id="large-photo" alt=""><button id="next-photo" class="photo-arrow next" aria-label="下一张照片">→</button><p id="photo-caption"></p></dialog>
   <dialog id="install-dialog" class="install-dialog" aria-labelledby="install-title"><button id="close-install" class="install-close" type="button" aria-label="关闭">×</button><span class="install-mark" aria-hidden="true">▦</span><h2 id="install-title">安装积木档案</h2><p id="install-message">将它放到主屏幕，像应用一样随时打开。</p><ol id="install-steps"><li>在浏览器菜单中选择“安装应用”或“添加到主屏幕”。</li><li>确认安装后，即可从主屏幕进入模型展厅。</li></ol><button id="confirm-install" class="install-confirm" type="button">知道了</button></dialog>
   <div id="toast" role="status" aria-live="polite"></div>
   <noscript><p class="noscript">请开启 JavaScript 以浏览交互式 3D 模型。下方参考照片仍可查看。</p></noscript>
-  <script type="module" src="./main.js?v=20"></script>
+  <script type="module" src="./main.js?v=22"></script>
 </body>
 </html>
