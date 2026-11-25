@@ -9,6 +9,12 @@ const materials={
   orange:new THREE.MeshStandardMaterial({color:0xee8a36,roughness:.25,metalness:.1,transparent:true,opacity:.73}),
   rubber:new THREE.MeshStandardMaterial({color:0x101315,roughness:.9}),
   lime:new THREE.MeshStandardMaterial({color:0x719257,roughness:.38}),
+  paleBlue:new THREE.MeshStandardMaterial({color:0x9db4bd,roughness:.38,metalness:.08}),
+  cream:new THREE.MeshStandardMaterial({color:0xd9d1ad,roughness:.58}),
+  olive:new THREE.MeshStandardMaterial({color:0x596948,roughness:.58}),
+  purple:new THREE.MeshStandardMaterial({color:0x63407d,roughness:.45}),
+  amber:new THREE.MeshStandardMaterial({color:0xf4942d,roughness:.32,transparent:true,opacity:.78}),
+  glass:new THREE.MeshStandardMaterial({color:0xb8c6d4,roughness:.15,metalness:.02,transparent:true,opacity:.57,side:THREE.DoubleSide,depthWrite:false}),
 };
 const meshes=[];
 function add(parent,geometry,material,position=[0,0,0],name='Brick'){
@@ -76,25 +82,67 @@ export function buildCrossbow(){
 
 export function buildModernTank(){
  meshes.length=0;const model=new THREE.Group();
- // Two thin Technic side frames replace the incorrect solid tracked block.
+ // +X is the nose: the clear sloping cabins and the cannon opening face forward.
+ // The underside photo shows two separate perforated beams, not a solid chassis.
  for(const side of [-1,1]){
-  box(model,[3.35,.2,.18],[0,.27,side*.72],'black','Lower side frame');
-  for(const x of [-.82,0,.82])cyl(model,.16,.2,[x,.29,side*.73],'steel','z','Side frame roller');
-  for(const x of [-1.48,1.48])cyl(model,.25,.38,[x,.72,side*.8],'black','z','Corner tube');
+  const trackShape=new THREE.Shape();trackShape.moveTo(-1.55,.13);trackShape.lineTo(1.55,.13);
+  trackShape.absarc(1.55,.34,.21,-Math.PI/2,Math.PI/2,false);
+  trackShape.lineTo(-1.55,.55);trackShape.absarc(-1.55,.34,.21,Math.PI/2,Math.PI*1.5,false);
+  for(const x of [-1.55,-1.04,-.52,0,.52,1.04,1.55]){
+   const hole=new THREE.Path();hole.absarc(x,.34,.105,0,Math.PI*2,true);trackShape.holes.push(hole);
+  }
+  const trackGeometry=new THREE.ExtrudeGeometry(trackShape,{depth:.2,bevelEnabled:false});
+  trackGeometry.translate(0,0,side*.76-.1);trackGeometry.normalizeNormals();
+  add(model,trackGeometry,'black',[0,0,0],'Perforated Technic track beam');
+  for(const x of [-1.04,-.52,0,.52,1.04]){
+   const ring=add(model,new THREE.TorusGeometry(.11,.025,8,18),'paleBlue',[x,.34,side*.87],'Track axle ring');
+   if(Math.abs(x)>1)box(model,[.055,.21,.018],[x,.34,side*.887],'paleBlue','Track end axle pin');
+  }
+  // The black corner tubes are parallel to the cannon, visible end-on in both end views.
+  for(const x of [-1.54,1.54]){
+   cyl(model,.17,.58,[x,.91,side*.72],'black','x','Longitudinal corner tube');
+   cyl(model,.105,.018,[x+(x>0?.3:-.3),.91,side*.72],'graphite','x','Corner tube opening');
+  }
+  for(const x of [-1.28,1.27]){
+   cyl(model,.22,.34,[x,1.03,side*.68],'paleBlue','y','Open blue corner socket');
+   cyl(model,.125,.014,[x,1.207,side*.68],'graphite','y','Corner socket recess');
+  }
  }
- box(model,[3.2,.24,1.28],[0,.55,0],'graphite','Low tank deck');
- box(model,[.95,.27,1.12],[-.95,.77,0],'steel','Rear armour tiles');
- box(model,[.7,.3,1.02],[.08,.78,0],'black','Central cockpit base');
- for(const side of [-1,1])box(model,[.72,.32,.34],[.25,.91,side*.39],side<0?'orange':'blue','Transparent side canopy');
+ // The side silhouette is low and layered: dark lower rail, tan stripe and pale-blue rear tiles.
+ box(model,[3.2,.12,1.22],[0,.61,0],'black','Open central spine');
  for(const side of [-1,1]){
-  cyl(model,.19,.28,[.92,.92,side*.56],'steel','z','Forward round module');
-  cyl(model,.19,.28,[-1.06,.92,side*.56],'steel','z','Rear round module');
+  box(model,[3.02,.13,.17],[0,.73,side*.55],'olive','Olive hull edge');
+  box(model,[1.45,.2,.14],[.3,.84,side*.57],'cream','Tan side stripe');
+  box(model,[.63,.24,.54],[-.88,.92,side*.36],'paleBlue','Rear roof tile one');
+  box(model,[.48,.24,.54],[-.31,.92,side*.36],'paleBlue','Rear roof tile two');
+  box(model,[.92,.19,.43],[.69,.83,side*.35],'black','Clear cabin sill');
+  const canopyProfile=new THREE.Shape();
+  canopyProfile.moveTo(.18,.92);canopyProfile.lineTo(1.18,.92);
+  canopyProfile.lineTo(.68,1.23);canopyProfile.lineTo(.18,1.23);canopyProfile.closePath();
+  const canopyGeometry=new THREE.ExtrudeGeometry(canopyProfile,{depth:.39,bevelEnabled:false});
+  canopyGeometry.translate(0,0,side*.36-.195);
+  add(model,canopyGeometry,'glass',[0,0,0],'Sloped clear side canopy');
+  box(model,[.045,.31,.025],[.17,1.075,side*.56],'steel','Cabin rear frame');
+  box(model,[.65,.045,.025],[.51,.91,side*.56],'steel','Cabin lower frame');
  }
- // One long centre cannon is visible in the top and end photographs.
- cyl(model,.18,2.55,[.05,1.2,0],'steel','x','Central long cannon');
- cyl(model,.25,.38,[1.22,1.2,0],'steel','x','Cannon muzzle sleeve');
- cyl(model,.22,.48,[-1.23,1.2,0],'black','x','Cannon rear sleeve');
- return finish(model,'新型坦克','双侧细梁底盘承载透明座舱、四个角部圆筒与中央长炮。');
+ box(model,[.62,.12,.14],[.5,1.28,-.2],'amber','Narrow orange canopy connector');
+ box(model,[.85,.18,.42],[-.62,1.15,0],'purple','Purple cannon support');
+ box(model,[.48,.3,.52],[1.29,.94,0],'cream','Cream nose block');
+ box(model,[.42,.22,.44],[1.47,.75,0],'blue','Blue nose brick');
+ for(const x of [-.75,.48])cyl(model,.19,1.1,[x,1.48,0],'paleBlue','x','Segmented light-blue cannon');
+ cyl(model,.235,.1,[-.14,1.48,0],'steel','x','Cannon segment seam');
+ cyl(model,.235,.27,[-.27,1.48,0],'paleBlue','y','Top cannon connector');
+ cyl(model,.115,.015,[-.27,1.625,0],'graphite','y','Top connector recess');
+ cyl(model,.125,.018,[1.05,1.48,0],'black','x','Cannon bore');
+ const muzzleRing=add(model,new THREE.TorusGeometry(.16,.027,8,20),'steel',[1.065,1.48,0],'Cannon muzzle rim');
+ muzzleRing.rotation.y=Math.PI/2;
+ cyl(model,.23,.35,[-1.22,1.37,0],'black','y','Rear vertical socket');
+ cyl(model,.13,.015,[-1.22,1.552,0],'graphite','y','Rear socket recess');
+ for(const x of [-.65,0,.65]){
+  cyl(model,.14,.08,[x,.59,0],'paleBlue','y','Underside axle connector');
+  cyl(model,.07,.012,[x,.545,0],'black','y','Underside connector hole');
+ }
+ return finish(model,'新型坦克','带孔双侧履带梁、透明斜面座舱、四角圆筒与分段浅蓝灰主炮。');
 }
 
 export function buildGuardianOne(){
