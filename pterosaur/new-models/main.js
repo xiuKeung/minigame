@@ -8,7 +8,7 @@ const $=selector=>document.querySelector(selector);
 async function toggleFullscreen(element){
  try{if(document.fullscreenElement)await document.exitFullscreen();else if(element.requestFullscreen)await element.requestFullscreen();}catch{ /* Browser may deny fullscreen outside a user gesture. */ }
 }
-export function startNewModelsShowcase(){
+export function startNewModelsShowcase(initialKey='crossbow'){
  const root=$('#new-models');if(!root)return;
  const host=$('#new-models-canvas-host'),scene=new THREE.Scene();scene.background=new THREE.Color('#eeefe9');scene.fog=new THREE.Fog('#eeefe9',32,70);
  const renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:'high-performance'});renderer.setPixelRatio(Math.min(devicePixelRatio,1.7));renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;host.append(renderer.domElement);
@@ -23,7 +23,7 @@ export function startNewModelsShowcase(){
   if(current)scene.remove(current.model);const entry=registry[key],result=entry.build();current=result;selectedKey=key;folded=false;foldAmount=0;shotTime=0;stopScan();current.model.rotation.y=DEFAULT_MODEL_HEADING;scene.add(current.model);
   if(stage)Object.values(stage).forEach(part=>scene.remove(part));framing=createModelFraming({camera,controls,model:current.model});stage=addArchiveStage(scene,framing.frame);
   current.materials&&Object.values(current.materials).forEach(mat=>mat.wireframe=wire);
-  $('#new-model-name').textContent=current.model.name;$('#new-model-description').textContent=current.description;const download=$('#new-model-download');download.href=`./assets/${entry.file}.glb`;download.download=`${entry.file}.glb`;$('#new-model-mesh-count').textContent=`${current.meshCount} 个几何部件`;
+  $('#new-model-name').textContent=current.model.name;$('#new-models-title').innerHTML=`${current.model.name}<span class="title-dot">.</span>`;$('#new-model-subtitle').textContent=current.description;$('#new-model-description').textContent=current.description;const download=$('#new-model-download');download.href=`./assets/${entry.file}.glb`;download.download=`${entry.file}.glb`;$('#new-model-mesh-count').textContent=`${current.meshCount} 个几何部件`;
   $('#crossbow-controls').hidden=key!=='crossbow';$('#modern-controls').hidden=key!=='modern';$('#guardian-controls').hidden=!key.startsWith('guardian');
   crossbowPose.setAttribute('aria-pressed','false');crossbowPose.textContent='变形';crossbowFire.disabled=false;
   setAngle(modernTurret,$('#modern-turret-value'),0);setAngle(modernBarrel,$('#modern-barrel-value'),0);
@@ -66,5 +66,6 @@ export function startNewModelsShowcase(){
   if(cameraMotion){camera.position.lerp(cameraMotion.position,.09);controls.target.lerp(cameraMotion.target,.09);if(camera.position.distanceTo(cameraMotion.position)<.02){camera.position.copy(cameraMotion.position);controls.target.copy(cameraMotion.target);cameraMotion=null;}}
   controls.update();renderer.render(scene,camera);
  }
- select('crossbow');resize();requestAnimationFrame(frame);
+ select(registry[initialKey]?initialKey:'crossbow');resize();requestAnimationFrame(frame);
+ return {select};
 }

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'brick-archive-shell-v2';
+const CACHE_NAME = 'brick-archive-shell-v3';
 const SHELL = ['./index.html', './assets/icon.svg', './manifest.webmanifest'];
 
 self.addEventListener('install', event => {

@@ -2,7 +2,7 @@ import * as THREE from './vendor/three.module.js';
 import { OrbitControls } from './vendor/OrbitControls.js';
 import { buildModel } from './model.js?v=2';
 import { buildTank } from './tank/model.js?v=1';
-import { startNewModelsShowcase } from './new-models/main.js?v=9';
+import { startNewModelsShowcase } from './new-models/main.js?v=10';
 import { AnimationPlayer, sampleAnimation, CHAPTERS, DURATION } from './animation.js?v=3';
 import { addArchiveLighting, addArchiveStage, createModelFraming, DEFAULT_MODEL_HEADING } from './viewer-framing.js?v=2';
 
@@ -76,23 +76,36 @@ setupInstall();
 const photos = $$('.photo');
 const dialog = $('#photo-dialog');
 let currentPhoto = 0;
-let photoCategory = 'all';
-function filteredPhotos() { return photos.filter(p => photoCategory === 'all' || p.dataset.category === photoCategory); }
+let selectedModel = 'carrier';
+let photoCategory = 'current';
+const modelRegistry = {
+  carrier: {section: '#exhibit', photos: ['combined', 'creature', 'chassis'], start: startGallery},
+  yellow: {section: '#tank-model', photos: ['tank'], start: startTankShowcase},
+  modern: {section: '#new-models', photos: ['modern-tank']},
+  crossbow: {section: '#new-models', photos: ['crossbow']},
+  guardian1: {section: '#new-models', photos: ['guardian-one']},
+  guardian2: {section: '#new-models', photos: ['guardian-two']}
+};
+function photoVisible(photo) { return photoCategory === 'all' || (photoCategory === 'current' ? modelRegistry[selectedModel].photos.includes(photo.dataset.category) : photo.dataset.category === photoCategory); }
+function filteredPhotos() { return photos.filter(photoVisible); }
+function applyPhotoFilter() {
+  photos.forEach(p => { const hidden = !photoVisible(p); p.toggleAttribute('hidden', hidden); p.setAttribute('aria-hidden', String(hidden)); });
+  $$('[data-filter]').forEach(button => { const selected = button.dataset.filter === photoCategory; button.classList.toggle('selected', selected); button.setAttribute('aria-pressed', String(selected)); });
+  $('#photo-count').textContent = String(filteredPhotos().length);
+}
 function nextPhoto(direction) {
   const filtered = filteredPhotos();
   const index = filtered.indexOf(photos[currentPhoto]);
   showPhoto(photos.indexOf(filtered[(index + direction + filtered.length) % filtered.length]));
 }
-$$('[data-filter]').forEach(button => button.addEventListener('click', () => {
-  photoCategory = button.dataset.filter;
-  photos.forEach(p => { const hidden = photoCategory !== 'all' && p.dataset.category !== photoCategory; p.toggleAttribute('hidden', hidden); p.setAttribute('aria-hidden', String(hidden)); });
-  $$('[data-filter]').forEach(b => { const selected = b === button; b.classList.toggle('selected', selected); b.setAttribute('aria-pressed', selected); });
-}));
+$$('[data-filter]').forEach(button => button.addEventListener('click', () => { photoCategory = button.dataset.filter; applyPhotoFilter(); }));
+applyPhotoFilter();
 function showPhoto(index) {
   currentPhoto = (index + photos.length) % photos.length;
   const source = photos[currentPhoto].querySelector('img');
   $('#large-photo').src = source.dataset.full || source.src; $('#large-photo').alt = source.alt;
-  $('#photo-caption').textContent = `${String(currentPhoto + 1).padStart(2, '0')} / ${photos.length} · ${photos[currentPhoto].querySelector('span').textContent.replace(/\d|↗/g, '').trim()}`;
+  const visible = filteredPhotos();
+  $('#photo-caption').textContent = `${String(visible.indexOf(photos[currentPhoto]) + 1).padStart(2, '0')} / ${visible.length} · ${photos[currentPhoto].querySelector('span').textContent.replace(/\d|↗/g, '').trim()}`;
   if (!dialog.open) dialog.showModal();
 }
 photos.forEach((p, i) => p.addEventListener('click', () => showPhoto(i)));
@@ -356,32 +369,29 @@ function startTankShowcase() {
   requestAnimationFrame(frame);
 }
 
-function startWhenNear(selector, start) {
-  const target = $(selector); if (!target) return;
-  let started = false;
-  const run = () => {
-    if (started) return; started = true;
-    try { start(); } catch (error) { console.error(`3D viewer could not start: ${selector}`, error); }
-  };
-  if (location.hash === selector || target.getBoundingClientRect().top < innerHeight + 700) { run(); return; }
-  if (!('IntersectionObserver' in window)) { run(); return; }
-  const observer = new IntersectionObserver(entries => {
-    if (!entries.some(entry => entry.isIntersecting)) return;
-    observer.disconnect(); run();
-  }, { rootMargin: '620px 0px' });
-  observer.observe(target);
-  window.addEventListener('hashchange', () => { if (location.hash === selector) { observer.disconnect(); run(); } });
+const startedViewers = new Set();
+let newModelsViewer;
+function selectModel(id, updateUrl = false) {
+  const entry = modelRegistry[id]; if (!entry) return;
+  selectedModel = id;
+  photoCategory = 'current';
+  ['#exhibit', '#tank-model', '#new-models'].forEach(selector => { $(selector).hidden = selector !== entry.section; });
+  $$('[data-model-id]').forEach(button => { const selected = button.dataset.modelId === id; button.classList.toggle('selected', selected); button.setAttribute('aria-pressed', String(selected)); });
+  applyPhotoFilter();
+  try {
+    if (entry.section === '#new-models') {
+      if (!newModelsViewer) newModelsViewer = startNewModelsShowcase(id);
+      else newModelsViewer.select(id);
+    } else if (!startedViewers.has(entry.section)) {
+      entry.start(); startedViewers.add(entry.section);
+    }
+  } catch (error) { console.error(`3D viewer could not start: ${id}`, error); toast('模型暂时无法显示，请刷新页面重试'); }
+  if (updateUrl) { const url = new URL(location.href); url.searchParams.set('model', id); url.hash = 'models'; history.replaceState(null, '', url); }
 }
-
-try {
-  // Keep the above-the-fold winged carrier responsive; the two lower viewers
-  // allocate WebGL contexts only when the visitor is about to reach them.
-  startWhenNear('#exhibit', startGallery);
-  startWhenNear('#tank-model', startTankShowcase);
-  startWhenNear('#new-models', startNewModelsShowcase);
-} catch (error) {
-  console.error('3D gallery could not start:', error);
-  loading.innerHTML = '<span>当前设备暂时无法显示 3D。请使用支持 WebGL 的浏览器，或下载模型查看。</span>';
-  loading.style.padding = '35px'; loading.style.textAlign = 'center';
-  $$('.panel button, .panel input, .view-tools button, .views button').forEach(control => { control.disabled = true; });
+$$('[data-model-id]').forEach(button => button.addEventListener('click', () => selectModel(button.dataset.modelId, true)));
+function modelFromUrl() {
+  const legacy = {'#exhibit': 'carrier', '#tank-model': 'yellow', '#new-models': 'crossbow'};
+  return legacy[location.hash] || (modelRegistry[new URL(location.href).searchParams.get('model')] ? new URL(location.href).searchParams.get('model') : 'carrier');
 }
+selectModel(modelFromUrl());
+window.addEventListener('hashchange', () => { if (['#exhibit', '#tank-model', '#new-models'].includes(location.hash)) selectModel(modelFromUrl()); });
