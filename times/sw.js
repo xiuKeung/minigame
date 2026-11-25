@@ -1,5 +1,5 @@
-const CACHE = 'times-planet-v3';
-const ASSETS = ['./', './index.html', './style.css', './game.js', './install.js', './manifest.webmanifest', '../assets/times-mark.svg', '../assets/times-mark-180.png', '../assets/times-mark-192.png', '../assets/times-mark-512.png'];
+const CACHE = 'times-planet-v4';
+const ASSETS = ['./', './index.html', './style.css', './game.js', './install.js', './manifest.webmanifest', '../assets/times-mark.svg', '../assets/times-mark-180.png', '../assets/times-mark-192.png', '../assets/times-mark-512.png', '../assets/times-mark-maskable-192.png', '../assets/times-mark-maskable-512.png'];
 
 self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting())));
 self.addEventListener('activate', event => event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key.startsWith('times-planet-') && key !== CACHE).map(key => caches.delete(key)))).then(() => self.clients.claim())));
