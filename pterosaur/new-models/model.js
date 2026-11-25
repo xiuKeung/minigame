@@ -10,6 +10,7 @@ const materials={
   rubber:new THREE.MeshStandardMaterial({color:0x101315,roughness:.9}),
   lime:new THREE.MeshStandardMaterial({color:0x719257,roughness:.38}),
   paleBlue:new THREE.MeshStandardMaterial({color:0x9db4bd,roughness:.38,metalness:.08}),
+  guardianGray:new THREE.MeshStandardMaterial({color:0x61727c,roughness:.52,metalness:.05}),
   cream:new THREE.MeshStandardMaterial({color:0xd9d1ad,roughness:.58}),
   olive:new THREE.MeshStandardMaterial({color:0x596948,roughness:.58}),
   purple:new THREE.MeshStandardMaterial({color:0x63407d,roughness:.45}),
@@ -43,10 +44,6 @@ function trackedBase(parent,{length=3.2,width=1.7,wheelCount=4,redHubs=false}={}
    cyl(parent,.12,.315,[x,.4,side*(width/2+.055)],redHubs?'red':'steel','z','Track hub');
   }
  }
-}
-function slope(parent,width,height,length,position,material='graphite',name='Sloped armour'){
- const shape=new THREE.Shape();shape.moveTo(-length/2,0);shape.lineTo(length/2,0);shape.lineTo(length/2,height);shape.lineTo(-length*.22,height);shape.closePath();
- const geo=new THREE.ExtrudeGeometry(shape,{depth:width,bevelEnabled:true,bevelThickness:.02,bevelSize:.02,bevelSegments:1});geo.translate(0,0,-width/2);return add(parent,geo,material,position,name);
 }
 function finish(group,name,description){
  group.name=name;group.userData={name,description,materials,meshCount:meshes.length};return {model:group,materials,meshCount:meshes.length,description};
@@ -181,14 +178,25 @@ export function buildGuardianOne(){
 }
 
 export function buildGuardianTwo(){
- meshes.length=0;const model=new THREE.Group();trackedBase(model,{length:2.25,width:1.26,wheelCount:3,redHubs:true});
- box(model,[1.82,.32,1.04],[0,.76,0],'black','Guardian two hull');
- const wedgeGroup=new THREE.Group();wedgeGroup.position.set(-.45,1.02,0);model.add(wedgeGroup);
- slope(wedgeGroup,.86,.72,1.3,[.8,0,0],'graphite','Armoured wedge cannon');
- wedgeGroup.rotation.z=.35;
- box(wedgeGroup,[1.14,.26,.52],[.9,.37,0],'graphite','Wedge top rail');
- cyl(model,.13,.2,[-.72,.93,0],'blue','z','Rear joint');
- for(const side of [-1,1])box(model,[.36,.18,.16],[.65,.93,side*.53],'graphite','Side guard');
- const result=finish(model,'守护小坦克 2','紧凑的低矮履带车，采用仰角可调的楔形炮体。');
- result.rig={barrel:wedgeGroup,defaultElevation:20};return result;
+ meshes.length=0;const model=new THREE.Group();
+ // The six views show a compact open carriage, not tracks or a wedge cannon.
+ for(const side of [-1,1]){
+  const z=side*.52;
+  box(model,[1.74,.32,.25],[0,.36,z],'guardianGray','Rounded grey side rail');
+  for(const x of [-.87,.87])cyl(model,.16,.25,[x,.36,z],'guardianGray','z','Rounded rail end');
+  box(model,[1.21,.12,.12],[.02,.56,z],'guardianGray','Raised rail lip');
+  box(model,[.3,.11,.12],[-.36,.13,z],'black','Inner carriage brace');
+  box(model,[.06,.29,.11],[-.96,.36,z],'red','Rear red cross pin upright');
+  box(model,[.06,.1,.31],[-.96,.36,z],'red','Rear red cross pin arm');
+ }
+ box(model,[1.45,.16,.78],[0,.26,0],'black','Open black carriage floor');
+ box(model,[.35,.48,.74],[-.43,.48,0],'black','Cannon elevation cradle');
+ cyl(model,.23,.77,[-.43,.62,0],'graphite','z','Elevation hinge');
+ const barrel=new THREE.Group();barrel.position.set(-.43,.62,0);barrel.rotation.z=THREE.MathUtils.degToRad(20);model.add(barrel);
+ cyl(barrel,.27,.69,[.34,0,0],'guardianGray','x','Round cannon breech');
+ cyl(barrel,.205,1.22,[1.21,0,0],'guardianGray','x','Round cannon tube');
+ cyl(barrel,.232,.13,[1.75,0,0],'guardianGray','x','Cannon muzzle collar');
+ cyl(barrel,.135,.012,[1.823,0,0],'black','x','Dark cannon bore');
+ const result=finish(model,'守护小坦克 2','灰蓝色双侧支架、黑色中框、红色连接件与可调仰角的圆筒炮管。');
+ result.rig={barrel,defaultElevation:20};return result;
 }
