@@ -1,4 +1,4 @@
-const CACHE = 'times-planet-v2';
+const CACHE = 'times-planet-v3';
 const ASSETS = ['./', './index.html', './style.css', './game.js', './install.js', './manifest.webmanifest', '../assets/times-mark.svg', '../assets/times-mark-180.png', '../assets/times-mark-192.png', '../assets/times-mark-512.png'];
 
 self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)).then(() => self.skipWaiting())));
