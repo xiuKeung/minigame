@@ -31,20 +31,6 @@ function beamBetween(parent,start,end,thickness=.16,material='graphite',name='Te
  const part=add(parent,new THREE.BoxGeometry(length,thickness,thickness),material,a.clone().add(b).multiplyScalar(.5).toArray(),name);
  part.quaternion.setFromUnitVectors(new THREE.Vector3(1,0,0),direction.normalize());return part;
 }
-function wheel(parent,x,z,r=.38){
- cyl(parent,r,.22,[x,.38,z],'rubber','z','Wheel with tread');cyl(parent,r*.5,.235,[x,.38,z],'steel','z','Wheel hub');
-}
-function trackedBase(parent,{length=3.2,width=1.7,wheelCount=4,redHubs=false}={}){
- box(parent,[length,.22,width],[0,.38,0],'black','Lower chassis');
- for(const side of [-1,1]){
-  box(parent,[length+.14,.42,.26],[0,.4,side*(width/2+.03)],'rubber','Track');
-  for(let i=0;i<wheelCount;i++){
-   const x=-length*.37+i*(length*.74/Math.max(1,wheelCount-1));
-   cyl(parent,.25,.3,[x,.4,side*(width/2+.05)],'rubber','z','Track roller');
-   cyl(parent,.12,.315,[x,.4,side*(width/2+.055)],redHubs?'red':'steel','z','Track hub');
-  }
- }
-}
 function finish(group,name,description){
  group.name=name;group.userData={name,description,materials,meshCount:meshes.length};return {model:group,materials,meshCount:meshes.length,description};
 }
@@ -167,13 +153,28 @@ export function buildModernTank(){
 }
 
 export function buildGuardianOne(){
- meshes.length=0;const model=new THREE.Group();trackedBase(model,{length:2.3,width:1.28,wheelCount:3,redHubs:true});
- box(model,[1.75,.35,1.05],[0,.77,0],'black','Guardian one hull');
- const mount=new THREE.Group();mount.position.set(-.1,.98,0);model.add(mount);cyl(mount,.22,.72,[0,.12,0],'graphite','z','Cannon pivot');
- const cannon=new THREE.Group();cannon.position.set(.08,.12,0);cannon.rotation.z=.62;mount.add(cannon);
- box(cannon,[1.55,.32,.42],[.62,0,0],'graphite','Raised cannon');cyl(cannon,.11,.72,[1.58,0,0],'black','x','Cannon muzzle');
- for(const side of [-1,1])cyl(model,.16,.19,[.72,.95,side*.51],'red','z','Signal hub');
- const result=finish(model,'守护小坦克 1','红色轮毂的小型履带守卫车，炮管仰角可调。');
+ meshes.length=0;const model=new THREE.Group();
+ // The photographed unit is a small open cannon carriage, without tracks or wheels.
+ for(const side of [-1,1]){
+  const z=side*.46;
+  box(model,[1.16,.28,.24],[0,.31,z],'black','Short black side foot');
+  for(const x of [-.58,.58])cyl(model,.14,.24,[x,.31,z],'black','z','Rounded foot end');
+  box(model,[.26,.11,.12],[-.31,.13,z],'graphite','Foot inner support');
+  box(model,[.05,.24,.1],[-.55,.31,side*.59],'red','Red cross pin upright');
+  box(model,[.05,.08,.26],[-.55,.31,side*.59],'red','Red cross pin arm');
+  cyl(model,.13,.012,[.46,.31,side*.585],'graphite','z','Open side pin');
+ }
+ box(model,[.42,.34,.66],[-.29,.43,0],'guardianGray','Blue grey central connector');
+ box(model,[.52,.18,.68],[.03,.29,0],'black','Open carriage crosspiece');
+ cyl(model,.24,.7,[-.32,.62,0],'graphite','z','Cannon elevation pivot');
+ const cannon=new THREE.Group();cannon.position.set(-.32,.62,0);cannon.rotation.z=THREE.MathUtils.degToRad(35);model.add(cannon);
+ cyl(cannon,.24,.61,[.29,0,0],'black','x','Round cannon breech');
+ cyl(cannon,.27,.09,[.59,0,0],'graphite','x','Cannon breech collar');
+ cyl(cannon,.17,1.13,[1.18,0,0],'black','x','Long round cannon barrel');
+ cyl(cannon,.19,.07,[1.72,0,0],'graphite','x','Cannon muzzle rim');
+ cyl(cannon,.115,.012,[1.762,0,0],'black','x','Recessed muzzle bore');
+ box(cannon,[.58,.015,.045],[1.36,.17,0],'graphite','Narrow barrel top slot');
+ const result=finish(model,'守护小坦克 1','短黑色双侧支架、灰蓝色连接块、红色十字销与可调仰角的黑色圆炮管。');
  result.rig={barrel:cannon,defaultElevation:35};return result;
 }
 

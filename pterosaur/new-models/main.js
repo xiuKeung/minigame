@@ -1,7 +1,7 @@
 import * as THREE from '../vendor/three.module.js';
 import {OrbitControls} from '../vendor/OrbitControls.js';
 import {addArchiveLighting,addArchiveStage,createModelFraming,DEFAULT_MODEL_HEADING} from '../viewer-framing.js?v=3';
-import {buildCrossbow,buildModernTank,buildGuardianOne,buildGuardianTwo} from './model.js?v=7';
+import {buildCrossbow,buildModernTank,buildGuardianOne,buildGuardianTwo} from './model.js?v=8';
 
 const registry={crossbow:{build:buildCrossbow,file:'crossbow'},modern:{build:buildModernTank,file:'modern-tank'},guardian1:{build:buildGuardianOne,file:'guardian-tank-1'},guardian2:{build:buildGuardianTwo,file:'guardian-tank-2'}};
 const $=selector=>document.querySelector(selector);
@@ -31,12 +31,6 @@ export function startNewModelsShowcase(){
   root.querySelectorAll('[data-new-model]').forEach(button=>{const on=button.dataset.newModel===key;button.classList.toggle('selected',on);button.setAttribute('aria-pressed',String(on));});moveCamera('perspective',true);
  }
  function moveCamera(next,instant=false){view=next;root.querySelectorAll('[data-new-view]').forEach(button=>{const on=button.dataset.newView===next;button.classList.toggle('selected',on);button.setAttribute('aria-pressed',String(on));});if(!framing)return;const pose=framing.pose(next);if(instant){camera.position.copy(pose.position);controls.target.copy(pose.target);controls.update();cameraMotion=null;}else cameraMotion=pose;}
- function keepModelInFrame(){
-  const direction=camera.position.clone().sub(controls.target).normalize();
-  framing.refresh();const required=framing.pose(view).position.distanceTo(framing.frame.center);
-  const distance=Math.max(required,camera.position.distanceTo(controls.target));
-  controls.target.copy(framing.frame.center);camera.position.copy(controls.target).addScaledVector(direction,distance);cameraMotion=null;controls.update();
- }
  function setAuto(value){auto=value;controls.autoRotate=value;$('#new-models-rotate').setAttribute('aria-checked',String(value));}
  function setWire(value){wire=value;if(current)Object.values(current.materials).forEach(mat=>mat.wireframe=value);$('#new-models-wireframe').setAttribute('aria-checked',String(value));}
  root.querySelectorAll('[data-new-model]').forEach(button=>button.addEventListener('click',()=>select(button.dataset.newModel)));
@@ -45,9 +39,9 @@ export function startNewModelsShowcase(){
  });
  crossbowFire.addEventListener('click',()=>{if(selectedKey!=='crossbow'||shotTime)return;shotTime=.001;crossbowFire.disabled=true;});
  modernTurret.addEventListener('input',()=>{if(selectedKey!=='modern')return;stopScan();current.rig.turret.rotation.y=THREE.MathUtils.degToRad(Number(modernTurret.value));setAngle(modernTurret,$('#modern-turret-value'),modernTurret.value);});
- modernBarrel.addEventListener('input',()=>{if(selectedKey!=='modern')return;stopScan();current.rig.barrel.rotation.z=THREE.MathUtils.degToRad(Number(modernBarrel.value));setAngle(modernBarrel,$('#modern-barrel-value'),modernBarrel.value);keepModelInFrame();});
+ modernBarrel.addEventListener('input',()=>{if(selectedKey!=='modern')return;stopScan();current.rig.barrel.rotation.z=THREE.MathUtils.degToRad(Number(modernBarrel.value));setAngle(modernBarrel,$('#modern-barrel-value'),modernBarrel.value);});
  modernScan.addEventListener('click',()=>{if(selectedKey!=='modern')return;scanning=!scanning;modernScan.setAttribute('aria-pressed',String(scanning));});
- guardianBarrel.addEventListener('input',()=>{if(!selectedKey.startsWith('guardian'))return;current.rig.barrel.rotation.z=THREE.MathUtils.degToRad(Number(guardianBarrel.value));setAngle(guardianBarrel,$('#guardian-barrel-value'),guardianBarrel.value);keepModelInFrame();});
+ guardianBarrel.addEventListener('input',()=>{if(!selectedKey.startsWith('guardian'))return;current.rig.barrel.rotation.z=THREE.MathUtils.degToRad(Number(guardianBarrel.value));setAngle(guardianBarrel,$('#guardian-barrel-value'),guardianBarrel.value);});
  root.querySelectorAll('[data-new-view]').forEach(button=>button.addEventListener('click',()=>{setAuto(false);moveCamera(button.dataset.newView);}));
  $('#new-models-rotate').addEventListener('click',()=>setAuto(!auto));$('#new-models-wireframe').addEventListener('click',()=>setWire(!wire));
  $('#new-models-reset').addEventListener('click',()=>{current.model.rotation.y=DEFAULT_MODEL_HEADING;setAuto(false);setWire(false);moveCamera('perspective');});
