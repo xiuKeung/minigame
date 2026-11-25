@@ -9,7 +9,7 @@
   "background_color": "#fff8e8",
   "theme_color": "#fff8e8",
   "icons": [
-    {"src":"../assets/minigame-mark-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
-    {"src":"../assets/minigame-mark-512.png","sizes":"512x512","type":"image/png","purpose":"any"}
+    {"src":"../assets/times-mark-192.png","sizes":"192x192","type":"image/png","purpose":"any"},
+    {"src":"../assets/times-mark-512.png","sizes":"512x512","type":"image/png","purpose":"any"}
   ]
 }
