@@ -6,10 +6,13 @@ function chantFor(a, b) { const answer = a * b; const product = answer === 10 ? 
 const facts = Array.from({ length: 9 }, (_, i) => i + 1).flatMap(a =>
   Array.from({ length: 9 }, (_, i) => i + 1).filter(b => b >= a).map(b => ({ a, b, answer: a * b, chant: chantFor(a, b) }))
 );
-const state = { screen: 'home', difficulty: 'easy', playMode: 'practice', selectedFactors: [2,3,4,5,6,7,8,9], lessonGroup: 2, lessonIndex: 0, seconds: DURATION, score: 0, total: 0, roundSize: 0, misses: [], coverageQueue: [], reviewQueue: [], timer: null, nextQuestionTimer: null, question: null, inputValue: '', skipGameAnimation: false, locked: false, startedAt: null, calendarMonth: new Date(new Date().getFullYear(), new Date().getMonth(), 1), calendarDate: null };
+function readSetup() { try { const value = JSON.parse(localStorage.getItem('times-setup') || '{}'); const factors = [...new Set((Array.isArray(value.selectedFactors) ? value.selectedFactors : []).map(Number).filter(n => n >= 2 && n <= 9))].sort((a, b) => a - b); return { difficulty: ['easy', 'middle', 'hard'].includes(value.difficulty) ? value.difficulty : 'easy', playMode: ['practice', 'challenge'].includes(value.playMode) ? value.playMode : 'practice', selectedFactors: factors.length ? factors : [2] }; } catch { return { difficulty: 'easy', playMode: 'practice', selectedFactors: [2] }; } }
+const savedSetup = readSetup();
+const state = { screen: 'home', difficulty: savedSetup.difficulty, playMode: savedSetup.playMode, selectedFactors: savedSetup.selectedFactors, lessonGroup: 2, lessonIndex: 0, seconds: DURATION, score: 0, total: 0, roundSize: 0, misses: [], coverageQueue: [], reviewQueue: [], timer: null, nextQuestionTimer: null, question: null, inputValue: '', skipGameAnimation: false, locked: false, startedAt: null, calendarMonth: new Date(new Date().getFullYear(), new Date().getMonth(), 1), calendarDate: null };
 const saved = JSON.parse(localStorage.getItem('times-progress') || '{"learned":[]}');
 const history = readHistory();
 function save() { localStorage.setItem('times-progress', JSON.stringify(saved)); }
+function saveSetup() { try { localStorage.setItem('times-setup', JSON.stringify({ difficulty: state.difficulty, playMode: state.playMode, selectedFactors: state.selectedFactors })); } catch {} }
 function readHistory() { try { const value = JSON.parse(localStorage.getItem('times-history') || '[]'); return Array.isArray(value) ? value : []; } catch { return []; } }
 function saveHistory() { localStorage.setItem('times-history', JSON.stringify(history)); }
 function localDateKey(date = new Date()) { const y = date.getFullYear(), m = String(date.getMonth() + 1).padStart(2, '0'), d = String(date.getDate()).padStart(2, '0'); return `${y}-${m}-${d}`; }
@@ -39,8 +42,8 @@ function headerBar(title, back) { return `<header class="topbar"><button class="
 function difficulty() {
   const data = [{id:'easy', name:'容易'}, {id:'middle', name:'中等'}, {id:'hard', name:'困难'}];
   const modes = [{id:'practice', name:'练习一轮'}, {id:'challenge', name:'3 分钟挑战'}];
-  const help = `<div id="setup-help" class="setup-help-modal hidden" role="dialog" aria-modal="true" aria-labelledby="setup-help-title"><div class="setup-help-card"><button class="setup-help-close" data-action="setup-help-close" aria-label="关闭说明">×</button><p class="eyebrow">玩法说明</p><h2 id="setup-help-title">怎么选择？</h2><section><h3>难度</h3><p><b>容易：</b>选择答案和补全算式，每题 2 个选项。</p><p><b>中等：</b>在容易的题型上加入“找出错误”，每题 4 个选项。</p><p><b>困难：</b>在中等的题型上加入手填答案，算式顺序也会随机变化，每题 4 个选项。</p></section><section><h3>挑战方式</h3><p><b>练习一轮：</b>按已选范围逐条练习；答错的口诀会在最后继续复习，直到答对。</p><p><b>3 分钟挑战：</b>三分钟内持续出题；完成一轮后会重新出题，挑战更多答对题数。</p></section><button class="primary" data-action="setup-help-close">知道了</button></div></div>`;
-  app.innerHTML = shell(`${headerBar('','home')}<div class="panel center"><p class="eyebrow">开始闯关</p><div class="setup-heading"><h2>难度选择</h2><button class="setup-help" data-action="setup-help" aria-label="查看难度和挑战方式说明">?</button></div><div class="difficulty">${data.map(d => `<button class="${state.difficulty === d.id ? 'active' : ''}" data-difficulty="${d.id}"><span><b>${d.name}</b></span><span>${state.difficulty === d.id ? '✓' : ''}</span></button>`).join('')}</div><div class="play-mode-picker"><div class="factor-heading"><span>挑战方式</span></div>${modes.map(mode => `<button class="${state.playMode === mode.id ? 'active' : ''}" data-play-mode="${mode.id}"><span><b>${mode.name}</b></span><span>${state.playMode === mode.id ? '✓' : ''}</span></button>`).join('')}</div><div class="factor-picker"><div class="factor-heading"><span>练习范围</span><small>可只选一个数</small></div><div class="factor-options">${Array.from({length:8},(_,i)=>i+2).map(n => `<button class="${state.selectedFactors.includes(n) ? 'active' : ''}" data-factor="${n}" aria-pressed="${state.selectedFactors.includes(n)}"><span>${n}</span><span class="factor-check">${state.selectedFactors.includes(n) ? '✓' : ''}</span></button>`).join('')}</div></div><button class="primary" data-action="start-game">出发！</button></div>${help}`);
+  const help = `<div id="setup-help" class="setup-help-modal hidden" role="dialog" aria-modal="true" aria-labelledby="setup-help-title"><div class="setup-help-card"><button class="setup-help-close" data-action="setup-help-close" aria-label="关闭说明">×</button><p class="eyebrow">玩法说明</p><h2 id="setup-help-title">怎么选择？</h2><section><h3>难度</h3><ul class="setup-help-list"><li><b>容易：</b>选择答案和补全算式，每题 2 个选项。</li><li><b>中等：</b>在容易题型上加入“找出错误”，每题 4 个选项。</li><li><b>困难：</b>在中等题型上加入手填答案；算式顺序会随机变化，每题 4 个选项。</li></ul></section><section><h3>挑战方式</h3><ul class="setup-help-list"><li><b>练习一轮：</b>按已选范围逐条练习；答错的口诀会继续复习，直到答对。</li><li><b>3 分钟挑战：</b>三分钟内持续出题；完成一轮后会重新出题，挑战更多答对题数。</li></ul></section><button class="primary" data-action="setup-help-close">知道了</button></div></div>`;
+  app.innerHTML = shell(`${headerBar('','home')}<div class="panel center"><div class="setup-heading"><h2>难度选择</h2><button class="setup-help" data-action="setup-help" aria-label="查看难度和挑战方式说明">?</button></div><div class="difficulty">${data.map(d => `<button class="${state.difficulty === d.id ? 'active' : ''}" data-difficulty="${d.id}"><span><b>${d.name}</b></span><span>${state.difficulty === d.id ? '✓' : ''}</span></button>`).join('')}</div><div class="play-mode-picker"><div class="factor-heading"><span>挑战方式</span></div>${modes.map(mode => `<button class="${state.playMode === mode.id ? 'active' : ''}" data-play-mode="${mode.id}"><span><b>${mode.name}</b></span><span>${state.playMode === mode.id ? '✓' : ''}</span></button>`).join('')}</div><div class="factor-picker"><div class="factor-heading"><span>练习范围</span><small>可只选一个数</small></div><div class="factor-options">${Array.from({length:8},(_,i)=>i+2).map(n => `<button class="${state.selectedFactors.includes(n) ? 'active' : ''}" data-factor="${n}" aria-pressed="${state.selectedFactors.includes(n)}"><span>${n}</span><span class="factor-check">${state.selectedFactors.includes(n) ? '✓' : ''}</span></button>`).join('')}</div></div><button class="primary" data-action="start-game">出发！</button></div>${help}`);
 }
 function learnMenu() {
   const allChants = Array.from({length:8}, (_, i) => i + 2).map(group => {
@@ -52,7 +55,7 @@ function learnMenu() {
 function lessonFacts() { return facts.filter(f => f.a === state.lessonGroup); }
 function lesson() {
   const items = lessonFacts(), f = items[state.lessonIndex];
-  app.innerHTML = shell(`${headerBar('口诀课堂','learn')}<div class="lesson-progress"><span style="width:${((state.lessonIndex+1)/items.length)*100}%"></span></div><p class="center subtitle">第 ${state.lessonIndex+1} 条 / 共 ${items.length} 条</p><article class="panel lesson-card center"><p class="lesson-label">${cn(state.lessonGroup)}的口诀</p><p class="equation">${factText(f)}</p><p class="chant">${f.chant}</p><p class="subtitle">看一看，念一念</p></article><section class="lesson-overview" aria-label="本组口诀总览"><p>本组口诀</p><div>${items.map((item, index) => `<span class="${index === state.lessonIndex ? 'current' : ''}">${item.chant}</span>`).join('')}</div></section><div class="lesson-actions"><button class="secondary" data-action="lesson-prev">上一条</button><button class="primary" data-action="lesson-next">${state.lessonIndex === items.length-1 ? '学完啦！' : '下一条'}</button><button class="secondary" data-action="lesson-repeat">再看一次</button></div>`);
+  app.innerHTML = shell(`${headerBar('口诀课堂','learn')}<div class="lesson-progress"><span style="width:${((state.lessonIndex+1)/items.length)*100}%"></span></div><p class="center subtitle">第 ${state.lessonIndex+1} 条 / 共 ${items.length} 条</p><article class="panel lesson-card center"><p class="lesson-label">${cn(state.lessonGroup)}的口诀</p><p class="equation">${factText(f)}</p><p class="chant">${f.chant}</p><p class="subtitle">看一看，念一念</p></article><section class="lesson-overview" aria-label="本组口诀总览"><p>本组口诀</p><div>${items.map((item, index) => `<span class="${index === state.lessonIndex ? 'current' : ''}">${item.chant}</span>`).join('')}</div></section><div class="lesson-actions"><button class="secondary" data-action="lesson-prev">上一条</button><button class="primary" data-action="lesson-next">${state.lessonIndex === items.length-1 ? '学完啦！' : '下一条'}</button></div>`);
 }
 function availableFacts() {
   return facts.filter(f => state.selectedFactors.includes(f.a) || state.selectedFactors.includes(f.b));
@@ -85,7 +88,7 @@ function game() {
   const gameClass = state.skipGameAnimation ? 'game-screen no-animate' : 'game-screen';
   state.skipGameAnimation = false;
   const gameStatus = state.playMode === 'challenge' ? `<div class="challenge-status"><div class="timer-wrap"><div class="timer-bar" style="width:${(state.seconds/DURATION)*100}%"></div></div><span class="timer">${formatTime(state.seconds)}</span></div>` : `<div class="practice-progress"><span>${q.phase === 'review' ? '错题复习' : '完整覆盖'}</span><strong>${q.phase === 'review' ? `剩余 ${state.reviewQueue.length + 1} 题` : `${state.roundSize - state.coverageQueue.length} / ${state.roundSize}`}</strong></div>`;
-  app.innerHTML = shell(`<div id="confetti" class="confetti" aria-hidden="true"></div><div class="game-top"><button class="pause-btn" data-action="pause" aria-label="暂停游戏">Ⅱ <span>暂停</span></button>${gameStatus}<span class="score">✦ ${state.score}</span></div>${gameQuestion(q)}<div id="feedback" class="feedback">认真看题，再选出答案吧。</div><div id="pause" class="pause hidden"><div class="panel center"><p class="eyebrow">已暂停</p><h2>休息一下吧</h2><p class="subtitle">准备好后继续挑战</p><button class="primary" data-action="resume">继续游戏</button><button class="muted-btn" data-go="home">结束本局</button></div></div>`, gameClass);
+  app.innerHTML = shell(`<div id="confetti" class="confetti" aria-hidden="true"></div><div class="game-top"><button class="pause-btn" data-action="pause" aria-label="暂停游戏">Ⅱ <span>暂停</span></button>${gameStatus}<span class="score">✦ ${state.score}</span></div>${gameQuestion(q)}<div id="feedback" class="feedback">认真看题，再选出答案吧。</div><div id="pause" class="pause hidden"><div class="panel center"><p class="eyebrow">已暂停</p><h2>休息一下吧</h2><p class="subtitle">准备好后继续挑战</p><button class="primary" data-action="resume">继续游戏</button><button class="muted-btn" data-go="difficulty">结束本局</button></div></div>`, gameClass);
   if (state.playMode === 'challenge') startTimer();
 }
 function gameQuestion(q) {
@@ -137,6 +140,7 @@ document.addEventListener('click', e => {
   if(el.dataset.calendarDate) { state.calendarDate = el.dataset.calendarDate; render(); return; }
   if(el.dataset.difficulty) {
     state.difficulty = el.dataset.difficulty;
+    saveSetup();
     document.querySelectorAll('[data-difficulty]').forEach(button => {
       const selected = button.dataset.difficulty === state.difficulty;
       button.classList.toggle('active', selected);
@@ -146,6 +150,7 @@ document.addEventListener('click', e => {
   }
   if(el.dataset.playMode) {
     state.playMode = el.dataset.playMode;
+    saveSetup();
     document.querySelectorAll('[data-play-mode]').forEach(button => {
       const selected = button.dataset.playMode === state.playMode;
       button.classList.toggle('active', selected);
@@ -158,6 +163,7 @@ document.addEventListener('click', e => {
     const selected = state.selectedFactors.includes(factor);
     if (selected && state.selectedFactors.length === 1) return;
     state.selectedFactors = selected ? state.selectedFactors.filter(n => n !== factor) : [...state.selectedFactors, factor].sort((a, b) => a - b);
+    saveSetup();
     document.querySelectorAll('[data-factor]').forEach(button => {
       const active = state.selectedFactors.includes(Number(button.dataset.factor));
       button.classList.toggle('active', active);
@@ -183,7 +189,6 @@ document.addEventListener('click', e => {
   if(el.dataset.action==='setup-help-close') { document.querySelector('#setup-help')?.classList.add('hidden'); document.body.classList.remove('modal-open'); return; }
   if(el.dataset.action==='start-game') return startGame();
   if(el.dataset.action==='lesson-prev') { state.lessonIndex=Math.max(0,state.lessonIndex-1); render(); return; }
-  if(el.dataset.action==='lesson-repeat') return render();
   if(el.dataset.action==='lesson-next') { const items=lessonFacts(); if(state.lessonIndex < items.length-1) state.lessonIndex++; else { if(!saved.learned.includes(state.lessonGroup)) saved.learned.push(state.lessonGroup); save(); state.screen='learn'; } render(); return; }
   if(el.dataset.action==='pause') { clearInterval(state.timer); document.querySelector('#pause').classList.remove('hidden'); return; }
   if(el.dataset.action==='resume') { document.querySelector('#pause').classList.add('hidden'); if (state.playMode === 'challenge') startTimer(); return; }
@@ -198,8 +203,8 @@ function calendar() {
   const monthTitle = `${year}年${monthIndex + 1}月`;
   const days = Array.from({ length: firstDay + daysInMonth }, (_, index) => {
     if (index < firstDay) return '<span class="calendar-blank" aria-hidden="true"></span>';
-    const day = index - firstDay + 1, key = localDateKey(new Date(year, monthIndex, day)), sessions = byDate[key] || [], correct = sessions.reduce((sum, item) => sum + item.correct, 0), total = sessions.reduce((sum, item) => sum + item.total, 0), active = state.calendarDate === key;
-    return `<button class="calendar-day ${sessions.length ? 'has-record' : ''} ${active ? 'selected' : ''}" data-calendar-date="${key}" aria-label="${dayLabel(key)}${sessions.length ? `，${sessions.length}局` : '，无记录'}"><b>${day}</b>${sessions.length ? `<span>${sessions.length}局</span><i class="${total && correct / total >= .8 ? 'great' : ''}"></i>` : ''}</button>`;
+    const day = index - firstDay + 1, key = localDateKey(new Date(year, monthIndex, day)), sessions = byDate[key] || [], correct = sessions.reduce((sum, item) => sum + item.correct, 0), total = sessions.reduce((sum, item) => sum + item.total, 0), active = state.calendarDate === key, today = key === localDateKey();
+    return `<button class="calendar-day ${sessions.length ? 'has-record' : ''} ${active ? 'selected' : ''} ${today ? 'today' : ''}" data-calendar-date="${key}" aria-label="${dayLabel(key)}${sessions.length ? `，${sessions.length}局` : '，无记录'}"><b>${day}</b>${sessions.length ? `<span>${sessions.length}局</span><i class="${total && correct / total >= .8 ? 'great' : ''}"></i>` : ''}</button>`;
   }).join('');
   const selectedIsInMonth = state.calendarDate && parseDateKey(state.calendarDate).getFullYear() === year && parseDateKey(state.calendarDate).getMonth() === monthIndex;
   const chosenDate = selectedIsInMonth && byDate[state.calendarDate] ? state.calendarDate : Object.keys(byDate).find(key => parseDateKey(key).getFullYear() === year && parseDateKey(key).getMonth() === monthIndex) || null;
