@@ -23,6 +23,9 @@ function unique(items) { return [...new Set(items)]; }
 function factText(f) { return `${f.a} × ${f.b} = ${f.answer}`; }
 function shell(content, cls = '') { return `<div class="stars"></div><section class="screen ${cls}">${content}</section>`; }
 function render() {
+  const playing = state.screen === 'game';
+  document.documentElement.classList.toggle('game-active', playing);
+  document.body.classList.toggle('game-active', playing);
   clearInterval(state.timer); state.timer = null;
   if (state.screen === 'home') return home();
   if (state.screen === 'calendar') return calendar();
@@ -133,9 +136,12 @@ function celebrate() { const box = document.querySelector('#confetti'); if (!box
 function resolve(correct, message) { if(state.locked) return; state.locked=true; document.querySelectorAll('.answer, .keypad button').forEach(b=>b.classList.add('disabled')); state.total++; if(correct) { state.score++; feedback('答对啦！继续加油 ✦','good'); celebrate(); } else { state.misses.push(state.question.f); if (!state.reviewQueue.some(f => factKey(f) === factKey(state.question.f))) state.reviewQueue.push(state.question.f); feedback(message || `答案是 <b>${factText(state.question.f)}</b>，${state.question.f.chant}。`,'bad'); } state.nextQuestionTimer = setTimeout(()=>{ if(state.screen !== 'game' || (state.playMode === 'challenge' && state.seconds <= 0)) return; state.question = null; state.skipGameAnimation = true; render(); }, correct ? 700 : 1700); }
 function updateInputAnswer() { const display = document.querySelector('#input-answer'); if (display) display.textContent = state.inputValue || '?'; }
 function startGame() { clearTimeout(state.nextQuestionTimer); state.nextQuestionTimer=null; state.screen='game'; state.seconds=DURATION; state.score=0; state.total=0; state.roundSize=0; state.misses=[]; state.coverageQueue=[]; state.reviewQueue=[]; state.question=null; state.startedAt=Date.now(); render(); }
+let touchStartX = 0, touchStartY = 0;
+app.addEventListener('touchstart', event => { if (state.screen !== 'game' || event.touches.length !== 1) return; touchStartX = event.touches[0].clientX; touchStartY = event.touches[0].clientY; }, { passive: true });
+app.addEventListener('touchmove', event => { if (state.screen !== 'game' || event.touches.length !== 1) return; const dx = event.touches[0].clientX - touchStartX, dy = event.touches[0].clientY - touchStartY; if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) event.preventDefault(); }, { passive: false });
 document.addEventListener('click', e => {
   const el=e.target.closest('button'); if(!el) return;
-  if(el.dataset.go) { state.screen=el.dataset.go; render(); return; }
+  if(el.dataset.go) { state.screen=el.dataset.go; if (state.screen === 'calendar') { const today = new Date(); state.calendarMonth = new Date(today.getFullYear(), today.getMonth(), 1); state.calendarDate = localDateKey(today); } render(); return; }
   if(el.dataset.calendarMonth) { state.calendarMonth = new Date(state.calendarMonth.getFullYear(), state.calendarMonth.getMonth() + Number(el.dataset.calendarMonth), 1); render(); return; }
   if(el.dataset.calendarDate) { state.calendarDate = el.dataset.calendarDate; render(); return; }
   if(el.dataset.difficulty) {
@@ -210,7 +216,7 @@ function calendar() {
   const chosenDate = selectedIsInMonth ? state.calendarDate : Object.keys(byDate).find(key => parseDateKey(key).getFullYear() === year && parseDateKey(key).getMonth() === monthIndex) || null;
   if (chosenDate !== state.calendarDate) state.calendarDate = chosenDate;
   const detail = chosenDate && byDate[chosenDate] ? calendarDetail(chosenDate, byDate[chosenDate]) : `<div class="calendar-empty"><b>${chosenDate ? '这一天还没有闯关记录' : '这个月还没有闯关记录'}</b><span>完成一局后，它会出现在这里。</span></div>`;
-  app.innerHTML = shell(`${headerBar('练习日历','home')}<section class="calendar"><div class="calendar-summary"><p class="eyebrow">学习足迹</p><h2>每天练一点，口诀记得更牢</h2><p>圆点表示完成记录，绿色代表当天正确率达到 80%。</p></div><div class="calendar-panel"><div class="calendar-month"><button data-calendar-month="-1" aria-label="上一个月">‹</button><h3>${monthTitle}</h3><button data-calendar-month="1" aria-label="下一个月">›</button></div><div class="calendar-weekdays"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div><div class="calendar-grid">${days}</div></div><section class="calendar-detail"><h3>${chosenDate ? dayLabel(chosenDate) : '当天详情'}</h3>${detail}</section></section>`);
+  app.innerHTML = shell(`${headerBar('练习日历','home')}<section class="calendar"><div class="calendar-summary"><p class="eyebrow">学习足迹</p><h2>每天练一点，口诀记得更牢</h2><p>圆点表示完成记录，绿色代表当天正确率达到 80%。</p></div><div class="calendar-panel"><div class="calendar-month"><button data-calendar-month="-1" aria-label="上一个月">‹</button><h3>${monthTitle}</h3><button data-calendar-month="1" aria-label="下一个月">›</button></div><div class="calendar-weekdays"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div><div class="calendar-grid">${days}</div></div><section class="calendar-detail"><h3>${chosenDate ? dayLabel(chosenDate) : '当天详情'}</h3>${detail}</section></section>`, 'calendar-screen no-animate');
 }
 function calendarDetail(key, sessions) {
   const labels = { practice: '练习一轮', challenge: '3 分钟挑战', easy: '容易', middle: '中等', hard: '困难' };
