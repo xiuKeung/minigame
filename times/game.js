@@ -207,9 +207,9 @@ function calendar() {
     return `<button class="calendar-day ${sessions.length ? 'has-record' : ''} ${active ? 'selected' : ''} ${today ? 'today' : ''}" data-calendar-date="${key}" aria-label="${dayLabel(key)}${sessions.length ? `，${sessions.length}局` : '，无记录'}"><b>${day}</b>${sessions.length ? `<span>${sessions.length}局</span><i class="${total && correct / total >= .8 ? 'great' : ''}"></i>` : ''}</button>`;
   }).join('');
   const selectedIsInMonth = state.calendarDate && parseDateKey(state.calendarDate).getFullYear() === year && parseDateKey(state.calendarDate).getMonth() === monthIndex;
-  const chosenDate = selectedIsInMonth && byDate[state.calendarDate] ? state.calendarDate : Object.keys(byDate).find(key => parseDateKey(key).getFullYear() === year && parseDateKey(key).getMonth() === monthIndex) || null;
+  const chosenDate = selectedIsInMonth ? state.calendarDate : Object.keys(byDate).find(key => parseDateKey(key).getFullYear() === year && parseDateKey(key).getMonth() === monthIndex) || null;
   if (chosenDate !== state.calendarDate) state.calendarDate = chosenDate;
-  const detail = chosenDate ? calendarDetail(chosenDate, byDate[chosenDate]) : `<div class="calendar-empty"><b>这个月还没有闯关记录</b><span>完成一局后，它会出现在这里。</span></div>`;
+  const detail = chosenDate && byDate[chosenDate] ? calendarDetail(chosenDate, byDate[chosenDate]) : `<div class="calendar-empty"><b>${chosenDate ? '这一天还没有闯关记录' : '这个月还没有闯关记录'}</b><span>完成一局后，它会出现在这里。</span></div>`;
   app.innerHTML = shell(`${headerBar('练习日历','home')}<section class="calendar"><div class="calendar-summary"><p class="eyebrow">学习足迹</p><h2>每天练一点，口诀记得更牢</h2><p>圆点表示完成记录，绿色代表当天正确率达到 80%。</p></div><div class="calendar-panel"><div class="calendar-month"><button data-calendar-month="-1" aria-label="上一个月">‹</button><h3>${monthTitle}</h3><button data-calendar-month="1" aria-label="下一个月">›</button></div><div class="calendar-weekdays"><span>日</span><span>一</span><span>二</span><span>三</span><span>四</span><span>五</span><span>六</span></div><div class="calendar-grid">${days}</div></div><section class="calendar-detail"><h3>${chosenDate ? dayLabel(chosenDate) : '当天详情'}</h3>${detail}</section></section>`);
 }
 function calendarDetail(key, sessions) {
